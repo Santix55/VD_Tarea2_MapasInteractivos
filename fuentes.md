@@ -11,3 +11,15 @@
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
+
+## Mapa 2: cobertura de internet de alta velocidad por provincia
+
+- **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
+  Dataset XLSX: `cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx`  
+  URL: https://digital.gob.es/content/dam/portal-mtdfp/avance-digital/telecomunicacion-e-infraestructuras-digitales/areas_interes/banda-ancha/cobertura/documents/cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx  
+  Uso: porcentaje provincial de hogares con cobertura de banda ancha fija de al menos 1 Gbps en condiciones de maxima demanda, junio de 2024.
+
+- **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
+  Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
+  URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
+  Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
