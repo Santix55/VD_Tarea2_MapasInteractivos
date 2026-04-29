@@ -23,3 +23,16 @@
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
+
+## Mapa 3: temperatura media anual por provincia
+
+- **NASA POWER - Monthly API**  
+  API JSON: parametro `T2M`, comunidad `SB`, periodo 1995-2024  
+  URL base: https://power.larc.nasa.gov/api/temporal/monthly/point  
+  Documentacion: https://power.larc.nasa.gov/docs/services/api/temporal/monthly/  
+  Uso: temperatura media mensual del aire a 2 metros para el punto representativo de cada provincia; se calcula una media anual ponderada por dias del mes.
+
+- **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
+  Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
+  URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
+  Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
