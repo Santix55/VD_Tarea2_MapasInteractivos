@@ -17,6 +17,23 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson  
   Uso: geometria municipal para crear puntos representativos reales de los municipios con dato de alquiler.
 
+## Mapa 3: accesibilidad laboral a hubs tech/IA
+
+- **Capa metodologica propia de hubs tech/IA**  
+  Dataset generado: `mapa3_hubs_tech.csv`  
+  Hubs: UPV/Valencia, Madrid, Barcelona, Malaga, Bilbao, Sevilla y Zaragoza.  
+  Uso: proxy razonado de proximidad a ecosistemas urbanos de trabajo tecnologico/IA. No representa una fuente oficial de empleo, ofertas laborales ni tiempo real de viaje.
+
+- **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
+  Dataset CSV: `VDP001_01.csv`  
+  URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
+  Uso: alquiler medio ponderado provincial en 2024 como contexto en popups y grafico lateral, no como variable principal de la coropleta.
+
+- **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
+  Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
+  URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
+  Uso: geometria provincial, puntos representativos, calculo de distancias al hub mas cercano y recorte de buffers a Espana.
+
 ## Mapa 4: conectividad para teletrabajo e IA por provincia
 
 - **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
