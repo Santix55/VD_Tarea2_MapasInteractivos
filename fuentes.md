@@ -1,16 +1,21 @@
 # Fuentes utilizadas
 
-## Mapa 1: precio medio de alquiler por provincia
+## Mapa 1: precio actual del alquiler y dispersion interna
 
 - **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
   Dataset CSV: `VDP001_01.csv`  
   URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
-  Uso: precios municipales de alquiler y recuento de viviendas para calcular la media ponderada provincial.
+  Uso: precios municipales de alquiler, percentiles 25/50/75 y recuento de viviendas para calcular medias ponderadas, dispersion y puntos municipales.
 
 - **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
+
+- **Eurostat/GISCO - LAU 2024, escala 1:1M**  
+  Dataset GeoJSON: `LAU_RG_01M_2024_4326.geojson`  
+  URL: https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson  
+  Uso: geometria municipal para crear puntos representativos reales de los municipios con dato de alquiler.
 
 ## Mapa 4: conectividad para teletrabajo e IA por provincia
 
