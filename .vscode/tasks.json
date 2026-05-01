@@ -1,0 +1,107 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Mapa 1: abrir alquiler provincias",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa1_alquiler_provincias.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapa 2: abrir evolucion alquiler",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa2_evolucion_alquiler.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapa 3: abrir accesibilidad laboral tech",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa3_accesibilidad_laboral_tech.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapa 4: abrir conectividad teletrabajo",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa4_conectividad_teletrabajo.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapa 5: abrir confort climatico",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa5_confort_climatico.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapa 6: abrir indice destino tech",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/mapa6_indice_destino_tech.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapas: abrir todos",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/abrir_todos_los_mapas.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mapas: regenerar todos",
+      "type": "shell",
+      "command": "${workspaceFolder}/run/regenerar_todos_los_mapas.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Shell: ejecutar archivo activo",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "${file}"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    }
+  ]
+}
