@@ -17,6 +17,18 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson  
   Uso: geometria municipal para crear puntos representativos reales de los municipios con dato de alquiler.
 
+## Mapa 2: evolucion del alquiler
+
+- **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
+  Dataset CSV: `VDP001_01.csv`  
+  URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
+  Uso: serie municipal de alquiler, mediana de precio y recuento de viviendas para calcular variacion total, crecimiento reciente, crecimiento previo 2011-2019, aceleracion y clases de trayectoria provincial hasta 2024.
+
+- **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
+  Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
+  URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
+  Uso: geometria provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometria insular a provincia.
+
 ## Mapa 3: accesibilidad laboral a hubs tech/IA
 
 - **Capa metodologica propia de hubs tech/IA**  
