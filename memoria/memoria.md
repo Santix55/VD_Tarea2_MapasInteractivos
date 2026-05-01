@@ -118,7 +118,7 @@ El tercer mapa cambia el foco desde la vivienda hacia la accesibilidad laboral. 
 
 Madrid, Bizkaia, Sevilla y Malaga quedan en el primer intervalo de proximidad inmediata. La interpretacion debe ser prudente: el mapa no mide ofertas de empleo reales ni tiempos de viaje por carretera, sino una accesibilidad espacial simplificada a entornos donde es razonable esperar mas actividad tecnologica, universidades, eventos y empresas.
 
-Tecnicas principales: reproyeccion a `EPSG:3035`, `sjoin_nearest()`, buffers de 75, 150, 250 y 400 km, lineas provincia-hub, capas apagables, herramienta de medicion y `Draw(export=True)` en Folium.
+Tecnicas principales: reproyeccion a `EPSG:3035`, `sjoin_nearest()`, anillos de influencia de 50, 100, 175 y 250 km coloreados por hub, lineas provincia-hub, capas apagables, herramienta de medicion y `Draw(export=True)` en Folium.
 
 Salida interactiva: `../3_accesibilidad_laboral_tech/salidas/mapa3_accesibilidad_laboral_tech_interactivo.html`.
 

@@ -377,22 +377,59 @@ def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
             bins[index] = bins[index - 1] + 0.01
     return bins
 
+
+def plot_canary_inset(map_ax: plt.Axes, map_data: gpd.GeoDataFrame) -> None:
+    canary_codes = ["35", "38"]
+    canary_map = map_data[map_data["COD_PROVINCIA"].isin(canary_codes)]
+    if canary_map.empty:
+        return
+
+    canary_ax = map_ax.inset_axes([0.035, 0.055, 0.22, 0.19])
+    canary_map.plot(
+        ax=canary_ax,
+        color=canary_map["readiness_color"],
+        linewidth=0.45,
+        edgecolor="#ffffff",
+    )
+    canary_map.boundary.plot(ax=canary_ax, color="#4f4f4f", linewidth=0.18, alpha=0.6)
+
+    alert = canary_map[canary_map["alert_tech_gap"]].copy()
+    if not alert.empty:
+        alert.plot(
+            ax=canary_ax,
+            facecolor="none",
+            edgecolor="#222222",
+            linewidth=0.0,
+            hatch="////",
+            zorder=3,
+        )
+
+    canary_ax.set_xlim(-18.4, -13.1)
+    canary_ax.set_ylim(27.55, 29.65)
+    canary_ax.set_title("Canarias", fontsize=8.2, pad=2)
+    canary_ax.set_xticks([])
+    canary_ax.set_yticks([])
+    for spine in canary_ax.spines.values():
+        spine.set_edgecolor("#8c8c8c")
+        spine.set_linewidth(0.8)
+
+
 def save_static_map(map_data: gpd.GeoDataFrame) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    fig = plt.figure(figsize=(16, 9.2), dpi=180)
+    fig = plt.figure(figsize=(16, 9.8), dpi=180)
     grid = fig.add_gridspec(
         3,
-        2,
-        width_ratios=[1.48, 0.9],
+        3,
+        width_ratios=[1.25, 1.25, 0.95],
         height_ratios=[0.52, 1, 1],
-        wspace=0.11,
+        wspace=0.18,
         hspace=0.36,
     )
-    map_ax = fig.add_subplot(grid[:, 0])
-    summary_ax = fig.add_subplot(grid[0, 1])
-    gap_ax = fig.add_subplot(grid[1, 1])
-    slope_ax = fig.add_subplot(grid[2, 1])
+    map_ax = fig.add_subplot(grid[:, :2])
+    summary_ax = fig.add_subplot(grid[0, 2])
+    gap_ax = fig.add_subplot(grid[1, 2])
+    slope_ax = fig.add_subplot(grid[2, 2])
 
     map_data.plot(
         ax=map_ax,
@@ -428,22 +465,16 @@ def save_static_map(map_data: gpd.GeoDataFrame) -> None:
             [path_effects.withStroke(linewidth=2.5, foreground="white", alpha=0.96)]
         )
 
+    map_ax.set_xlim(-10.2, 5.0)
+    map_ax.set_ylim(35.0, 44.5)
     map_ax.set_title(
         "Semaforo provincial de aptitud para teletrabajo",
-        fontsize=14,
+        fontsize=16.2,
         fontweight="bold",
-        pad=9,
-    )
-    map_ax.text(
-        0.01,
-        0.94,
-        "Verde/azul: destino apto. Amarillo: revisar. Naranja/granate: riesgo.",
-        transform=map_ax.transAxes,
-        fontsize=8.5,
-        color="#333333",
-        ha="left",
+        pad=12,
     )
     map_ax.set_axis_off()
+    plot_canary_inset(map_ax, map_data)
 
     legend_handles = [
         mpatches.Patch(facecolor=color, edgecolor="#666666", label=label)
@@ -460,7 +491,7 @@ def save_static_map(map_data: gpd.GeoDataFrame) -> None:
     map_ax.legend(
         handles=legend_handles,
         title="Cobertura 1 Gbps",
-        loc="lower left",
+        loc="lower right",
         fontsize=7.6,
         title_fontsize=8.7,
         frameon=True,
@@ -550,9 +581,10 @@ def save_static_map(map_data: gpd.GeoDataFrame) -> None:
 
     fig.suptitle(
         "Mapa 4. Conectividad para teletrabajo e IA",
-        fontsize=18,
+        fontsize=20,
         fontweight="bold",
-        y=0.98,
+        x=0.44,
+        y=0.985,
     )
     fig.text(
         0.02,

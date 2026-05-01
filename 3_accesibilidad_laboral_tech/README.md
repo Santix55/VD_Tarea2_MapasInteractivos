@@ -12,9 +12,9 @@ Este mapa mide la distancia euclidea desde cada provincia espanola al hub de tra
   - `representative_point()` para obtener un punto interior de cada provincia;
   - reproyeccion a `EPSG:3035` para medir distancias en metros;
   - `sjoin_nearest()` para asignar el hub mas cercano;
-  - `buffer()` y `clip()` para crear areas de influencia de 75, 150, 250 y 400 km;
-  - lineas vectoriales entre cada provincia y su hub mas cercano.
-- Clasificacion de la coropleta: 5 intervalos definidos por usuario: `0-75`, `75-150`, `150-250`, `250-400` y `>400 km`.
+  - `buffer()` y `clip()` para crear anillos de influencia de 50, 100, 175 y 250 km, coloreados por hub;
+  - lineas vectoriales coloreadas entre cada provincia y su hub mas cercano.
+- Clasificacion de la coropleta: 5 intervalos definidos por usuario: `0-50`, `50-100`, `100-175`, `175-250` y `>250 km`.
 - Alquiler 2024 de MIVAU: se usa solo como contexto en popups y en el grafico lateral distancia vs alquiler.
 
 Importante: las distancias son euclideas, no tiempos reales de viaje, ni distancia por carretera, ni probabilidad directa de encontrar empleo.
@@ -33,4 +33,4 @@ El script usa los datos ya cacheados en `datos/` y genera:
 - `salidas/mapa3_accesibilidad_laboral_tech_datos.csv`
 - `salidas/mapa3_hubs_tech.csv`
 
-El HTML interactivo incluye coropleta provincial, hubs, buffers, lineas al hub mas cercano, busqueda, medicion, minimapa, pantalla completa, control de capas y herramienta `Draw(export=True)`.
+El HTML interactivo incluye coropleta provincial, hubs, anillos por hub, lineas al hub mas cercano, busqueda, medicion, minimapa, pantalla completa, control de capas y herramienta `Draw(export=True)`.

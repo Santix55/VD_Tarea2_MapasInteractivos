@@ -33,13 +33,13 @@ NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
 PROJECTED_CRS = "EPSG:3035"
 
 PRICE_MEASURES = {"MEDIANA": "median_rent_eur"}
-DISTANCE_BINS = [0, 75, 150, 250, 400, math.inf]
+DISTANCE_BINS = [0, 50, 100, 175, 250, math.inf]
 DISTANCE_LABELS = [
-    "0-75 km - area inmediata",
-    "75-150 km - muy accesible",
-    "150-250 km - accesible",
-    "250-400 km - periferica",
-    ">400 km - alejada",
+    "0-50 km - area inmediata",
+    "50-100 km - muy accesible",
+    "100-175 km - accesible",
+    "175-250 km - periferica",
+    ">250 km - alejada",
 ]
 DISTANCE_COLORS = {
     1: "#1a9850",
@@ -48,12 +48,39 @@ DISTANCE_COLORS = {
     4: "#fc8d59",
     5: "#d73027",
 }
-BUFFER_RADII_KM = [75, 150, 250, 400]
-BUFFER_COLORS = {
-    75: "#1a9850",
-    150: "#5aae61",
-    250: "#fdae61",
-    400: "#d73027",
+HUB_COLORS = {
+    "valencia_upv": "#0072B2",
+    "madrid": "#D55E00",
+    "barcelona": "#009E73",
+    "malaga": "#CC79A7",
+    "bilbao": "#56B4E9",
+    "sevilla": "#E69F00",
+    "zaragoza": "#7F3C8D",
+}
+BUFFER_RADII_KM = [50, 100, 175, 250]
+BUFFER_LINEWIDTHS = {
+    50: 0.55,
+    100: 0.7,
+    175: 0.85,
+    250: 1.0,
+}
+BUFFER_LINESTYLES = {
+    50: ":",
+    100: "--",
+    175: "-.",
+    250: "-",
+}
+BUFFER_OPACITIES = {
+    50: 0.52,
+    100: 0.6,
+    175: 0.68,
+    250: 0.76,
+}
+BUFFER_DASH_ARRAYS = {
+    50: "2 5",
+    100: "5 5",
+    175: "8 5",
+    250: "",
 }
 
 HUBS = [
@@ -221,6 +248,10 @@ def distance_comment(rank: int) -> str:
 
 def load_hubs() -> gpd.GeoDataFrame:
     hubs = pd.DataFrame(HUBS)
+    hubs["hub_color"] = hubs["hub_id"].map(HUB_COLORS)
+    if hubs["hub_color"].isna().any():
+        missing = ", ".join(hubs.loc[hubs["hub_color"].isna(), "hub_id"])
+        raise ValueError(f"Faltan colores para estos hubs: {missing}")
     geometry = [Point(lon, lat) for lon, lat in zip(hubs["longitude"], hubs["latitude"])]
     return gpd.GeoDataFrame(hubs, geometry=geometry, crs="EPSG:4326")
 
@@ -374,10 +405,12 @@ def assign_nearest_hubs(
             {
                 "COD_PROVINCIA": row["COD_PROVINCIA"],
                 "PROVINCIA": row["PROVINCIA"],
+                "nearest_hub_id": row["nearest_hub_id"],
                 "nearest_hub": row["nearest_hub"],
                 "nearest_hub_km": row["nearest_hub_km"],
                 "nearest_hub_km_label": row["nearest_hub_km_label"],
                 "distance_class": row["distance_class"],
+                "line_color": HUB_COLORS[row["nearest_hub_id"]],
                 "geometry": LineString([province_point, hub_point]),
             }
         )
@@ -442,7 +475,7 @@ def validate_dataset(map_data: gpd.GeoDataFrame) -> None:
     outside_immediate = hub_provinces[hub_provinces["distance_rank"].ne(1)]
     if not outside_immediate.empty:
         names = ", ".join(outside_immediate["PROVINCIA"].tolist())
-        raise ValueError(f"Las provincias hub no caen en la clase 0-75 km: {names}")
+        raise ValueError(f"Las provincias hub no caen en la clase 0-50 km: {names}")
 
 
 def distance_legend_handles() -> list[mpatches.Patch]:
@@ -515,21 +548,30 @@ def save_static_map(
 
     for radius in BUFFER_RADII_KM:
         subset = buffers[buffers["radius_km"].eq(radius)]
+        if subset.empty:
+            continue
         subset.boundary.plot(
             ax=map_ax,
-            color=BUFFER_COLORS[radius],
-            linewidth=0.65 if radius < 400 else 0.8,
-            linestyle="--" if radius < 400 else "-",
-            alpha=0.5,
+            color=subset["hub_color"].tolist(),
+            linewidth=BUFFER_LINEWIDTHS[radius],
+            linestyle=BUFFER_LINESTYLES[radius],
+            alpha=BUFFER_OPACITIES[radius],
             zorder=2,
         )
 
     mainland_lines = lines[~lines["COD_PROVINCIA"].isin(["35", "38"])].copy()
-    mainland_lines.plot(ax=map_ax, color="#333333", linewidth=0.5, alpha=0.24, zorder=3)
+    for _, hub_lines in mainland_lines.groupby("nearest_hub_id", sort=False):
+        hub_lines.plot(
+            ax=map_ax,
+            color=hub_lines["line_color"].iloc[0],
+            linewidth=0.55,
+            alpha=0.33,
+            zorder=3,
+        )
     hubs.plot(
         ax=map_ax,
         marker="*",
-        color="#111111",
+        color=hubs["hub_color"].tolist(),
         edgecolor="#ffffff",
         linewidth=0.7,
         markersize=145,
@@ -703,6 +745,16 @@ def add_legend(web_map: folium.Map, year: int) -> None:
         """
         for index, label in enumerate(DISTANCE_LABELS)
     )
+    hub_rows = "".join(
+        f"""
+        <div style="display:flex; align-items:center; gap:5px; white-space:nowrap;">
+          <span style="width:16px; height:3px; background:{HUB_COLORS[hub['hub_id']]};
+                       display:inline-block;"></span>
+          <span>{html.escape(hub['hub_name'])}</span>
+        </div>
+        """
+        for hub in HUBS
+    )
     legend_html = f"""
     <div style="
         position: fixed;
@@ -717,11 +769,16 @@ def add_legend(web_map: folium.Map, year: int) -> None:
         font-size: 12px;
         line-height: 1.35;
         box-shadow: 0 1px 5px rgba(0,0,0,0.18);
-        max-width: 300px;
+        max-width: 330px;
     ">
       <strong>Mapa 3 · accesibilidad tech</strong><br>
       Distancia al hub mas cercano<br>
       {class_rows}
+      <hr style="margin:7px 0;">
+      <strong>Anillos por hub</strong>: 50, 100, 175 y 250 km<br>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2px 9px; margin-top:4px;">
+        {hub_rows}
+      </div>
       <hr style="margin:7px 0;">
       Alquiler {year} solo como contexto.<br>
       Distancia euclidea, no tiempo de viaje.
@@ -782,18 +839,19 @@ def save_interactive_map(
     for radius in BUFFER_RADII_KM:
         subset = buffers[buffers["radius_km"].eq(radius)]
         group = folium.FeatureGroup(
-            name=f"Buffers {radius} km desde hubs",
-            show=radius in (150, 400),
+            name=f"Anillos {radius} km por hub",
+            show=radius in (100, 250),
         )
         folium.GeoJson(
             subset,
-            name=f"Buffers {radius} km",
-            style_function=lambda _, radius=radius: {
-                "fillColor": BUFFER_COLORS[radius],
-                "color": BUFFER_COLORS[radius],
-                "weight": 1.0,
-                "fillOpacity": 0.055,
-                "opacity": 0.62,
+            name=f"Anillos {radius} km",
+            style_function=lambda feature, radius=radius: {
+                "fillColor": feature["properties"]["hub_color"],
+                "color": feature["properties"]["hub_color"],
+                "weight": 1.25,
+                "dashArray": BUFFER_DASH_ARRAYS[radius],
+                "fillOpacity": 0.0,
+                "opacity": BUFFER_OPACITIES[radius],
             },
             tooltip=folium.GeoJsonTooltip(
                 fields=["hub_name", "radius_label"],
@@ -803,11 +861,15 @@ def save_interactive_map(
         ).add_to(group)
         group.add_to(web_map)
 
-    line_group = folium.FeatureGroup(name="Lineas al hub mas cercano", show=False)
+    line_group = folium.FeatureGroup(name="Asignacion provincia-hub (lineas)", show=True)
     folium.GeoJson(
         lines,
         name="Lineas provincia-hub",
-        style_function=lambda _: {"color": "#252525", "weight": 0.75, "opacity": 0.42},
+        style_function=lambda feature: {
+            "color": feature["properties"]["line_color"],
+            "weight": 0.85,
+            "opacity": 0.48,
+        },
         tooltip=folium.GeoJsonTooltip(
             fields=["PROVINCIA", "nearest_hub", "nearest_hub_km_label"],
             aliases=["Provincia", "Hub cercano", "Distancia"],
@@ -829,11 +891,16 @@ def save_interactive_map(
           </table>
         </div>
         """
-        folium.Marker(
+        folium.CircleMarker(
             location=[row.geometry.y, row.geometry.x],
+            radius=8,
             tooltip=row["hub_name"],
             popup=folium.Popup(popup_html, max_width=300),
-            icon=folium.Icon(color="black", icon="briefcase", prefix="fa"),
+            color="#ffffff",
+            weight=1.5,
+            fill=True,
+            fill_color=row["hub_color"],
+            fill_opacity=0.96,
         ).add_to(hub_group)
         folium.Marker(
             location=[row.geometry.y, row.geometry.x],
@@ -844,7 +911,8 @@ def save_interactive_map(
                     min-width: 80px;
                     color: #111;
                     background: rgba(255,255,255,0.86);
-                    border: 1px solid #555;
+                    border: 1px solid {row['hub_color']};
+                    border-left: 5px solid {row['hub_color']};
                     border-radius: 3px;
                     padding: 1px 4px;
                     font-family: Arial, sans-serif;

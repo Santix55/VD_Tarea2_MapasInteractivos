@@ -329,12 +329,78 @@ def color_for_value(value: float, bins: list[float]) -> str:
     return PALETTE[-1]
 
 
+def annotate_temperature_label(
+    ax: plt.Axes,
+    row: pd.Series,
+    season_col: str,
+    fontsize: float = 6.5,
+) -> None:
+    point = row.geometry.representative_point()
+    label = f"{row['province_name']}\n{row[season_col]:.1f} C"
+    text = ax.annotate(
+        label,
+        xy=(point.x, point.y),
+        ha="center",
+        va="center",
+        fontsize=fontsize,
+        color="#111111",
+    )
+    text.set_path_effects(
+        [path_effects.withStroke(linewidth=2.2, foreground="white", alpha=0.95)]
+    )
+
+
+def plot_canary_inset(
+    map_ax: plt.Axes,
+    map_data: gpd.GeoDataFrame,
+    season_col: str,
+    bins: list[float],
+    selected: gpd.GeoDataFrame,
+) -> None:
+    canary_codes = ["35", "38"]
+    canary_map = map_data[map_data["COD_PROVINCIA"].isin(canary_codes)]
+    if canary_map.empty:
+        return
+
+    canary_ax = map_ax.inset_axes([0.035, 0.055, 0.24, 0.2])
+    canary_map.plot(
+        column=season_col,
+        ax=canary_ax,
+        cmap="Spectral_r",
+        scheme="UserDefined",
+        classification_kwds={"bins": bins[1:]},
+        linewidth=0.42,
+        edgecolor="#ffffff",
+        legend=False,
+    )
+    canary_map.boundary.plot(ax=canary_ax, color="#606060", linewidth=0.15, alpha=0.6)
+
+    selected_canary = selected[selected["COD_PROVINCIA"].isin(canary_codes)]
+    for _, row in selected_canary.iterrows():
+        annotate_temperature_label(canary_ax, row, season_col, fontsize=5.9)
+
+    canary_ax.set_xlim(-18.4, -13.1)
+    canary_ax.set_ylim(27.55, 29.65)
+    canary_ax.set_title("Canarias", fontsize=7.4, pad=1.8)
+    canary_ax.set_xticks([])
+    canary_ax.set_yticks([])
+    for spine in canary_ax.spines.values():
+        spine.set_edgecolor("#8c8c8c")
+        spine.set_linewidth(0.75)
+
+
 def save_static_map(map_data: gpd.GeoDataFrame) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     bins = build_temperature_bins(map_data)
     fig = plt.figure(figsize=(16, 10), dpi=180)
-    grid = fig.add_gridspec(2, 3, width_ratios=[1, 1, 0.82], wspace=0.08, hspace=0.22)
+    grid = fig.add_gridspec(
+        2,
+        3,
+        width_ratios=[1.25, 1.25, 0.72],
+        wspace=0.06,
+        hspace=0.18,
+    )
     axes = [
         fig.add_subplot(grid[0, 0]),
         fig.add_subplot(grid[0, 1]),
@@ -358,31 +424,23 @@ def save_static_map(map_data: gpd.GeoDataFrame) -> None:
         )
         map_data.boundary.plot(ax=ax, color="#606060", linewidth=0.12, alpha=0.55)
         ax.set_title(season["label"], fontsize=12, fontweight="bold", pad=7)
+        ax.set_xlim(-10.2, 5.0)
+        ax.set_ylim(35.0, 44.5)
         ax.set_axis_off()
 
         selected = pd.concat([map_data.nlargest(1, season_col), map_data.nsmallest(1, season_col)])
-        for _, row in selected.iterrows():
-            point = row.geometry.representative_point()
-            label = f"{row['province_name']}\n{row[season_col]:.1f} C"
-            text = ax.annotate(
-                label,
-                xy=(point.x, point.y),
-                ha="center",
-                va="center",
-                fontsize=6.5,
-                color="#111111",
-            )
-            text.set_path_effects(
-                [path_effects.withStroke(linewidth=2.2, foreground="white", alpha=0.95)]
-            )
+        selected_main = selected[~selected["COD_PROVINCIA"].isin(["35", "38"])]
+        for _, row in selected_main.iterrows():
+            annotate_temperature_label(ax, row, season_col)
+        plot_canary_inset(ax, map_data, season_col, bins, selected)
 
     ranking = map_data.nlargest(10, "climate_comfort_score").sort_values("climate_comfort_score")
     rank_ax.barh(ranking["province_name"], ranking["climate_comfort_score"], color="#4c956c")
     rank_ax.set_xlim(0, 100)
-    rank_ax.set_title("Top confort anual", fontsize=12, fontweight="bold", pad=8)
-    rank_ax.set_xlabel("Indice 0-100", fontsize=9)
+    rank_ax.set_title("Top confort anual", fontsize=11.5, fontweight="bold", pad=8)
+    rank_ax.set_xlabel("Indice 0-100", fontsize=8.5)
     rank_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    rank_ax.tick_params(axis="both", labelsize=8)
+    rank_ax.tick_params(axis="both", labelsize=7.6)
     for spine in ["top", "right", "left"]:
         rank_ax.spines[spine].set_visible(False)
 

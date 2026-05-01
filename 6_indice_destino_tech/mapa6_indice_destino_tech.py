@@ -605,22 +605,66 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, int, list[float]]:
     return map_data, current_year, bins
 
 
+def plot_canary_inset(
+    map_ax: plt.Axes,
+    map_data: gpd.GeoDataFrame,
+    top_labels: gpd.GeoDataFrame,
+) -> None:
+    canary_codes = ["35", "38"]
+    canary_map = map_data[map_data["COD_PROVINCIA"].isin(canary_codes)]
+    if canary_map.empty:
+        return
+
+    canary_ax = map_ax.inset_axes([0.035, 0.055, 0.22, 0.19])
+    canary_map.plot(
+        ax=canary_ax,
+        color=canary_map["index_color"],
+        linewidth=0.45,
+        edgecolor="#ffffff",
+    )
+    canary_map.boundary.plot(ax=canary_ax, color="#575757", linewidth=0.16, alpha=0.6)
+
+    selected_canary = top_labels[top_labels["COD_PROVINCIA"].isin(canary_codes)]
+    for _, row in selected_canary.iterrows():
+        text = canary_ax.annotate(
+            f"#{int(row['rank_tech'])} {row['province_name']}\n{row['tech_destination_index']:.1f}",
+            xy=(row["label_lon"], row["label_lat"]),
+            ha="center",
+            va="center",
+            fontsize=5.9,
+            color="#111111",
+            zorder=5,
+        )
+        text.set_path_effects(
+            [path_effects.withStroke(linewidth=2.1, foreground="white", alpha=0.96)]
+        )
+
+    canary_ax.set_xlim(-18.4, -13.1)
+    canary_ax.set_ylim(27.55, 29.65)
+    canary_ax.set_title("Canarias", fontsize=8.2, pad=2)
+    canary_ax.set_xticks([])
+    canary_ax.set_yticks([])
+    for spine in canary_ax.spines.values():
+        spine.set_edgecolor("#8c8c8c")
+        spine.set_linewidth(0.8)
+
+
 def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[float]) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    fig = plt.figure(figsize=(16, 9.4), dpi=180)
+    fig = plt.figure(figsize=(16, 9.8), dpi=180)
     grid = fig.add_gridspec(
         3,
-        2,
-        width_ratios=[1.45, 0.92],
+        3,
+        width_ratios=[1.25, 1.25, 0.95],
         height_ratios=[0.42, 1, 1],
-        wspace=0.12,
+        wspace=0.18,
         hspace=0.36,
     )
-    map_ax = fig.add_subplot(grid[:, 0])
-    summary_ax = fig.add_subplot(grid[0, 1])
-    rank_ax = fig.add_subplot(grid[1, 1])
-    breakdown_ax = fig.add_subplot(grid[2, 1])
+    map_ax = fig.add_subplot(grid[:, :2])
+    summary_ax = fig.add_subplot(grid[0, 2])
+    rank_ax = fig.add_subplot(grid[1, 2])
+    breakdown_ax = fig.add_subplot(grid[2, 2])
 
     map_data.plot(
         ax=map_ax,
@@ -631,7 +675,8 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     map_data.boundary.plot(ax=map_ax, color="#575757", linewidth=0.14, alpha=0.55)
 
     top_labels = map_data.nsmallest(8, "rank_tech")
-    for _, row in top_labels.iterrows():
+    top_labels_main = top_labels[~top_labels["COD_PROVINCIA"].isin(["35", "38"])]
+    for _, row in top_labels_main.iterrows():
         text = map_ax.annotate(
             f"#{int(row['rank_tech'])} {row['province_name']}\n{row['tech_destination_index']:.1f}",
             xy=(row["label_lon"], row["label_lat"]),
@@ -645,6 +690,8 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
             [path_effects.withStroke(linewidth=2.4, foreground="white", alpha=0.96)]
         )
 
+    map_ax.set_xlim(-10.2, 5.0)
+    map_ax.set_ylim(35.0, 44.5)
     legend_handles = [
         mpatches.Patch(facecolor=color, edgecolor="#666666", label=label)
         for color, label in zip(INDEX_PALETTE, build_bin_labels(bins))
@@ -652,7 +699,7 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     map_ax.legend(
         handles=legend_handles,
         title="Indice final",
-        loc="lower left",
+        loc="lower right",
         fontsize=7.7,
         title_fontsize=8.8,
         frameon=True,
@@ -660,20 +707,12 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     )
     map_ax.set_title(
         "Equilibrio provincial entre vivienda, conectividad y confort",
-        fontsize=14,
+        fontsize=16.2,
         fontweight="bold",
-        pad=9,
-    )
-    map_ax.text(
-        0.01,
-        0.94,
-        "Puntuacion relativa 0-100: alquiler bajo, subida moderada, disponibilidad, 1 Gbps y clima.",
-        transform=map_ax.transAxes,
-        fontsize=8.5,
-        color="#333333",
-        ha="left",
+        pad=12,
     )
     map_ax.set_axis_off()
+    plot_canary_inset(map_ax, map_data, top_labels)
 
     summary_ax.set_axis_off()
     winner = map_data.nsmallest(1, "rank_tech").iloc[0]
@@ -758,9 +797,10 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
 
     fig.suptitle(
         f"Mapa 6. Indice final de destino residencial tech ({current_year})",
-        fontsize=18,
+        fontsize=20,
         fontweight="bold",
-        y=0.98,
+        x=0.44,
+        y=0.985,
     )
     fig.text(
         0.02,
