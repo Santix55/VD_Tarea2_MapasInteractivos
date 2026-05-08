@@ -1,7 +1,7 @@
 ---
 title: "Dónde vivir después del Máster de IA en la UPV"
 subtitle: "Análisis geoespacial de vivienda, conectividad y calidad de vida en España"
-author: "TODO: Nombre Apellidos"
+author: "Santiago Millán Giner"
 date: "Visualización de datos - Tarea 2"
 lang: es-ES
 toc: true
@@ -168,71 +168,11 @@ La tercera conclusión es que la conectividad abre oportunidades fuera de los gr
 
 La cuarta conclusión es que la proximidad a hubs tecnológicos y el índice final no siempre coinciden. Estar cerca de Madrid, Barcelona, Bilbao, Málaga o Valencia puede mejorar la exposición a empleo, eventos y redes profesionales, pero suele venir acompañado de costes residenciales más altos. El índice final favorece una estrategia distinta: vivir en provincias con buena relación coste-infraestructura y mantener conexión laboral remota o puntual con los hubs.
 
-Como recomendación general, Asturias, Jaén, Ciudad Real, Zamora y Ourense forman un grupo de destinos competitivos bajo los pesos propuestos. No son necesariamente los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, estabilidad relativa, conectividad aceptable y calidad de vida. La decisión final dependería de preferencias personales y del tipo de empleo buscado, pero el análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles.
+Como recomendación general, Asturias, Jaén, Ciudad Real, Zamora y Ourense forman un grupo de destinos competitivos bajo los pesos propuestos. No son necesariamente los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, estabilidad relativa, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
 
-# Limitaciones
+Aun así, la elección final depende mucho de las preferencias de cada persona. No todo el mundo valora igual el ahorro en alquiler, la cercanía a empresas tecnológicas, el clima, el tamaño de la ciudad, la vida cultural, la movilidad, la proximidad a familia y amistades o la posibilidad de construir una red profesional presencial. Para alguien que priorice oportunidades laborales inmediatas, Madrid, Barcelona, Málaga, Bilbao o Valencia pueden seguir siendo opciones muy atractivas aunque tengan peor puntuación residencial. Para otra persona que busque estabilidad económica, menor presión de gasto y buena conexión para trabajar en remoto, provincias con menor coste pueden resultar mucho más adecuadas.
 
-El estudio tiene varias limitaciones que conviene reconocer. En primer lugar, la distancia a hubs tecnológicos es euclídea y no incorpora tiempos reales de transporte, frecuencia ferroviaria, aeropuertos ni red viaria. En segundo lugar, el índice final depende de pesos metodológicos; por eso se incluye una app Streamlit que permite modificarlos. En tercer lugar, el alquiler observado por MIVAU puede no capturar todo el mercado informal o anuncios en tiempo real. Por último, el confort climático se aproxima mediante temperatura media y no incorpora humedad, extremos, calidad del aire ni preferencias subjetivas.
-
-Estas limitaciones no invalidan el análisis, pero delimitan su alcance. El objetivo es apoyar una comparación territorial razonada, no predecir la decisión óptima de cada persona.
-
-# Apéndice técnico
-
-## Librerías utilizadas
-
-Las librerías principales son:
-
-- `pandas` para lectura, limpieza, agregación y normalización.
-- `GeoPandas` para lectura de cartografía, uniones espaciales, reproyecciones y geometría.
-- `matplotlib` y `seaborn` para mapas estáticos y gráficas de apoyo.
-- `mapclassify` para clasificación de coropletas.
-- `folium` y plugins de Folium para mapas interactivos.
-- `streamlit`, `streamlit_folium` y `plotly` para las apps complementarias.
-- `requests` para obtener datos de APIs cuando es necesario.
-- `openpyxl` para leer el libro Excel de conectividad.
-
-## Métodos especiales
-
-Los métodos menos básicos usados en el proyecto son:
-
-- `dissolve()` para agrupar geometrías y ajustar la cartografía a la escala provincial.
-- `representative_point()` para ubicar etiquetas y marcadores dentro de la geometría real.
-- `to_crs()` para cambiar de sistema de referencia antes de calcular distancias.
-- `sjoin_nearest()` para asignar cada provincia al hub tecnológico más cercano.
-- `buffer()` y `clip()` para construir áreas de influencia y recortarlas al territorio español.
-- `TimeSliderChoropleth` para comparar estaciones climáticas en el mapa interactivo.
-- Popups HTML para explicar valores, rankings y recomendaciones sin saturar el mapa.
-- Normalización min-max e inversión de indicadores para construir el índice final.
-
-## Reproducibilidad
-
-Cada mapa vive en su propia carpeta y puede ejecutarse de forma independiente:
-
-```bash
-/home/s/miniconda3/envs/VD/bin/python 1_precio_medio_alquiler_provincia/mapa1_alquiler_provincias.py
-/home/s/miniconda3/envs/VD/bin/python 2_evolucion_alquiler/mapa2_evolucion_alquiler.py
-/home/s/miniconda3/envs/VD/bin/python 3_accesibilidad_laboral_tech/mapa3_accesibilidad_laboral_tech.py
-/home/s/miniconda3/envs/VD/bin/python 4_conectividad_teletrabajo/mapa4_conectividad_teletrabajo.py
-/home/s/miniconda3/envs/VD/bin/python 5_confort_climatico/mapa5_confort_climatico_estacional.py
-/home/s/miniconda3/envs/VD/bin/python 6_indice_destino_tech/mapa6_indice_destino_tech.py
-```
-
-Las apps complementarias se lanzan con:
-
-```bash
-/home/s/miniconda3/envs/VD/bin/python -m streamlit run app_streamlit/mapa2_evolucion_app.py --server.address 127.0.0.1 --server.port 8502
-/home/s/miniconda3/envs/VD/bin/python -m streamlit run app_streamlit/app.py --server.address 127.0.0.1 --server.port 8501
-```
-
-## Entregables asociados
-
-La entrega completa debe incluir:
-
-- Scripts de Python de los seis mapas.
-- Carpeta `datos/` con los datasets necesarios o cacheados.
-- Salidas PNG, PDF, HTML y CSV de cada mapa.
-- PDF final de esta memoria.
-- Presentación 16:9 de entre 5 y 10 minutos.
+Por eso, el índice final debe entenderse como una herramienta de apoyo a la decisión, no como una respuesta única. Su utilidad está en ordenar variables comparables y hacer visibles los compromisos entre vivienda, conectividad, accesibilidad laboral y confort climático. La mejor provincia no es necesariamente la que obtiene la puntuación más alta para todos los casos, sino la que encaja mejor con el proyecto vital y profesional de cada persona.
 
 # Referencias de datos
 
