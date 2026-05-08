@@ -934,7 +934,7 @@ def save_interactive_map(
         geom_type="Polygon",
         position="topleft",
     ).add_to(web_map)
-    plugins.Draw(export=True, position="topleft").add_to(web_map)
+    plugins.Draw(export=False, position="topleft").add_to(web_map)
     plugins.MeasureControl(position="topleft", primary_length_unit="kilometers").add_to(web_map)
     plugins.Fullscreen(position="topright").add_to(web_map)
     plugins.MiniMap(toggle_display=True, minimized=True, position="bottomright").add_to(web_map)

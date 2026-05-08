@@ -33,4 +33,4 @@ El script usa los datos ya cacheados en `datos/` y genera:
 - `salidas/mapa3_accesibilidad_laboral_tech_datos.csv`
 - `salidas/mapa3_hubs_tech.csv`
 
-El HTML interactivo incluye coropleta provincial, hubs, anillos por hub, lineas al hub mas cercano, busqueda, medicion, minimapa, pantalla completa, control de capas y herramienta `Draw(export=True)`.
+El HTML interactivo incluye coropleta provincial, hubs, anillos por hub, lineas al hub mas cercano, busqueda, medicion, minimapa, pantalla completa, control de capas y herramienta de dibujo sin boton de exportacion.

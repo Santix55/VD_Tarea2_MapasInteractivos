@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import os
 import sys
@@ -816,13 +817,13 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     plt.close(fig)
 
 
-class IndexPanelControl(MacroElement):
+class WeightedIndexControl(MacroElement):
     _template = Template(
         """
         {% macro header(this, kwargs) %}
         <style>
           #{{ this._parent.get_name() }} .index-panel {
-            width: 276px;
+            width: 318px;
             max-width: calc(100vw - 34px);
             padding: 10px 12px;
             border: 1px solid rgba(60, 60, 60, 0.55);
@@ -840,30 +841,353 @@ class IndexPanelControl(MacroElement):
             font-size: 12.5px;
             font-weight: 700;
           }
+
+          #{{ this._parent.get_name() }} .index-weight-row {
+            display: grid;
+            grid-template-columns: 102px 1fr 36px;
+            align-items: center;
+            gap: 6px;
+            margin: 6px 0;
+          }
+
+          #{{ this._parent.get_name() }} .index-weight-row label {
+            font-size: 11px;
+            font-weight: 700;
+          }
+
+          #{{ this._parent.get_name() }} .index-weight-row input {
+            width: 100%;
+            accent-color: #018571;
+          }
+
+          #{{ this._parent.get_name() }} .index-weight-value {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+          }
+
+          #{{ this._parent.get_name() }} .index-summary {
+            margin-top: 8px;
+            padding-top: 7px;
+            border-top: 1px solid rgba(0,0,0,0.16);
+          }
+
+          #{{ this._parent.get_name() }} .index-top-list {
+            margin: 5px 0 0 0;
+            padding-left: 18px;
+          }
+
+          #{{ this._parent.get_name() }} .index-top-list li {
+            margin: 2px 0;
+          }
+
+          #{{ this._parent.get_name() }} .index-legend-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 3px 0;
+            font-size: 11px;
+          }
+
+          #{{ this._parent.get_name() }} .index-legend-swatch {
+            width: 18px;
+            height: 12px;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.35);
+          }
+
+          #{{ this._parent.get_name() }} .dynamic-rank-label {
+            background: transparent;
+            border: 0;
+          }
         </style>
         {% endmacro %}
 
         {% macro script(this, kwargs) %}
         (function () {
-          const control = L.control({ position: "bottomright" });
+          const map = {{ this._parent.get_name() }};
+          const indexLayer = {{ this.index_layer_name }};
+          const components = {{ this.components_json | safe }};
+          const palette = {{ this.palette_json | safe }};
+          const labelsLayer = L.layerGroup().addTo(map);
+          const formatter = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 });
+
+          function asNumber(value) {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : 0;
+          }
+
+          function quantileBins(values, classes) {
+            const sorted = values
+              .filter((value) => Number.isFinite(value))
+              .sort((a, b) => a - b);
+            if (!sorted.length) {
+              return [0, 20, 40, 60, 80, 100];
+            }
+            const bins = [];
+            for (let i = 0; i <= classes; i += 1) {
+              const pos = Math.round((sorted.length - 1) * i / classes);
+              bins.push(sorted[pos]);
+            }
+            bins[0] = Math.floor(bins[0] * 10) / 10;
+            bins[bins.length - 1] = Math.ceil(bins[bins.length - 1] * 10) / 10;
+            return bins;
+          }
+
+          function colorForValue(value, bins) {
+            if (!Number.isFinite(value)) {
+              return "#d3d3d3";
+            }
+            for (let i = 0; i < palette.length; i += 1) {
+              if (value <= bins[i + 1]) {
+                return palette[i];
+              }
+            }
+            return palette[palette.length - 1];
+          }
+
+          function binLabel(bins, index) {
+            const low = formatter.format(bins[index]);
+            const high = formatter.format(bins[index + 1]);
+            return `${low} - ${high}`;
+          }
+
+          function readRawWeights(container) {
+            const rawWeights = {};
+            components.forEach((component) => {
+              const input = container.querySelector(`[data-weight="${component.key}"]`);
+              rawWeights[component.key] = asNumber(input.value);
+            });
+            return rawWeights;
+          }
+
+          function normalizeWeights(rawWeights) {
+            const total = Object.values(rawWeights).reduce((acc, value) => acc + value, 0);
+            if (total <= 0) {
+              const equal = 1 / components.length;
+              return {
+                total,
+                normalized: Object.fromEntries(components.map((component) => [component.key, equal])),
+              };
+            }
+            return {
+              total,
+              normalized: Object.fromEntries(
+                components.map((component) => [component.key, rawWeights[component.key] / total])
+              ),
+            };
+          }
+
+          function calculateIndex(properties, weights) {
+            return components.reduce(
+              (acc, component) => acc + asNumber(properties[component.key]) * weights[component.key],
+              0
+            );
+          }
+
+          function popupHtml(properties, weights) {
+            const rows = components.map((component) => {
+              const score = asNumber(properties[component.key]);
+              const contribution = score * weights[component.key];
+              return `<tr><td>${component.label}</td><td style="text-align:right; padding-left:10px;">${formatter.format(score)}</td><td style="text-align:right; padding-left:10px;">${formatter.format(contribution)}</td></tr>`;
+            }).join("");
+            return `
+              <div style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.35; min-width: 260px;">
+                <strong style="font-size: 13px;">${properties.province_name}</strong><br>
+                Indice recalculado: <strong>${formatter.format(properties.dynamic_index)}</strong><br>
+                Ranking recalculado: <strong>#${properties.dynamic_rank}</strong>
+                <hr style="margin: 6px 0;">
+                <table>
+                  <thead><tr><th style="text-align:left;">Componente</th><th>Score</th><th>Aporte</th></tr></thead>
+                  <tbody>${rows}</tbody>
+                </table>
+              </div>
+            `;
+          }
+
+          function tooltipHtml(properties) {
+            return `
+              <div>
+                <strong>${properties.province_name}</strong><br>
+                Ranking: #${properties.dynamic_rank}<br>
+                Indice recalculado: ${formatter.format(properties.dynamic_index)}<br>
+                Alquiler: ${formatter.format(asNumber(properties.rent_eur_month))} EUR/mes<br>
+                Cobertura 1 Gbps: ${formatter.format(asNumber(properties.coverage_1gbps_2024_pct))}%
+              </div>
+            `;
+          }
+
+          function dynamicStyle(properties, bins) {
+            return {
+              fillColor: colorForValue(properties.dynamic_index, bins),
+              color: "#4a4a4a",
+              weight: 0.5,
+              fillOpacity: 0.84,
+            };
+          }
+
+          function updateMap(container) {
+            const rawWeights = readRawWeights(container);
+            const weightInfo = normalizeWeights(rawWeights);
+            const weights = weightInfo.normalized;
+            const rows = [];
+
+            indexLayer.eachLayer((layer) => {
+              const properties = layer.feature.properties;
+              properties.dynamic_index = calculateIndex(properties, weights);
+              rows.push({ layer, properties });
+            });
+
+            rows.sort((a, b) => b.properties.dynamic_index - a.properties.dynamic_index);
+            rows.forEach((row, index) => {
+              row.properties.dynamic_rank = index + 1;
+            });
+
+            const bins = quantileBins(rows.map((row) => row.properties.dynamic_index), 5);
+            rows.forEach((row) => {
+              row.layer.setStyle(dynamicStyle(row.properties, bins));
+              if (row.layer.__dynamicMouseoutHandler) {
+                row.layer.off("mouseout", row.layer.__dynamicMouseoutHandler);
+              }
+              row.layer.__dynamicMouseoutHandler = function () {
+                window.setTimeout(() => row.layer.setStyle(dynamicStyle(row.properties, bins)), 0);
+              };
+              row.layer.on("mouseout", row.layer.__dynamicMouseoutHandler);
+              if (row.layer.getTooltip && row.layer.getTooltip()) {
+                row.layer.setTooltipContent(tooltipHtml(row.properties));
+              } else {
+                row.layer.bindTooltip(tooltipHtml(row.properties), { sticky: false });
+              }
+              if (row.layer.getPopup && row.layer.getPopup()) {
+                row.layer.setPopupContent(popupHtml(row.properties, weights));
+              } else {
+                row.layer.bindPopup(popupHtml(row.properties, weights), { maxWidth: 390 });
+              }
+            });
+
+            labelsLayer.clearLayers();
+            rows.slice(0, 10).forEach((row) => {
+              const properties = row.properties;
+              const lat = Number(properties.label_lat);
+              const lon = Number(properties.label_lon);
+              if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+                return;
+              }
+              const html = `
+                <div style="
+                  min-width: 92px; padding: 2px 5px;
+                  background: rgba(255, 255, 255, 0.90);
+                  border: 1px solid #444; border-radius: 3px;
+                  color: #111; font-family: Arial, sans-serif;
+                  font-size: 10px; font-weight: 700; line-height: 1.15;
+                  text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.25);">
+                  #${properties.dynamic_rank} ${properties.province_name}<br>${formatter.format(properties.dynamic_index)}
+                </div>
+              `;
+              L.marker([lat, lon], {
+                icon: L.divIcon({
+                  html,
+                  className: "dynamic-rank-label",
+                  iconSize: [98, 32],
+                  iconAnchor: [49, 16],
+                }),
+              }).addTo(labelsLayer);
+            });
+
+            components.forEach((component) => {
+              const value = container.querySelector(`[data-value="${component.key}"]`);
+              value.textContent = `${Math.round(rawWeights[component.key])}`;
+            });
+
+            const normalized = components.map((component) => (
+              `${component.label}: ${(weights[component.key] * 100).toFixed(1)}%`
+            )).join(" · ");
+            container.querySelector("[data-summary]").textContent =
+              `Suma bruta: ${weightInfo.total}. Pesos normalizados: ${normalized}`;
+
+            const topList = container.querySelector("[data-top]");
+            topList.innerHTML = rows.slice(0, 5).map((row) => (
+              `<li><strong>#${row.properties.dynamic_rank} ${row.properties.province_name}</strong>: ${formatter.format(row.properties.dynamic_index)}</li>`
+            )).join("");
+
+            const legend = container.querySelector("[data-legend]");
+            legend.innerHTML = palette.map((color, index) => (
+              `<div class="index-legend-row"><span class="index-legend-swatch" style="background:${color};"></span><span>${binLabel(bins, index)}</span></div>`
+            )).join("");
+          }
+
+          const control = L.control({ position: "topright" });
           control.onAdd = function () {
             const container = L.DomUtil.create("div", "index-panel leaflet-control");
             L.DomEvent.disableClickPropagation(container);
             L.DomEvent.disableScrollPropagation(container);
-            container.innerHTML =
-              '<div class="index-panel-title">Formula del indice</div>' +
-              '<div>35% alquiler bajo · 20% subida moderada · 15% disponibilidad · 20% cobertura 1 Gbps · 10% confort climatico.</div>';
+            container.innerHTML = `
+              <div class="index-panel-title">Pesos del indice</div>
+              ${components.map((component) => `
+                <div class="index-weight-row">
+                  <label for="weight-${component.key}">${component.label}</label>
+                  <input id="weight-${component.key}" data-weight="${component.key}" type="range" min="0" max="60" step="1" value="${component.default}">
+                  <span class="index-weight-value" data-value="${component.key}">${component.default}</span>
+                </div>
+              `).join("")}
+              <div class="index-summary" data-summary></div>
+              <div class="index-summary">
+                <div class="index-panel-title">Top 5 recalculado</div>
+                <ol class="index-top-list" data-top></ol>
+              </div>
+              <div class="index-summary">
+                <div class="index-panel-title">Leyenda dinamica</div>
+                <div data-legend></div>
+              </div>
+            `;
+            components.forEach((component) => {
+              container
+                .querySelector(`[data-weight="${component.key}"]`)
+                .addEventListener("input", () => updateMap(container));
+            });
+            window.setTimeout(() => updateMap(container), 0);
             return container;
           };
-          control.addTo({{ this._parent.get_name() }});
+          control.addTo(map);
         })();
         {% endmacro %}
         """
     )
 
-    def __init__(self) -> None:
+    def __init__(self, index_layer: folium.GeoJson) -> None:
         super().__init__()
-        self._name = "IndexPanelControl"
+        self._name = "WeightedIndexControl"
+        self.index_layer_name = index_layer.get_name()
+        self.components_json = json.dumps(
+            [
+                {
+                    "key": "rent_score_low_price",
+                    "label": "Alquiler bajo",
+                    "default": int(WEIGHTS["rent_score_low_price"] * 100),
+                },
+                {
+                    "key": "rent_growth_score",
+                    "label": "Subida moderada",
+                    "default": int(WEIGHTS["rent_growth_score"] * 100),
+                },
+                {
+                    "key": "availability_score",
+                    "label": "Disponibilidad",
+                    "default": int(WEIGHTS["availability_score"] * 100),
+                },
+                {
+                    "key": "connectivity_score",
+                    "label": "Conectividad",
+                    "default": int(WEIGHTS["connectivity_score"] * 100),
+                },
+                {
+                    "key": "climate_score",
+                    "label": "Confort climatico",
+                    "default": int(WEIGHTS["climate_score"] * 100),
+                },
+            ],
+            ensure_ascii=True,
+        )
+        self.palette_json = json.dumps(INDEX_PALETTE)
 
 
 def add_score_layer(
@@ -1041,45 +1365,8 @@ def save_interactive_map(
         bins,
         show=True,
     )
-    add_score_layer(
-        web_map,
-        map_data,
-        "Componente: alquiler bajo",
-        "rent_score_low_price",
-        SCORE_BINS,
-    )
-    add_score_layer(
-        web_map,
-        map_data,
-        "Componente: subida moderada",
-        "rent_growth_score",
-        SCORE_BINS,
-    )
-    add_score_layer(
-        web_map,
-        map_data,
-        "Componente: disponibilidad",
-        "availability_score",
-        SCORE_BINS,
-    )
-    add_score_layer(
-        web_map,
-        map_data,
-        "Componente: conectividad",
-        "connectivity_score",
-        SCORE_BINS,
-    )
-    add_score_layer(
-        web_map,
-        map_data,
-        "Componente: confort climatico",
-        "climate_score",
-        SCORE_BINS,
-    )
 
-    add_top_labels(web_map, map_data)
-    add_index_legend(web_map, bins)
-    IndexPanelControl().add_to(web_map)
+    WeightedIndexControl(final_layer).add_to(web_map)
     plugins.MiniMap(toggle_display=True, minimized=True).add_to(web_map)
     plugins.Fullscreen(position="topright").add_to(web_map)
     plugins.MeasureControl(position="topleft", primary_length_unit="kilometers").add_to(web_map)
@@ -1097,7 +1384,6 @@ def save_interactive_map(
         search_label="province_name",
         position="topleft",
     ).add_to(web_map)
-    folium.LayerControl(collapsed=False, position="bottomleft").add_to(web_map)
 
     web_map.save(OUTPUT_DIR / "mapa6_indice_destino_tech_interactivo.html")
 

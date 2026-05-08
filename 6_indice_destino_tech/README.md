@@ -18,8 +18,8 @@ La formula es una decision metodologica: favorece provincias con alquiler conten
 
 - El mapa estatico usa una coropleta provincial con 5 cuantiles del indice final.
 - La derecha del mapa muestra el top 10 y un desglose ponderado de los mejores destinos.
-- El HTML interactivo permite activar capas de cada componente, buscar provincias, consultar tooltips y abrir popups con el detalle de puntuaciones.
-- Las etiquetas del HTML resaltan el top 10 del ranking final.
+- El HTML interactivo permite buscar provincias, consultar tooltips y abrir popups con el detalle de puntuaciones.
+- El HTML incluye sliders de pesos ponderados: al moverlos se normalizan a 100%, se recalculan la coropleta, el top 5, la leyenda dinamica y las etiquetas del top 10.
 
 ## Ejecutar
 
