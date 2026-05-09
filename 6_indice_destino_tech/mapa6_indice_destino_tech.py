@@ -42,10 +42,13 @@ RENT_FILE = DATA_DIR / "mivau_alquiler_municipios.csv"
 BROADBAND_FILE = DATA_DIR / "cobertura_ba_espana_2021_2024.xlsx"
 NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
 CLIMATE_FILE = DATA_DIR / "nasa_power_temperatura_estacional_provincias_1995_2024.csv"
+PRECIPITATION_FILE = DATA_DIR / "nasa_power_precipitacion_provincias_1995_2024.csv"
 
 SHEET_NAME = "Provincia_%hogar"
 COVERAGE_COLUMN_2024 = "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2024)"
 BASELINE_YEAR = 2019
+CLIMATE_TEMPERATURE_WEIGHT = 0.70
+CLIMATE_RAIN_WEIGHT = 0.30
 
 WEIGHTS = {
     "rent_score_low_price": 0.35,
@@ -60,7 +63,7 @@ COMPONENTS = [
     ("Subida moderada", "growth_contribution", "#577590"),
     ("Disponibilidad", "availability_contribution", "#f4a261"),
     ("Conectividad", "connectivity_contribution", "#277da1"),
-    ("Confort climatico", "climate_contribution", "#90be6d"),
+    ("Clima temp+lluvia", "climate_contribution", "#90be6d"),
 ]
 
 INDEX_PALETTE = ["#8c2d04", "#cc4c02", "#fdb863", "#80cdc1", "#018571"]
@@ -247,6 +250,15 @@ def rescale_0_100(series: pd.Series, higher_is_better: bool = True) -> pd.Series
     if not higher_is_better:
         score = 100 - score
     return score.clip(0, 100)
+
+
+def target_balance_score(series: pd.Series, target: float) -> pd.Series:
+    clean = pd.to_numeric(series, errors="coerce")
+    gap = (clean - target).abs()
+    max_gap = gap.max()
+    if pd.isna(max_gap) or max_gap == 0:
+        return pd.Series(100.0, index=series.index)
+    return (100 * (1 - gap / max_gap)).clip(0, 100)
 
 
 def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
@@ -458,12 +470,33 @@ def load_climate_by_province() -> pd.DataFrame:
             "No se encontro la cache climatica. Ejecuta primero el mapa 5 o coloca "
             f"el archivo en {CLIMATE_FILE}."
         )
+    if not PRECIPITATION_FILE.exists():
+        raise FileNotFoundError(
+            "No se encontro la cache de precipitacion. Ejecuta primero el mapa 5 o coloca "
+            f"el archivo en {PRECIPITATION_FILE}."
+        )
 
     climate = pd.read_csv(CLIMATE_FILE, dtype={"COD_PROVINCIA": str})
     comfort_target = 17.0
     if "climate_comfort_score" not in climate.columns:
         comfort_gap = (climate["annual_mean_c"] - comfort_target).abs()
         climate["climate_comfort_score"] = 100 * (1 - comfort_gap / comfort_gap.max())
+    climate["temperature_comfort_score"] = climate["climate_comfort_score"].clip(0, 100)
+
+    precipitation = pd.read_csv(PRECIPITATION_FILE, dtype={"COD_PROVINCIA": str})[
+        ["COD_PROVINCIA", "precipitation_annual_mm"]
+    ]
+    climate = climate.merge(precipitation, on="COD_PROVINCIA", how="left")
+
+    rain_target = float(climate["precipitation_annual_mm"].median())
+    climate["rain_comfort_score"] = target_balance_score(
+        climate["precipitation_annual_mm"],
+        rain_target,
+    )
+    climate["climate_comfort_score"] = (
+        climate["temperature_comfort_score"] * CLIMATE_TEMPERATURE_WEIGHT
+        + climate["rain_comfort_score"] * CLIMATE_RAIN_WEIGHT
+    ).clip(0, 100)
 
     return climate[
         [
@@ -471,6 +504,9 @@ def load_climate_by_province() -> pd.DataFrame:
             "annual_mean_c",
             "summer_c",
             "winter_c",
+            "precipitation_annual_mm",
+            "temperature_comfort_score",
+            "rain_comfort_score",
             "climate_comfort_score",
         ]
     ].copy()
@@ -554,6 +590,9 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "annual_mean_c",
+        "precipitation_annual_mm",
+        "temperature_comfort_score",
+        "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
         "rent_growth_score",
@@ -592,6 +631,7 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, int, list[float]]:
         "rental_homes",
         "households",
         "coverage_1gbps_2024_pct",
+        "precipitation_annual_mm",
         "climate_comfort_score",
     ]
     missing = map_data[map_data[required_columns].isna().any(axis=1)]
@@ -736,7 +776,8 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     summary_ax.text(
         0.0,
         0.08,
-        f"Pesos: 35 alquiler, 20 evolucion, 15 disponibilidad, 20 conectividad, 10 clima. "
+        f"Pesos: 35 alquiler, 20 evolucion, 15 disponibilidad, 20 conectividad, "
+        f"10 clima (70 temperatura, 30 lluvia). "
         f"{no_history} provincias sin historico comparable de alquiler.",
         fontsize=8.1,
         color="#444444",
@@ -806,7 +847,8 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     fig.text(
         0.02,
         0.018,
-        "Fuentes: MIVAU alquiler municipal, SETELECO cobertura 1 Gbps, NASA POWER T2M y Eurostat/GISCO NUTS3. "
+        "Fuentes: MIVAU alquiler municipal, SETELECO cobertura 1 Gbps, "
+        "NASA POWER T2M/PRECTOTCORR y Eurostat/GISCO NUTS3. "
         "Coropleta provincial en 5 cuantiles; los pesos son una decision metodologica.",
         fontsize=8,
         color="#555555",
@@ -994,7 +1036,8 @@ class WeightedIndexControl(MacroElement):
               <div style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.35; min-width: 260px;">
                 <strong style="font-size: 13px;">${properties.province_name}</strong><br>
                 Indice recalculado: <strong>${formatter.format(properties.dynamic_index)}</strong><br>
-                Ranking recalculado: <strong>#${properties.dynamic_rank}</strong>
+                Ranking recalculado: <strong>#${properties.dynamic_rank}</strong><br>
+                Lluvia anual: <strong>${formatter.format(asNumber(properties.precipitation_annual_mm))} mm</strong>
                 <hr style="margin: 6px 0;">
                 <table>
                   <thead><tr><th style="text-align:left;">Componente</th><th>Score</th><th>Aporte</th></tr></thead>
@@ -1011,7 +1054,8 @@ class WeightedIndexControl(MacroElement):
                 Ranking: #${properties.dynamic_rank}<br>
                 Indice recalculado: ${formatter.format(properties.dynamic_index)}<br>
                 Alquiler: ${formatter.format(asNumber(properties.rent_eur_month))} EUR/mes<br>
-                Cobertura 1 Gbps: ${formatter.format(asNumber(properties.coverage_1gbps_2024_pct))}%
+                Cobertura 1 Gbps: ${formatter.format(asNumber(properties.coverage_1gbps_2024_pct))}%<br>
+                Lluvia anual: ${formatter.format(asNumber(properties.precipitation_annual_mm))} mm
               </div>
             `;
           }
@@ -1181,7 +1225,7 @@ class WeightedIndexControl(MacroElement):
                 },
                 {
                     "key": "climate_score",
-                    "label": "Confort climatico",
+                    "label": "Clima temp+lluvia",
                     "default": int(WEIGHTS["climate_score"] * 100),
                 },
             ],
@@ -1207,6 +1251,7 @@ def add_score_layer(
         "rent_growth_annual_label",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
+        "precipitation_annual_mm",
         "climate_comfort_score",
         "recommendation",
     ]
@@ -1219,7 +1264,8 @@ def add_score_layer(
         "Crecimiento alquiler",
         "Viviendas alquiler / 1.000 hogares",
         "Cobertura 1 Gbps",
-        "Confort climatico",
+        "Precipitacion anual",
+        "Confort climatico temp+lluvia",
         "Lectura",
     ]
     popup_fields = [
@@ -1229,6 +1275,8 @@ def add_score_layer(
         "rent_growth_score",
         "availability_score",
         "connectivity_score",
+        "temperature_comfort_score",
+        "rain_comfort_score",
         "climate_score",
         "rent_contribution",
         "growth_contribution",
@@ -1244,7 +1292,9 @@ def add_score_layer(
         "Score subida moderada",
         "Score disponibilidad",
         "Score conectividad",
-        "Score clima",
+        "Score temperatura",
+        "Score lluvia",
+        "Score clima final",
         "Aporte alquiler",
         "Aporte evolucion",
         "Aporte disponibilidad",
@@ -1410,6 +1460,9 @@ def save_tables(map_data: gpd.GeoDataFrame, current_year: int) -> None:
         "municipalities",
         "coverage_1gbps_2024_pct",
         "annual_mean_c",
+        "precipitation_annual_mm",
+        "temperature_comfort_score",
+        "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
         "rent_growth_score",

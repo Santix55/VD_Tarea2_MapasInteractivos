@@ -24,7 +24,7 @@ COMPONENT_LABELS = {
     "rent_growth_score": "Subida moderada",
     "availability_score": "Disponibilidad",
     "connectivity_score": "Conectividad",
-    "climate_score": "Confort climatico",
+    "climate_score": "Clima temp+lluvia",
 }
 
 DEFAULT_RAW_WEIGHTS = {
@@ -171,6 +171,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "rent_eur_month",
         "coverage_1gbps_2024_pct",
         "rental_homes_per_1000_households",
+        "precipitation_annual_mm",
         "climate_comfort_score",
         "filter_label",
     ]
@@ -182,7 +183,8 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "Alquiler mensual",
         "Cobertura 1 Gbps",
         "Alquiler / 1.000 hogares",
-        "Confort climatico",
+        "Precipitacion anual",
+        "Confort climatico temp+lluvia",
         "Filtro",
     ]
 
@@ -218,6 +220,8 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
                 "rent_growth_score",
                 "availability_score",
                 "connectivity_score",
+                "temperature_comfort_score",
+                "rain_comfort_score",
                 "climate_score",
                 "app_index",
                 "rank_change_vs_default",
@@ -228,7 +232,9 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
                 "Score subida moderada",
                 "Score disponibilidad",
                 "Score conectividad",
-                "Score clima",
+                "Score temperatura",
+                "Score lluvia",
+                "Score clima final",
                 "Indice recalculado",
                 "Cambio ranking vs. pesos base",
             ],
@@ -289,6 +295,9 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "rent_growth_annual_pct",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
+        "precipitation_annual_mm",
+        "temperature_comfort_score",
+        "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
         "rent_growth_score",
@@ -388,6 +397,7 @@ def main() -> None:
                 "app_index",
                 "rent_eur_month",
                 "coverage_1gbps_2024_pct",
+                "precipitation_annual_mm",
                 "rank_change_vs_default",
             ]
             st.dataframe(
@@ -400,6 +410,7 @@ def main() -> None:
                     "app_index": "Indice",
                     "rent_eur_month": "Alquiler",
                     "coverage_1gbps_2024_pct": "1 Gbps",
+                    "precipitation_annual_mm": "Lluvia anual",
                     "rank_change_vs_default": "Cambio vs base",
                 },
             )
@@ -455,12 +466,13 @@ def main() -> None:
         )
         selected = data[data["province_name"].eq(province_name)].iloc[0]
 
-        province_cols = st.columns(5)
+        province_cols = st.columns(6)
         province_cols[0].metric("Ranking filtrado", selected["filtered_rank_label"])
         province_cols[1].metric("Indice", f"{selected['app_index']:.1f}")
         province_cols[2].metric("Alquiler", f"{selected['rent_eur_month']:.0f} euros")
         province_cols[3].metric("Crecimiento", selected["rent_growth_annual_label"])
-        province_cols[4].metric("Cambio vs base", f"{selected['rank_change_vs_default']:+.0f}")
+        province_cols[4].metric("Lluvia anual", f"{selected['precipitation_annual_mm']:.0f} mm")
+        province_cols[5].metric("Cambio vs base", f"{selected['rank_change_vs_default']:+.0f}")
 
         score_columns = list(COMPONENT_LABELS.keys())
         radar = go.Figure()
@@ -524,7 +536,10 @@ def main() -> None:
                 ("rent_growth_score", "Crecimiento anualizado moderado"),
                 ("availability_score", "Viviendas de alquiler por 1.000 hogares"),
                 ("connectivity_score", "Cobertura fija >= 1 Gbps"),
-                ("climate_score", "Indice de confort climatico"),
+                (
+                    "climate_score",
+                    "Confort climatico: 70% temperatura y 30% lluvia anual equilibrada",
+                ),
             ]
         ]
         st.dataframe(pd.DataFrame(formula_rows), use_container_width=True, hide_index=True)
@@ -534,6 +549,10 @@ def main() -> None:
             La app recalcula el indice con los pesos elegidos en la barra lateral. Los pesos se
             normalizan automaticamente para sumar 100%, por lo que puedes comparar escenarios sin
             preocuparte de cuadrar la suma exacta.
+
+            El componente climatico combina la cercania a una temperatura media anual de referencia
+            con una puntuacion de lluvia equilibrada, que penaliza tanto provincias muy secas como
+            excesivamente lluviosas frente a la mediana provincial.
 
             Los filtros no cambian el valor del indice: solo sirven para limitar el ranking visible.
             En el mapa, las provincias fuera de filtro aparecen en gris para mantener el contexto

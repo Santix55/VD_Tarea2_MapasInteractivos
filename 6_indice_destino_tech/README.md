@@ -10,9 +10,9 @@ El indice final se calcula con cinco componentes normalizados en una escala 0-10
 - 20% subida moderada del alquiler: crecimiento anualizado del alquiler desde el primer ano comparable a partir de 2019 hasta 2024. Si una provincia no tiene historico comparable, recibe puntuacion neutral en este componente.
 - 15% disponibilidad del mercado: viviendas de alquiler observadas por cada 1.000 hogares.
 - 20% conectividad: porcentaje de hogares con cobertura fija de al menos 1 Gbps en junio de 2024.
-- 10% confort climatico: indice de confort del mapa 5, construido por cercania a una temperatura media anual de referencia.
+- 10% confort climatico: combina el confort termico del mapa 5 con la lluvia anual. Dentro de este componente, 70% depende de la cercania a una temperatura media anual de referencia y 30% de una precipitacion equilibrada, penalizando tanto provincias muy secas como excesivamente lluviosas frente a la mediana provincial.
 
-La formula es una decision metodologica: favorece provincias con alquiler contenido y buena infraestructura, sin dejar fuera mercado residencial y confort de vida. El CSV de salida conserva cada componente y su aportacion ponderada para poder justificar o cambiar los pesos.
+La formula es una decision metodologica: favorece provincias con alquiler contenido y buena infraestructura, sin dejar fuera mercado residencial y confort de vida. El CSV de salida conserva cada componente, la lluvia anual, los sub-scores climaticos y su aportacion ponderada para poder justificar o cambiar los pesos.
 
 ## Lectura visual
 
