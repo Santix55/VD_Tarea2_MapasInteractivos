@@ -1,0 +1,423 @@
+CMUN,COD_PROVINCIA,municipality_name_crime,population,crime_total,crime_rate_per_1000,safety_reading,lat,lon
+04003,04,Adra,25195,1149,45.6,Presion media,36.77,-3.06
+04013,04,Almería,200578,9867,49.19,Presion media,36.85,-2.37
+04902,04,Ejido (El),89975,4064,45.17,Presion media,36.75,-2.8
+04053,04,Huércal-Overa,20425,686,33.59,Presion media-baja,37.43,-1.91
+04066,04,Níjar,32858,1721,52.38,Presion alta,36.88,-2.1
+04079,04,Roquetas de Mar,106510,6410,60.18,Presion alta,36.78,-2.63
+04102,04,Vícar,28245,1369,48.47,Presion media,36.81,-2.64
+11004,11,Algeciras,123639,5523,44.67,Presion media,36.11,-5.48
+11006,11,Arcos de la Frontera,30953,766,24.75,Presion baja,36.74,-5.78
+11007,11,Barbate,22811,1206,52.87,Presion alta,36.19,-5.85
+11008,11,Barrios (Los),24219,1316,54.34,Presion alta,36.23,-5.57
+11012,11,Cádiz,111811,5568,49.8,Presion media,36.49,-6.27
+11015,11,Chiclana de la Frontera,88709,4133,46.59,Presion media,36.4,-6.12
+11014,11,Conil de la Frontera,23661,1170,49.45,Presion media,36.3,-6.07
+11020,11,Jerez de la Frontera,213231,11211,52.58,Presion alta,36.66,-6.04
+11022,11,Línea de la Concepción (La),63773,2369,37.15,Presion media-baja,36.21,-5.34
+11027,11,Puerto de Santa María (El),89813,5122,57.03,Presion alta,36.63,-6.23
+11028,11,Puerto Real,42069,1351,32.11,Presion media-baja,36.54,-6.09
+11030,11,Rota,29675,1547,52.13,Presion alta,36.67,-6.36
+11031,11,San Fernando,93927,4018,42.78,Presion media,36.45,-6.21
+11033,11,San Roque,33646,1742,51.77,Presion media,36.25,-5.36
+11032,11,Sanlúcar de Barrameda,69805,3187,45.66,Presion media,36.81,-6.29
+14013,14,Cabra,20070,856,42.65,Presion media,37.48,-4.46
+14021,14,Córdoba,323763,16469,50.87,Presion media,37.85,-4.69
+14038,14,Lucena,42813,2432,56.81,Presion alta,37.37,-4.54
+14042,14,Montilla,22298,642,28.79,Presion baja,37.57,-4.65
+14049,14,Palma del Río,20688,873,42.2,Presion media,37.67,-5.28
+14055,14,Priego de Córdoba,22003,449,20.41,Presion baja,37.46,-4.17
+14056,14,Puente Genil,29781,1098,36.87,Presion media-baja,37.41,-4.76
+18017,18,Almuñécar,27305,1628,59.62,Presion alta,36.78,-3.73
+18021,18,Armilla,25059,1820,72.63,Presion muy alta,37.15,-3.62
+18022,18,Atarfe,20024,983,49.09,Presion media,37.25,-3.71
+18023,18,Baza,20579,904,43.93,Presion media,37.42,-2.84
+18905,18,Gabias (Las),22829,913,39.99,Presion media-baja,37.13,-3.7
+18087,18,Granada,230595,13248,57.45,Presion alta,37.18,-3.58
+18122,18,Loja,20580,643,31.24,Presion baja,37.15,-4.19
+18127,18,Maracena,22275,918,41.21,Presion media-baja,37.21,-3.64
+18140,18,Motril,58939,2530,42.93,Presion media,36.75,-3.49
+21002,21,Aljaraque,22259,559,25.11,Presion baja,37.28,-7.02
+21005,21,Almonte,25233,1973,78.19,Presion muy alta,37.05,-6.53
+21010,21,Ayamonte,21645,903,41.72,Presion media-baja,37.28,-7.4
+21021,21,Cartaya,21128,1252,59.26,Presion alta,37.32,-7.14
+21041,21,Huelva,142532,7750,54.37,Presion alta,37.26,-6.94
+21042,21,Isla Cristina,21603,833,38.56,Presion media-baja,37.23,-7.28
+21044,21,Lepe,28813,1989,69.03,Presion muy alta,37.29,-7.23
+21050,21,Moguer,22956,882,38.42,Presion media-baja,37.2,-6.81
+23002,23,Alcalá la Real,21587,719,33.31,Presion media-baja,37.45,-3.93
+23005,23,Andújar,35788,907,25.34,Presion baja,38.2,-4.03
+23050,23,Jaén,111888,4645,41.51,Presion media-baja,37.78,-3.75
+23055,23,Linares,55096,1791,32.51,Presion media-baja,38.09,-3.62
+23060,23,Martos,24363,813,33.37,Presion media-baja,37.67,-3.98
+23092,23,Úbeda,33810,1037,30.67,Presion baja,37.99,-3.35
+29007,29,Alhaurín de la Torre,43674,1389,31.8,Presion baja,36.66,-4.58
+29008,29,Alhaurín el Grande,26879,861,32.03,Presion media-baja,36.65,-4.68
+29015,29,Antequera,41178,1455,35.33,Presion media-baja,37.04,-4.62
+29025,29,Benalmádena,75801,4391,57.93,Presion alta,36.6,-4.56
+29038,29,Cártama,28412,1126,39.63,Presion media-baja,36.75,-4.62
+29042,29,Coín,25023,980,39.16,Presion media-baja,36.68,-4.76
+29051,29,Estepona,76975,5081,66.01,Presion muy alta,36.47,-5.14
+29054,29,Fuengirola,85598,6353,74.22,Presion muy alta,36.55,-4.62
+29067,29,Málaga,586384,37519,63.98,Presion alta,36.77,-4.44
+29069,29,Marbella,156295,13803,88.31,Presion muy alta,36.51,-4.89
+29070,29,Mijas,91691,5807,63.33,Presion alta,36.55,-4.69
+29075,29,Nerja,21913,1423,64.94,Presion alta,36.78,-3.82
+29082,29,Rincón de la Victoria,51300,1800,35.09,Presion media-baja,36.73,-4.28
+29084,29,Ronda,33329,1532,45.97,Presion media,36.78,-5.23
+29901,29,Torremolinos,70434,5537,78.61,Presion muy alta,36.62,-4.52
+29091,29,Torrox,20932,1025,48.97,Presion media,36.77,-3.96
+29094,29,Vélez-Málaga,85377,4556,53.36,Presion alta,36.8,-4.11
+41004,41,Alcalá de Guadaíra,76547,3708,48.44,Presion media,37.27,-5.81
+41017,41,Bormujos,22780,818,35.91,Presion media-baja,37.36,-6.09
+41021,41,Camas,28157,1505,53.45,Presion alta,37.4,-6.04
+41024,41,Carmona,29551,1767,59.79,Presion alta,37.44,-5.62
+41034,41,Coria del Río,30887,1567,50.73,Presion media,37.25,-6.03
+41038,41,Dos Hermanas,138981,6625,47.67,Presion media,37.26,-5.94
+41039,41,Écija,39530,1448,36.63,Presion media-baja,37.53,-5.11
+41053,41,Lebrija,27727,1093,39.42,Presion media-baja,36.94,-6.09
+41058,41,Mairena del Alcor,24125,646,26.78,Presion baja,37.35,-5.73
+41059,41,Mairena del Aljarafe,47541,2007,42.22,Presion media,37.34,-6.06
+41065,41,Morón de la Frontera,27229,1142,41.94,Presion media-baja,37.12,-5.45
+41069,41,Palacios y Villafranca (Los),38698,1506,38.92,Presion media-baja,37.14,-5.92
+41081,41,Rinconada (La),40162,1287,32.05,Presion media-baja,37.46,-5.9
+41086,41,San Juan de Aznalfarache,22472,1884,83.84,Presion muy alta,37.37,-6.03
+41091,41,Sevilla,684025,51147,74.77,Presion muy alta,37.38,-5.94
+41093,41,Tomares,25374,728,28.69,Presion baja,37.37,-6.05
+41095,41,Utrera,51718,2240,43.31,Presion media,37.09,-5.73
+22125,22,Huesca,54136,2203,40.69,Presion media-baja,42.13,-0.44
+44216,44,Teruel,36267,1027,28.32,Presion baja,40.36,-1.13
+50297,50,Zaragoza,682513,28515,41.78,Presion media-baja,41.68,-0.99
+33004,33,Avilés,75518,2334,30.91,Presion baja,43.57,-5.92
+33016,33,Castrillón,22103,649,29.36,Presion baja,43.55,-5.99
+33024,33,Gijón,268313,9879,36.82,Presion media-baja,43.5,-5.69
+33031,33,Langreo,37978,1448,38.13,Presion media-baja,43.28,-5.7
+33037,33,Mieres,36195,1147,31.69,Presion baja,43.24,-5.77
+33044,33,Oviedo,217584,7551,34.7,Presion media-baja,43.34,-5.9
+33066,33,Siero,52194,1979,37.92,Presion media-baja,43.4,-5.64
+07026,07,Eivissa,51996,4616,88.78,Presion muy alta,38.91,1.42
+07046,07,Sant Antoni de Portmany,28237,2460,87.12,Presion muy alta,39.0,1.34
+07048,07,Sant Josep de sa Talaia,29506,3067,103.94,Presion muy alta,38.9,1.31
+07054,07,Santa Eulària des Riu,41228,2448,59.38,Presion alta,38.99,1.5
+07003,07,Alcudia,21322,1292,60.59,Presion alta,39.85,3.12
+07011,07,Calvià,53162,4750,89.35,Presion muy alta,39.55,2.51
+07027,07,Inca,34577,1311,37.92,Presion media-baja,39.71,2.94
+07031,07,Llucmajor,39040,2589,66.32,Presion muy alta,39.45,2.85
+07033,07,Manacor,46395,2253,48.56,Presion media,39.56,3.26
+07036,07,Marratxí,39440,1829,46.37,Presion media,39.62,2.73
+07040,07,Palma,423350,35540,83.95,Presion muy alta,39.58,2.71
+07015,07,Ciutadella de Menorca,31443,1498,47.64,Presion media,39.99,3.9
+07032,07,Maó-Mahón,29902,1171,39.16,Presion media-baja,39.92,4.24
+35014,35,Oliva (La),29099,1836,63.09,Presion alta,28.63,-13.93
+35015,35,Pájara,21271,1365,64.17,Presion alta,28.25,-14.18
+35017,35,Puerto del Rosario,43390,2601,59.94,Presion alta,28.51,-13.94
+35002,35,Agüimes,32643,1381,42.31,Presion media,27.91,-15.49
+35006,35,Arucas,38601,1244,32.23,Presion media-baja,28.12,-15.52
+35009,35,Gáldar,24678,813,32.94,Presion media-baja,28.09,-15.65
+35011,35,Ingenio,32354,1060,32.76,Presion media-baja,27.94,-15.45
+35012,35,Mogán,20845,1787,85.73,Presion muy alta,27.85,-15.72
+35016,35,Palmas de Gran Canaria (Las),378027,19691,52.09,Presion alta,28.09,-15.46
+35019,35,San Bartolomé de Tirajana,53912,4401,81.63,Presion muy alta,27.85,-15.6
+35022,35,Santa Lucía de Tirajana,75677,3004,39.7,Presion media-baja,27.87,-15.52
+35026,35,Telde,102487,5104,49.8,Presion media,27.97,-15.44
+35004,35,Arrecife,64826,2788,43.01,Presion media,28.98,-13.57
+35024,35,Teguise,23881,788,33.0,Presion media-baja,29.06,-13.56
+35028,35,Tías,21433,1419,66.21,Presion muy alta,28.95,-13.66
+38024,38,Llanos de Aridane (Los),20189,573,28.38,Presion baja,28.61,-17.9
+38001,38,Adeje,50167,6398,127.53,Presion muy alta,28.13,-16.73
+38006,38,Arona,85249,7108,83.38,Presion muy alta,28.06,-16.68
+38011,38,Candelaria,28694,782,27.25,Presion baja,28.38,-16.38
+38017,38,Granadilla de Abona,54942,3053,55.57,Presion alta,28.12,-16.57
+38019,38,Guía de Isora,22301,1293,57.98,Presion alta,28.21,-16.75
+38020,38,Güímar,21536,741,34.41,Presion media-baja,28.29,-16.42
+38022,38,Icod de los Vinos,23971,446,18.61,Presion baja,28.33,-16.69
+38026,38,Orotava (La),42454,1796,42.3,Presion media,28.29,-16.63
+38028,38,Puerto de la Cruz,30849,2593,84.05,Presion muy alta,28.41,-16.54
+38031,38,Realejos (Los),37207,754,20.27,Presion baja,28.35,-16.58
+38023,38,San Cristóbal de La Laguna,159034,6291,39.56,Presion media-baja,28.5,-16.32
+38035,38,San Miguel de Abona,22606,1552,68.65,Presion muy alta,28.07,-16.62
+38038,38,Santa Cruz de Tenerife,209395,10202,48.72,Presion media,28.52,-16.2
+38043,38,Tacoronte,24652,699,28.35,Presion baja,28.48,-16.39
+39016,39,Camargo,30349,1640,54.04,Presion alta,43.41,-3.87
+39020,39,Castro-Urdiales,33225,1577,47.46,Presion media,43.36,-3.23
+39052,39,Piélagos,26605,873,32.81,Presion media-baja,43.4,-3.95
+39075,39,Santander,172726,7941,45.97,Presion media,43.46,-3.83
+39087,39,Torrelavega,51361,2270,44.2,Presion media,43.34,-4.04
+05019,05,Ávila,57741,2259,39.12,Presion media-baja,40.67,-4.67
+09018,09,Aranda de Duero,33626,1551,46.13,Presion media,41.7,-3.67
+09059,09,Burgos,174451,6436,36.89,Presion media-baja,42.34,-3.68
+09219,09,Miranda de Ebro,35639,1529,42.9,Presion media,42.68,-2.96
+24089,24,León,121281,6620,54.58,Presion alta,42.6,-5.57
+24115,24,Ponferrada,62963,2600,41.29,Presion media-baja,42.49,-6.58
+24142,24,San Andrés del Rabanedo,29961,1152,38.45,Presion media-baja,42.63,-5.7
+34120,34,Palencia,76331,2500,32.75,Presion media-baja,42.0,-4.54
+37274,37,Salamanca,143954,6857,47.63,Presion media,40.95,-5.69
+40194,40,Segovia,51011,2049,40.17,Presion media-baja,40.91,-4.16
+42173,42,Soria,40096,1754,43.75,Presion media,41.87,-2.93
+47010,47,Arroyo de la Encomienda,21946,1434,65.34,Presion muy alta,41.62,-4.8
+47076,47,Laguna de Duero,22672,978,43.14,Presion media,41.58,-4.72
+47085,47,Medina del Campo,20090,904,45.0,Presion media,41.33,-4.92
+47186,47,Valladolid,297459,11170,37.55,Presion media-baja,41.63,-4.71
+49275,49,Zamora,59259,2041,34.44,Presion media-baja,41.52,-5.81
+02003,02,Albacete,173206,8392,48.45,Presion media,38.91,-1.94
+02009,02,Almansa,24282,673,27.72,Presion baja,38.83,-1.1
+02037,02,Hellín,30516,1491,48.86,Presion media,38.5,-1.68
+02081,02,Villarrobledo,25189,980,38.91,Presion media-baja,39.19,-2.59
+13005,13,Alcázar de San Juan,30928,941,30.43,Presion baja,39.28,-3.24
+13034,13,Ciudad Real,75303,3066,40.72,Presion media-baja,38.97,-3.99
+13071,13,Puertollano,45127,1715,38.0,Presion media-baja,38.64,-4.04
+13082,13,Tomelloso,36304,1338,36.86,Presion media-baja,39.21,-2.98
+13087,13,Valdepeñas,30411,681,22.39,Presion baja,38.8,-3.43
+16078,16,Cuenca,53512,2244,41.93,Presion media-baja,40.27,-1.91
+19046,19,Azuqueca de Henares,35498,1776,50.03,Presion media,40.56,-3.26
+19130,19,Guadalajara,89010,4125,46.34,Presion media,40.71,-3.26
+45081,45,Illescas,31327,1948,62.18,Presion alta,40.13,-3.84
+45161,45,Seseña,29271,1597,54.56,Presion alta,40.09,-3.66
+45165,45,Talavera de la Reina,84137,3478,41.34,Presion media-baja,39.95,-4.85
+45168,45,Toledo,86070,4081,47.41,Presion media,39.87,-4.01
+08015,08,Badalona,225957,15062,66.66,Presion muy alta,41.46,2.24
+08252,08,Barberà del Vallès,33322,1885,56.57,Presion alta,41.52,2.13
+08019,08,Barcelona,1660122,175867,105.94,Presion muy alta,41.4,2.16
+08051,08,Castellar del Vallès,25150,477,18.97,Presion baja,41.62,2.07
+08056,08,Castelldefels,68427,3345,48.88,Presion media,41.28,1.97
+08266,08,Cerdanyola del Vallès,57879,2059,35.57,Presion media-baja,41.48,2.13
+08073,08,Cornellà de Llobregat,90303,5422,60.04,Presion alta,41.35,2.08
+08076,08,Esparreguera,22442,475,21.17,Presion baja,41.55,1.86
+08077,08,Esplugues de Llobregat,46921,3365,71.72,Presion muy alta,41.38,2.09
+08086,08,Les Franqueses del Vallès,20522,688,33.52,Presion media-baja,41.64,2.31
+08089,08,Gavà,47593,2181,45.83,Presion media,41.29,1.95
+08096,08,Granollers,63092,3281,52.0,Presion alta,41.59,2.28
+08101,08,Hospitalet de Llobregat (L'),274455,21427,78.07,Presion muy alta,41.36,2.11
+08102,08,Igualada,41164,1870,45.43,Presion media,41.58,1.61
+08112,08,Manlleu,21172,431,20.36,Presion baja,42.01,2.28
+08113,08,Manresa,78877,4819,61.1,Presion alta,41.72,1.82
+08114,08,Martorell,28760,1578,54.87,Presion alta,41.48,1.92
+08118,08,Masnou (El),24181,733,30.31,Presion baja,41.48,2.33
+08121,08,Mataró,129870,9321,71.77,Presion muy alta,41.55,2.45
+08123,08,Molins de Rei,26555,997,37.54,Presion media-baja,41.41,2.03
+08124,08,Mollet del Vallès,51824,2509,48.41,Presion media,41.55,2.21
+08125,08,Montcada i Reixac,36891,2496,67.66,Presion muy alta,41.49,2.19
+08147,08,Olesa de Montserrat,24446,437,17.88,Presion baja,41.56,1.9
+08163,08,Pineda de Mar,28751,1535,53.39,Presion alta,41.63,2.68
+08169,08,Prat de Llobregat (El),65516,14873,227.01,Presion muy alta,41.32,2.11
+08172,08,Premià de Mar,28767,1394,48.46,Presion media,41.49,2.36
+08180,08,Ripollet,39269,1686,42.93,Presion media,41.5,2.15
+08184,08,Rubí,80044,3547,44.31,Presion media,41.5,2.02
+08187,08,Sabadell,218300,10673,48.89,Presion media,41.55,2.1
+08194,08,Sant Adrià de Besòs,37925,3798,100.15,Presion muy alta,41.42,2.22
+08196,08,Sant Andreu de la Barca,26910,645,23.97,Presion baja,41.45,1.96
+08200,08,Sant Boi de Llobregat,83919,4310,51.36,Presion media,41.32,2.05
+08205,08,Sant Cugat del Vallès,97530,4395,45.06,Presion media,41.47,2.05
+08211,08,Sant Feliu de Llobregat,46056,1789,38.84,Presion media-baja,41.39,2.05
+08217,08,Sant Joan Despí,34568,1317,38.1,Presion media-baja,41.37,2.06
+08221,08,Sant Just Desvern,20462,656,32.06,Presion media-baja,41.39,2.08
+08231,08,Sant Pere de Ribes,31786,1066,33.54,Presion media-baja,41.26,1.78
+08238,08,Sant Quirze del Vallès,20241,554,27.37,Presion baja,41.52,2.07
+08263,08,Sant Vicenç dels Horts,28406,1327,46.72,Presion media,41.39,2.0
+08245,08,Santa Coloma de Gramenet,119862,5274,44.0,Presion media,41.45,2.21
+08260,08,Santa Perpètua de Mogoda,25928,1368,52.76,Presion alta,41.54,2.17
+08270,08,Sitges,31954,3253,101.8,Presion muy alta,41.26,1.87
+08279,08,Terrassa,225277,9808,43.54,Presion media,41.58,2.0
+08298,08,Vic,48364,2561,52.95,Presion alta,41.92,2.24
+08301,08,Viladecans,66677,3078,46.16,Presion media,41.31,2.03
+08305,08,Vilafranca del Penedès,40714,2792,68.58,Presion muy alta,41.35,1.7
+08307,08,Vilanova i la Geltrú,68854,4370,63.47,Presion alta,41.23,1.71
+08219,08,Vilassar de Mar,21055,652,30.97,Presion baja,41.51,2.39
+17015,17,Banyoles,20506,865,42.18,Presion media,42.13,2.77
+17023,17,Blanes,41653,2207,52.99,Presion alta,41.69,2.79
+17066,17,Figueres,47879,4148,86.64,Presion muy alta,42.27,2.98
+17079,17,Girona,104320,7511,72.0,Presion muy alta,41.99,2.85
+17095,17,Lloret de Mar,41559,3254,78.3,Presion muy alta,41.72,2.83
+17114,17,Olot,37975,1496,39.39,Presion media-baja,42.18,2.49
+17117,17,Palafrugell,23848,1626,68.18,Presion muy alta,41.91,3.18
+17152,17,Roses,20140,1950,96.82,Presion muy alta,42.27,3.19
+17155,17,Salt,33242,2343,70.48,Presion muy alta,41.97,2.78
+17160,17,Sant Feliu de Guíxols,22751,1224,53.8,Presion alta,41.78,3.01
+25120,25,Lleida,143094,9797,68.47,Presion muy alta,41.63,0.6
+43014,43,Amposta,22270,1267,56.89,Presion alta,40.69,0.61
+43037,43,Calafell,30631,1283,41.89,Presion media-baja,41.21,1.59
+43038,43,Cambrils,36496,1676,45.92,Presion media,41.08,1.02
+43123,43,Reus,108479,6169,56.87,Presion alta,41.15,1.12
+43905,43,Salou,30224,3716,122.95,Presion muy alta,41.08,1.14
+43148,43,Tarragona,138262,9740,70.45,Presion muy alta,41.13,1.28
+43155,43,Tortosa,34639,1933,55.8,Presion alta,40.81,0.57
+43161,43,Valls,25014,1397,55.85,Presion alta,41.29,1.24
+43163,43,Vendrell (El),39601,3462,87.42,Presion muy alta,41.2,1.52
+43171,43,Vila-seca,23176,1644,70.94,Presion muy alta,41.09,1.11
+03009,03,Alcoy/Alcoi,59493,2305,38.74,Presion media-baja,38.68,-0.54
+03011,03,L'Alfàs del Pi,20518,1134,55.27,Presion alta,38.58,-0.09
+03014,03,Alicante/Alacant,349282,24585,70.39,Presion muy alta,38.37,-0.58
+03015,03,Almoradí,21874,1040,47.55,Presion media,38.1,-0.8
+03018,03,Altea,23820,1422,59.7,Presion alta,38.62,-0.05
+03019,03,Aspe,21473,842,39.21,Presion media-baja,38.32,-0.77
+03031,03,Benidorm,72342,5985,82.73,Presion muy alta,38.57,-0.15
+03047,03,Calp,25854,1867,72.21,Presion muy alta,38.65,0.04
+03050,03,Campello (el),29993,1295,43.18,Presion media,38.45,-0.39
+03059,03,Crevillent,30191,1057,35.01,Presion media-baja,38.23,-0.81
+03063,03,Dénia,45622,2496,54.71,Presion alta,38.82,0.1
+03065,03,Elche/Elx,238293,9818,41.2,Presion media-baja,38.24,-0.64
+03066,03,Elda,53034,2324,43.82,Presion media,38.47,-0.82
+03079,03,Ibi,23920,818,34.2,Presion media-baja,38.63,-0.56
+03082,03,Jávea/Xàbia,29760,1885,63.34,Presion alta,38.77,0.16
+03090,03,Mutxamel,27078,774,28.58,Presion baja,38.43,-0.46
+03093,03,Novelda,25771,786,30.5,Presion baja,38.39,-0.8
+03099,03,Orihuela,82449,4514,54.75,Presion alta,38.02,-0.91
+03104,03,Petrer,33914,851,25.09,Presion baja,38.5,-0.72
+03902,03,Pilar de la Horadada,23428,1661,70.9,Presion muy alta,37.9,-0.83
+03122,03,San Vicente del Raspeig/Sant Vicent del Raspeig,59928,2519,42.03,Presion media,38.43,-0.53
+03119,03,Sant Joan d'Alacant,25275,1095,43.32,Presion media,38.41,-0.43
+03121,03,Santa Pola,37816,2403,63.54,Presion alta,38.2,-0.58
+03133,03,Torrevieja,89290,9299,104.14,Presion muy alta,37.99,-0.7
+03139,03,Villajoyosa/Vila Joiosa (la),36093,2118,58.68,Presion alta,38.52,-0.25
+03140,03,Villena,34144,1199,35.12,Presion media-baja,38.65,-0.92
+12009,12,Almazora/Almassora,27989,1575,56.27,Presion alta,39.95,-0.06
+12027,12,Benicarló,28681,2165,75.49,Presion muy alta,40.44,0.4
+12032,12,Borriana/Burriana,35750,2212,61.87,Presion alta,39.9,-0.06
+12040,12,Castellón de la Plana/Castelló de la Plana,176238,7539,42.78,Presion media,40.0,-0.05
+12084,12,Onda,25547,974,38.13,Presion media-baja,39.99,-0.23
+12126,12,Vall d'Uixó (la),31611,1179,37.3,Presion media-baja,39.82,-0.23
+12135,12,Vila-real,51852,1454,28.04,Presion baja,39.94,-0.12
+12138,12,Vinaròs,29686,1858,62.59,Presion alta,40.51,0.44
+46005,46,Alaquàs,29825,902,30.24,Presion baja,39.45,-0.47
+46013,46,Alboraia/Alboraya,25792,1860,72.12,Presion muy alta,39.5,-0.34
+46021,46,Aldaia,33376,1980,59.32,Presion alta,39.46,-0.48
+46022,46,Alfafar,21879,1710,78.16,Presion muy alta,39.39,-0.35
+46029,46,Algemesí,27438,1391,50.7,Presion media,39.21,-0.43
+46017,46,Alzira,46421,2796,60.23,Presion alta,39.13,-0.39
+46070,46,Bétera,26759,1012,37.82,Presion media-baja,39.6,-0.46
+46078,46,Burjassot,39702,1533,38.61,Presion media-baja,39.51,-0.41
+46083,46,Carcaixent,20777,1028,49.48,Presion media,39.1,-0.44
+46094,46,Catarroja,29316,1174,40.05,Presion media-baja,39.39,-0.38
+46105,46,Cullera,23753,2257,95.02,Presion muy alta,39.16,-0.27
+46131,46,Gandia,78108,5115,65.49,Presion muy alta,38.99,-0.22
+46147,46,Llíria,24518,1526,62.24,Presion alta,39.69,-0.64
+46159,46,Manises,31573,1288,40.79,Presion media-baja,39.5,-0.5
+46169,46,Mislata,45644,1718,37.64,Presion media-baja,39.48,-0.42
+46171,46,Moncada,22067,956,43.32,Presion media,39.56,-0.4
+46181,46,Oliva,25558,1500,58.69,Presion alta,38.9,-0.11
+46184,46,Ontinyent,36194,1104,30.5,Presion baja,38.81,-0.65
+46186,46,Paiporta,27184,926,34.06,Presion media-baja,39.42,-0.41
+46190,46,Paterna,73488,3343,45.49,Presion media,39.52,-0.47
+46194,46,Picassent,22236,1065,47.9,Presion media,39.35,-0.49
+46202,46,Pobla de Vallbona (la),26435,1087,41.12,Presion media-baja,39.61,-0.54
+46205,46,Puçol,20731,658,31.74,Presion baja,39.62,-0.3
+46102,46,Quart de Poblet,25590,1237,48.34,Presion media,39.47,-0.52
+46213,46,Requena,20387,1071,52.53,Presion alta,39.44,-1.15
+46214,46,Riba-roja de Túria,23555,1417,60.16,Presion alta,39.52,-0.56
+46220,46,Sagunto/Sagunt,70128,3476,49.57,Presion media,39.71,-0.26
+46235,46,Sueca,28086,1828,65.09,Presion muy alta,39.23,-0.3
+46244,46,Torrent,87295,3985,45.65,Presion media,39.42,-0.52
+46250,46,Valencia,807693,62709,77.64,Presion muy alta,39.42,-0.34
+46145,46,Xàtiva,30072,1398,46.49,Presion media,39.0,-0.51
+46110,46,Xirivella,30749,1523,49.53,Presion media,39.46,-0.43
+06011,06,Almendralejo,33948,1462,43.07,Presion media,38.7,-6.4
+06015,06,Badajoz,150190,7810,52.0,Presion alta,38.85,-6.95
+06044,06,Don Benito,37485,1399,37.32,Presion media-baja,38.92,-5.86
+06083,06,Mérida,59461,3308,55.63,Presion alta,38.98,-6.36
+06153,06,Villanueva de la Serena,25751,809,31.42,Presion baja,39.0,-5.73
+10037,10,Cáceres,96215,3738,38.85,Presion media-baja,39.39,-6.49
+10148,10,Plasencia,39412,1516,38.47,Presion media-baja,39.99,-6.16
+15002,15,Ames,32482,1087,33.46,Presion media-baja,42.89,-8.67
+15005,15,Arteixo,33516,1421,42.4,Presion media,43.3,-8.52
+15017,15,Cambre,24739,784,31.69,Presion baja,43.28,-8.33
+15019,15,Carballo,31416,1254,39.92,Presion media-baja,43.21,-8.66
+15030,15,Coruña (A),247376,12510,50.57,Presion media,43.34,-8.41
+15031,15,Culleredo,30864,1216,39.4,Presion media-baja,43.27,-8.41
+15036,15,Ferrol,63890,3052,47.77,Presion media,43.52,-8.28
+15054,15,Narón,39051,1155,29.58,Presion baja,43.54,-8.16
+15058,15,Oleiros,37809,1275,33.72,Presion media-baja,43.36,-8.33
+15073,15,Ribeira,27030,1424,52.68,Presion alta,42.57,-9.0
+15078,15,Santiago de Compostela,98687,5056,51.23,Presion media,42.91,-8.52
+27028,27,Lugo,98214,3928,39.99,Presion media-baja,42.98,-7.6
+32054,32,Ourense,104250,4552,43.66,Presion media,42.35,-7.86
+36008,36,Cangas,26807,995,37.12,Presion media-baja,42.28,-8.79
+36017,36,Estrada (A),20081,446,22.21,Presion baja,42.68,-8.43
+36024,36,Lalín,20282,448,22.09,Presion baja,42.67,-8.12
+36026,36,Marín,24197,688,28.43,Presion baja,42.36,-8.71
+36042,36,Ponteareas,23154,833,35.98,Presion media-baja,42.19,-8.52
+36038,36,Pontevedra,82535,3323,40.26,Presion media-baja,42.43,-8.62
+36039,36,"Porriño, O",20562,757,36.82,Presion media-baja,42.13,-8.64
+36045,36,Redondela,28937,820,28.34,Presion baja,42.28,-8.62
+36057,36,Vigo,293652,12199,41.54,Presion media-baja,42.19,-8.74
+36060,36,Vilagarcía de Arousa,37689,1766,46.86,Presion media,42.6,-8.75
+28005,28,Alcalá de Henares,199184,9765,49.03,Presion media,40.5,-3.37
+28006,28,Alcobendas,119416,5490,45.97,Presion media,40.54,-3.65
+28007,28,Alcorcón,171772,6983,40.65,Presion media-baja,40.36,-3.84
+28009,28,Algete,20991,870,41.45,Presion media-baja,40.62,-3.57
+28013,28,Aranjuez,60668,2816,46.42,Presion media,40.02,-3.62
+28014,28,Arganda del Rey,58990,3423,58.03,Presion alta,40.29,-3.45
+28015,28,Arroyomolinos,35972,2446,68.0,Presion muy alta,40.28,-3.91
+28022,28,Boadilla del Monte,64742,2316,35.77,Presion media-baja,40.42,-3.89
+28040,28,Ciempozuelos,25866,1457,56.33,Presion alta,40.15,-3.62
+28047,28,Collado Villalba,65657,3333,50.76,Presion media,40.65,-3.98
+28045,28,Colmenar Viejo,55198,2477,44.87,Presion media,40.67,-3.75
+28049,28,Coslada,80171,3585,44.72,Presion media,40.43,-3.56
+28058,28,Fuenlabrada,188736,5952,31.54,Presion baja,40.29,-3.8
+28061,28,Galapagar,35273,1821,51.63,Presion media,40.57,-3.98
+28065,28,Getafe,185899,8988,48.35,Presion media,40.3,-3.67
+28074,28,Leganés,190665,9037,47.4,Presion media,40.32,-3.77
+28079,28,Madrid,3332035,237573,71.3,Presion muy alta,40.47,-3.67
+28080,28,Majadahonda,72548,4731,65.21,Presion muy alta,40.47,-3.89
+28084,28,Mejorada del Campo,24274,1221,50.3,Presion media,40.4,-3.47
+28092,28,Móstoles,211265,8608,40.75,Presion media-baja,40.31,-3.89
+28096,28,Navalcarnero,31974,1505,47.07,Presion media,40.28,-4.01
+28104,28,Paracuellos de Jarama,27000,1047,38.78,Presion media-baja,40.52,-3.53
+28106,28,Parla,133004,7701,57.9,Presion alta,40.23,-3.77
+28113,28,Pinto,55208,3009,54.5,Presion alta,40.24,-3.69
+28115,28,Pozuelo de Alarcón,88784,2412,27.17,Presion baja,40.43,-3.81
+28123,28,Rivas-Vaciamadrid,100275,5294,52.79,Presion alta,40.35,-3.52
+28127,28,Rozas de Madrid (Las),98086,4628,47.18,Presion media,40.53,-3.9
+28130,28,San Fernando de Henares,38974,1736,44.54,Presion media,40.44,-3.51
+28134,28,San Sebastián de los Reyes,92734,4380,47.23,Presion media,40.58,-3.58
+28132,28,San Martín de la Vega,20304,1044,51.42,Presion media,40.24,-3.57
+28148,28,Torrejón de Ardoz,137711,5297,38.46,Presion media-baja,40.47,-3.46
+28152,28,Torrelodones,25115,1177,46.86,Presion media,40.57,-3.92
+28903,28,Tres Cantos,51453,1611,31.31,Presion baja,40.61,-3.73
+28161,28,Valdemoro,81394,4282,52.61,Presion alta,40.18,-3.65
+28176,28,Villanueva de la Cañada,23593,943,39.97,Presion media-baja,40.44,-3.99
+28181,28,Villaviciosa de Odón,28750,1311,45.6,Presion media,40.36,-3.94
+30003,30,Águilas,36862,1928,52.3,Presion alta,37.47,-1.59
+30005,30,Alcantarilla,43049,1537,35.7,Presion media-baja,37.97,-1.23
+30008,30,Alhama de Murcia,23280,1031,44.29,Presion media,37.81,-1.38
+30009,30,Archena,20110,991,49.28,Presion media,38.11,-1.29
+30015,30,Caravaca de la Cruz,25756,1001,38.86,Presion media-baja,38.0,-2.06
+30016,30,Cartagena,218050,10103,46.33,Presion media,37.64,-1.01
+30019,30,Cieza,35286,1454,41.21,Presion media-baja,38.27,-1.46
+30022,30,Jumilla,26784,1348,50.33,Presion media,38.49,-1.34
+30024,30,Lorca,98447,3668,37.26,Presion media-baja,37.69,-1.78
+30026,30,Mazarrón,34462,1759,51.04,Presion media,37.63,-1.34
+30027,30,Molina de Segura,76074,3006,39.51,Presion media-baja,38.14,-1.21
+30030,30,Murcia,469177,25358,54.05,Presion alta,37.94,-1.11
+30035,30,San Javier,35241,2600,73.78,Presion muy alta,37.82,-0.85
+30036,30,San Pedro del Pinatar,27691,1788,64.57,Presion alta,37.83,-0.79
+30037,30,Torre-Pacheco,39037,1940,49.7,Presion media,37.78,-0.96
+30038,30,Torres de Cotillas (Las),22183,883,39.81,Presion media-baja,38.02,-1.27
+30039,30,Totana,33149,1484,44.77,Presion media,37.79,-1.52
+30041,30,La Unión,20897,894,42.78,Presion media,37.61,-0.87
+30043,30,Yecla,35521,981,27.62,Presion baja,38.6,-1.13
+31060,31,Burlada/Burlata,20865,761,36.47,Presion media-baja,42.82,-1.61
+31201,31,Pamplona/Iruña,205762,15488,75.27,Presion muy alta,42.82,-1.66
+31232,31,Tudela,37791,2888,76.42,Presion muy alta,42.09,-1.62
+31086,31,Valle de Egüés/Eguesibar,22121,698,31.55,Presion baja,42.83,-1.55
+01059,01,Vitoria-Gasteiz,255886,12816,50.08,Presion media,42.85,-2.66
+20055,20,Arrasate/Mondragón,21867,777,35.53,Presion media-baja,43.07,-2.5
+20069,20,Donostia/San Sebastián,188743,11047,58.53,Presion alta,43.3,-1.98
+20030,20,Eibar,27234,1795,65.91,Presion muy alta,43.19,-2.46
+20067,20,Errenteria,39231,1748,44.56,Presion media,43.26,-1.88
+20040,20,Hernani,20527,727,35.42,Presion media-baja,43.23,-1.93
+20045,20,Irun,62920,4134,65.7,Presion muy alta,43.32,-1.79
+20071,20,Tolosa,20065,1363,67.93,Presion muy alta,43.13,-2.09
+20079,20,Zarautz,23152,821,35.46,Presion media-baja,43.27,-2.17
+48013,48,Barakaldo,101229,5299,52.35,Presion alta,43.27,-3.01
+48015,48,Basauri,40413,1929,47.73,Presion media,43.23,-2.89
+48020,48,Bilbao,346096,23763,68.66,Presion muy alta,43.26,-2.93
+48027,48,Durango,29767,1115,37.46,Presion media-baja,43.16,-2.67
+48902,48,Erandio,24411,1481,60.67,Presion alta,43.32,-2.97
+48036,48,Galdakao,29332,1193,40.67,Presion media-baja,43.24,-2.84
+48044,48,Getxo,76104,2578,33.87,Presion media-baja,43.35,-3.01
+48054,48,Leioa,32491,1051,32.35,Presion media-baja,43.33,-2.99
+48078,48,Portugalete,44629,1679,37.62,Presion media-baja,43.32,-3.02
+48082,48,Santurtzi,46057,1626,35.3,Presion media-baja,43.33,-3.05
+48084,48,Sestao,27834,1486,53.39,Presion alta,43.31,-3.0
+26036,26,Calahorra,24994,1372,54.89,Presion alta,42.31,-1.96
+26089,26,Logroño,150583,5614,37.28,Presion media-baja,42.47,-2.47

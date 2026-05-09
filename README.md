@@ -4,9 +4,9 @@ Proyecto de visualizacion de datos georreferenciados sobre la pregunta:
 
 **Donde vivir despues del Master de IA en la UPV**
 
-El repositorio genera seis mapas sobre alquiler, evolucion temporal,
+El repositorio genera seis mapas sobre alquiler, seguridad relativa,
 accesibilidad laboral tech, conectividad, confort climatico e indice final de
-destino residencial. Tambien incluye dos apps Streamlit y una memoria en
+destino residencial. Tambien incluye una app Streamlit y una memoria en
 Markdown/PDF.
 
 ## Estructura
@@ -128,12 +128,6 @@ python 5_confort_climatico/mapa5_confort_climatico_estacional.py
 python 6_indice_destino_tech/mapa6_indice_destino_tech.py
 ```
 
-El mapa 2 permite una comparacion exacta de anos:
-
-```bash
-python 2_evolucion_alquiler/mapa2_evolucion_alquiler.py --start-year 2019 --exact-start
-```
-
 ## Salidas generadas
 
 Cada mapa deja sus resultados dentro de su carpeta `salidas/`.
@@ -156,20 +150,6 @@ Ejemplo:
 ```
 
 ## Apps Streamlit
-
-### App del mapa 2
-
-Permite explorar la evolucion del alquiler con filtros y seleccion de anos.
-
-```bash
-python -m streamlit run app_streamlit/mapa2_evolucion_app.py --server.address 127.0.0.1 --server.port 8502
-```
-
-Despues abre:
-
-```text
-http://127.0.0.1:8502
-```
 
 ### App del mapa 6
 

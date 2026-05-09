@@ -21,7 +21,7 @@ from streamlit_folium import st_folium
 
 COMPONENT_LABELS = {
     "rent_score_low_price": "Alquiler bajo",
-    "rent_growth_score": "Subida moderada",
+    "safety_score": "Seguridad",
     "availability_score": "Disponibilidad",
     "connectivity_score": "Conectividad",
     "climate_score": "Clima temp+lluvia",
@@ -29,7 +29,7 @@ COMPONENT_LABELS = {
 
 DEFAULT_RAW_WEIGHTS = {
     "rent_score_low_price": 35,
-    "rent_growth_score": 20,
+    "safety_score": 20,
     "availability_score": 15,
     "connectivity_score": 20,
     "climate_score": 10,
@@ -37,7 +37,7 @@ DEFAULT_RAW_WEIGHTS = {
 
 COMPONENT_COLORS = {
     "rent_score_low_price": "#2a9d8f",
-    "rent_growth_score": "#577590",
+    "safety_score": "#577590",
     "availability_score": "#f4a261",
     "connectivity_score": "#277da1",
     "climate_score": "#90be6d",
@@ -80,7 +80,6 @@ def recalculate_index(
     weights: dict[str, float],
     min_coverage: float,
     max_rent: float,
-    require_growth_history: bool,
 ):
     module = load_map6_module()
     result = data.copy()
@@ -99,8 +98,6 @@ def recalculate_index(
         result["coverage_1gbps_2024_pct"].ge(min_coverage)
         & result["rent_eur_month"].le(max_rent)
     )
-    if require_growth_history:
-        result["passes_filters"] = result["passes_filters"] & result["has_growth_history"]
 
     result["filtered_rank"] = pd.Series(pd.NA, index=result.index, dtype="Int64")
     filtered_index = result[result["passes_filters"]]["app_index"].rank(
@@ -169,6 +166,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "app_index",
         "app_index_class",
         "rent_eur_month",
+        "crime_rate_label",
         "coverage_1gbps_2024_pct",
         "rental_homes_per_1000_households",
         "precipitation_annual_mm",
@@ -181,6 +179,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "Indice recalculado",
         "Clase",
         "Alquiler mensual",
+        "Criminalidad",
         "Cobertura 1 Gbps",
         "Alquiler / 1.000 hogares",
         "Precipitacion anual",
@@ -217,7 +216,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
             fields=[
                 "province_name",
                 "rent_score_low_price",
-                "rent_growth_score",
+                "safety_score",
                 "availability_score",
                 "connectivity_score",
                 "temperature_comfort_score",
@@ -229,7 +228,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
             aliases=[
                 "Provincia",
                 "Score alquiler bajo",
-                "Score subida moderada",
+                "Score seguridad",
                 "Score disponibilidad",
                 "Score conectividad",
                 "Score temperatura",
@@ -292,7 +291,8 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "app_index",
         "default_index",
         "rent_eur_month",
-        "rent_growth_annual_pct",
+        "crime_total",
+        "crime_rate_per_1000",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
@@ -300,7 +300,7 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
-        "rent_growth_score",
+        "safety_score",
         "availability_score",
         "connectivity_score",
         "climate_score",
@@ -344,10 +344,6 @@ def main() -> None:
         value=max_rent_value,
         step=25,
     )
-    require_growth_history = st.sidebar.checkbox(
-        "Solo provincias con historico comparable de alquiler",
-        value=False,
-    )
     top_n = st.sidebar.slider("Tamano del ranking visible", 5, 20, 10, 1)
 
     data, bins = recalculate_index(
@@ -355,7 +351,6 @@ def main() -> None:
         weights,
         min_coverage,
         max_rent,
-        require_growth_history,
     )
     filtered = data[data["passes_filters"]].copy().sort_values("filtered_rank")
 
@@ -373,7 +368,7 @@ def main() -> None:
     metric_cols[0].metric("Destino #1", winner["province_name"])
     metric_cols[1].metric("Indice", f"{winner['app_index']:.1f}")
     metric_cols[2].metric("Alquiler", f"{winner['rent_eur_month']:.0f} euros/mes")
-    metric_cols[3].metric("Cobertura 1 Gbps", f"{winner['coverage_1gbps_2024_pct']:.1f}%")
+    metric_cols[3].metric("Seguridad", winner["crime_rate_label"])
     metric_cols[4].metric("Provincias filtradas", f"{len(filtered)} / {len(data)}")
 
     tab_map, tab_ranking, tab_province, tab_method = st.tabs(
@@ -396,6 +391,7 @@ def main() -> None:
                 "province_name",
                 "app_index",
                 "rent_eur_month",
+                "crime_rate_label",
                 "coverage_1gbps_2024_pct",
                 "precipitation_annual_mm",
                 "rank_change_vs_default",
@@ -409,6 +405,7 @@ def main() -> None:
                     "province_name": "Provincia",
                     "app_index": "Indice",
                     "rent_eur_month": "Alquiler",
+                    "crime_rate_label": "Criminalidad",
                     "coverage_1gbps_2024_pct": "1 Gbps",
                     "precipitation_annual_mm": "Lluvia anual",
                     "rank_change_vs_default": "Cambio vs base",
@@ -470,7 +467,7 @@ def main() -> None:
         province_cols[0].metric("Ranking filtrado", selected["filtered_rank_label"])
         province_cols[1].metric("Indice", f"{selected['app_index']:.1f}")
         province_cols[2].metric("Alquiler", f"{selected['rent_eur_month']:.0f} euros")
-        province_cols[3].metric("Crecimiento", selected["rent_growth_annual_label"])
+        province_cols[3].metric("Seguridad", selected["crime_rate_label"])
         province_cols[4].metric("Lluvia anual", f"{selected['precipitation_annual_mm']:.0f} mm")
         province_cols[5].metric("Cambio vs base", f"{selected['rank_change_vs_default']:+.0f}")
 
@@ -533,7 +530,7 @@ def main() -> None:
             }
             for column, variable in [
                 ("rent_score_low_price", "Alquiler medio ponderado bajo"),
-                ("rent_growth_score", "Crecimiento anualizado moderado"),
+                ("safety_score", "Menor tasa de infracciones penales por 1.000 habitantes"),
                 ("availability_score", "Viviendas de alquiler por 1.000 hogares"),
                 ("connectivity_score", "Cobertura fija >= 1 Gbps"),
                 (

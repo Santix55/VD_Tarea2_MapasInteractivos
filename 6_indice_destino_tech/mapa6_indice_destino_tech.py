@@ -37,22 +37,28 @@ BROADBAND_URL = (
     "cobertura/documents/cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx"
 )
 NUTS_URL = "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson"
+CRIME_URL = (
+    "https://estadisticasdecriminalidad.ses.mir.es/sec/jaxiPx/files/_px/es/"
+    "csv_bdsc/DatosBalanceAnt/l0/1409012.csv_bdsc"
+)
 
 RENT_FILE = DATA_DIR / "mivau_alquiler_municipios.csv"
 BROADBAND_FILE = DATA_DIR / "cobertura_ba_espana_2021_2024.xlsx"
 NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
 CLIMATE_FILE = DATA_DIR / "nasa_power_temperatura_estacional_provincias_1995_2024.csv"
 PRECIPITATION_FILE = DATA_DIR / "nasa_power_precipitacion_provincias_1995_2024.csv"
+CRIME_FILE = DATA_DIR / "criminalidad_balance_2024_municipios_mas_20000.csv"
 
 SHEET_NAME = "Provincia_%hogar"
 COVERAGE_COLUMN_2024 = "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2024)"
-BASELINE_YEAR = 2019
+CRIME_TYPE = "III. TOTAL INFRACCIONES PENALES"
+CRIME_PERIOD = "enero-diciembre 2024"
 CLIMATE_TEMPERATURE_WEIGHT = 0.70
 CLIMATE_RAIN_WEIGHT = 0.30
 
 WEIGHTS = {
     "rent_score_low_price": 0.35,
-    "rent_growth_score": 0.20,
+    "safety_score": 0.20,
     "availability_score": 0.15,
     "connectivity_score": 0.20,
     "climate_score": 0.10,
@@ -60,7 +66,7 @@ WEIGHTS = {
 
 COMPONENTS = [
     ("Alquiler bajo", "rent_contribution", "#2a9d8f"),
-    ("Subida moderada", "growth_contribution", "#577590"),
+    ("Seguridad relativa", "safety_contribution", "#577590"),
     ("Disponibilidad", "availability_contribution", "#f4a261"),
     ("Conectividad", "connectivity_contribution", "#277da1"),
     ("Clima temp+lluvia", "climate_contribution", "#90be6d"),
@@ -147,6 +153,7 @@ PROVINCE_CODE_BY_NAME = {
     "badajoz": "06",
     "balears, illes": "07",
     "illes balears": "07",
+    "balears (illes)": "07",
     "barcelona": "08",
     "burgos": "09",
     "caceres": "10",
@@ -155,6 +162,7 @@ PROVINCE_CODE_BY_NAME = {
     "ciudad real": "13",
     "cordoba": "14",
     "coruna, a": "15",
+    "coruna (a)": "15",
     "a coruna": "15",
     "cuenca": "16",
     "girona": "17",
@@ -168,15 +176,21 @@ PROVINCE_CODE_BY_NAME = {
     "lleida": "25",
     "rioja, la": "26",
     "la rioja": "26",
+    "rioja (la)": "26",
     "lugo": "27",
     "madrid": "28",
+    "madrid (comunidad de)": "28",
     "malaga": "29",
     "murcia": "30",
+    "murcia (region de)": "30",
     "navarra": "31",
+    "navarra (comunidad foral de)": "31",
     "ourense": "32",
     "asturias": "33",
+    "asturias (principado de)": "33",
     "palencia": "34",
     "palmas, las": "35",
+    "palmas (las)": "35",
     "las palmas": "35",
     "pontevedra": "36",
     "salamanca": "37",
@@ -195,7 +209,9 @@ PROVINCE_CODE_BY_NAME = {
     "zamora": "49",
     "zaragoza": "50",
     "ceuta": "51",
+    "ciudad autonoma de ceuta": "51",
     "melilla": "52",
+    "ciudad autonoma de melilla": "52",
 }
 
 
@@ -229,6 +245,11 @@ def to_percent(series: pd.Series) -> pd.Series:
     if values.dropna().max() <= 1.5:
         values = values * 100
     return values
+
+
+def parse_spanish_number(value: object) -> float:
+    text = str(value).strip().replace(".", "").replace(",", ".")
+    return pd.to_numeric(text, errors="coerce")
 
 
 def format_int(value: float) -> str:
@@ -388,45 +409,7 @@ def load_rent_metrics() -> tuple[pd.DataFrame, int]:
     current = aggregate_rent_by_year(rent, current_year).rename(
         columns={"PROVINCIA": "province_name"}
     )
-
-    yearly_frames = []
-    for year in sorted(rent["ANO"].unique()):
-        if BASELINE_YEAR <= year < current_year:
-            yearly = aggregate_rent_by_year(rent, int(year))
-            yearly_frames.append(
-                yearly[
-                    [
-                        "COD_PROVINCIA",
-                        "rent_eur_month",
-                        "year",
-                    ]
-                ].rename(
-                    columns={
-                        "rent_eur_month": "baseline_rent_eur_month",
-                        "year": "baseline_year",
-                    }
-                )
-            )
-
-    baseline = (
-        pd.concat(yearly_frames, ignore_index=True)
-        .sort_values(["COD_PROVINCIA", "baseline_year"])
-        .groupby("COD_PROVINCIA", as_index=False)
-        .first()
-    )
-    summary = current.merge(baseline, on="COD_PROVINCIA", how="left")
-    years_between = current_year - summary["baseline_year"]
-    summary["rent_growth_total_pct"] = (
-        (summary["rent_eur_month"] / summary["baseline_rent_eur_month"] - 1) * 100
-    )
-    summary["rent_growth_annual_pct"] = (
-        (summary["rent_eur_month"] / summary["baseline_rent_eur_month"])
-        ** (1 / years_between)
-        - 1
-    ) * 100
-    summary.loc[years_between.le(0), ["rent_growth_total_pct", "rent_growth_annual_pct"]] = pd.NA
-    summary["has_growth_history"] = summary["rent_growth_annual_pct"].notna()
-    return summary, current_year
+    return current, current_year
 
 
 def load_broadband_by_province() -> pd.DataFrame:
@@ -462,6 +445,33 @@ def load_broadband_by_province() -> pd.DataFrame:
     summary["households"] = pd.to_numeric(summary["households"], errors="coerce")
     summary["coverage_1gbps_2024_pct"] = to_percent(summary["coverage_1gbps_2024_pct"])
     return summary
+
+
+def extract_crime_province_code(geography: str) -> str | None:
+    text = str(geography).strip()
+    if text.startswith("Provincia de "):
+        name = text.replace("Provincia de ", "", 1)
+        return PROVINCE_CODE_BY_NAME.get(normalize_text(name))
+    if text in {"NACIONAL", "EXTRANJERA"}:
+        return None
+    if text[:5].isdigit():
+        return None
+    if text.startswith("Isla de "):
+        return None
+    return PROVINCE_CODE_BY_NAME.get(normalize_text(text))
+
+
+def load_safety_by_province() -> pd.DataFrame:
+    crime = pd.read_csv(CRIME_FILE, sep=";", encoding="utf-8-sig")
+    crime = crime[
+        crime["Tipología penal"].eq(CRIME_TYPE) & crime["Periodos:"].eq(CRIME_PERIOD)
+    ].copy()
+    crime["COD_PROVINCIA"] = crime["Geografía"].map(extract_crime_province_code)
+    crime = crime.dropna(subset=["COD_PROVINCIA"])
+    crime["crime_total"] = crime["Total"].map(parse_spanish_number)
+    return crime.groupby("COD_PROVINCIA", as_index=False).agg(
+        crime_total=("crime_total", "sum")
+    )
 
 
 def load_climate_by_province() -> pd.DataFrame:
@@ -531,9 +541,10 @@ def add_scores(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     scored["rent_score_low_price"] = rescale_0_100(
         scored["rent_eur_month"], higher_is_better=False
     )
-    scored["rent_growth_score"] = rescale_0_100(
-        scored["rent_growth_annual_pct"], higher_is_better=False
-    ).fillna(50)
+    scored["crime_rate_per_1000"] = scored["crime_total"] / scored["population"] * 1000
+    scored["safety_score"] = rescale_0_100(
+        scored["crime_rate_per_1000"], higher_is_better=False
+    )
     scored["availability_score"] = rescale_0_100(
         scored["rental_homes_per_1000_households"], higher_is_better=True
     )
@@ -541,7 +552,7 @@ def add_scores(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     scored["climate_score"] = scored["climate_comfort_score"].clip(0, 100)
 
     scored["rent_contribution"] = scored["rent_score_low_price"] * WEIGHTS["rent_score_low_price"]
-    scored["growth_contribution"] = scored["rent_growth_score"] * WEIGHTS["rent_growth_score"]
+    scored["safety_contribution"] = scored["safety_score"] * WEIGHTS["safety_score"]
     scored["availability_contribution"] = (
         scored["availability_score"] * WEIGHTS["availability_score"]
     )
@@ -565,16 +576,8 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
     labelled["index_class"] = labelled["tech_destination_index"].map(
         lambda value: label_for_bins(value, bins)
     )
-    labelled["rent_growth_annual_label"] = labelled["rent_growth_annual_pct"].map(
-        lambda value: "sin historico comparable"
-        if pd.isna(value)
-        else f"{float(value):.1f}% anual"
-    )
-    labelled["rent_baseline_label"] = labelled.apply(
-        lambda row: "sin historico comparable"
-        if pd.isna(row["baseline_year"])
-        else f"{int(row['baseline_year'])}-{current_year}",
-        axis=1,
+    labelled["crime_rate_label"] = labelled["crime_rate_per_1000"].map(
+        lambda value: "sin dato" if pd.isna(value) else f"{float(value):.1f} / 1.000 hab."
     )
     labelled["recommendation"] = labelled["rank_tech"].map(
         lambda rank: "Destino muy competitivo"
@@ -584,9 +587,8 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
 
     numeric_columns = [
         "rent_eur_month",
-        "baseline_rent_eur_month",
-        "rent_growth_total_pct",
-        "rent_growth_annual_pct",
+        "crime_total",
+        "crime_rate_per_1000",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "annual_mean_c",
@@ -595,12 +597,12 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
         "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
-        "rent_growth_score",
+        "safety_score",
         "availability_score",
         "connectivity_score",
         "climate_score",
         "rent_contribution",
-        "growth_contribution",
+        "safety_contribution",
         "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
@@ -614,15 +616,18 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, int, list[float]]:
     download_file(MIVAU_URL, RENT_FILE)
     download_file(BROADBAND_URL, BROADBAND_FILE)
     download_file(NUTS_URL, NUTS_FILE)
+    download_file(CRIME_URL, CRIME_FILE)
 
     provinces = load_province_geometries()
     rent, current_year = load_rent_metrics()
     broadband = load_broadband_by_province()
+    safety = load_safety_by_province()
     climate = load_climate_by_province()
 
     map_data = (
         provinces.merge(rent, on="COD_PROVINCIA", how="left")
         .merge(broadband, on="COD_PROVINCIA", how="left")
+        .merge(safety, on="COD_PROVINCIA", how="left")
         .merge(climate, on="COD_PROVINCIA", how="left")
     )
 
@@ -630,6 +635,7 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, int, list[float]]:
         "rent_eur_month",
         "rental_homes",
         "households",
+        "crime_total",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
         "climate_comfort_score",
@@ -747,7 +753,7 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
         framealpha=0.96,
     )
     map_ax.set_title(
-        "Equilibrio provincial entre vivienda, conectividad y confort",
+        "Equilibrio provincial entre vivienda, seguridad, conectividad y confort",
         fontsize=16.2,
         fontweight="bold",
         pad=12,
@@ -757,7 +763,6 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
 
     summary_ax.set_axis_off()
     winner = map_data.nsmallest(1, "rank_tech").iloc[0]
-    no_history = int((~map_data["has_growth_history"]).sum())
     summary_ax.text(0.0, 0.98, "Lectura rapida", fontsize=11, fontweight="bold", va="top")
     summary_ax.text(
         0.0,
@@ -776,9 +781,8 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     summary_ax.text(
         0.0,
         0.08,
-        f"Pesos: 35 alquiler, 20 evolucion, 15 disponibilidad, 20 conectividad, "
-        f"10 clima (70 temperatura, 30 lluvia). "
-        f"{no_history} provincias sin historico comparable de alquiler.",
+        f"Pesos: 35 alquiler, 20 seguridad, 15 disponibilidad, 20 conectividad, "
+        f"10 clima (70 temperatura, 30 lluvia). Seguridad = menor tasa de delitos por 1.000 hab.",
         fontsize=8.1,
         color="#444444",
         wrap=True,
@@ -848,7 +852,7 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
         0.02,
         0.018,
         "Fuentes: MIVAU alquiler municipal, SETELECO cobertura 1 Gbps, "
-        "NASA POWER T2M/PRECTOTCORR y Eurostat/GISCO NUTS3. "
+        "Ministerio del Interior criminalidad 2024, NASA POWER T2M/PRECTOTCORR y Eurostat/GISCO NUTS3. "
         "Coropleta provincial en 5 cuantiles; los pesos son una decision metodologica.",
         fontsize=8,
         color="#555555",
@@ -1037,6 +1041,7 @@ class WeightedIndexControl(MacroElement):
                 <strong style="font-size: 13px;">${properties.province_name}</strong><br>
                 Indice recalculado: <strong>${formatter.format(properties.dynamic_index)}</strong><br>
                 Ranking recalculado: <strong>#${properties.dynamic_rank}</strong><br>
+                Seguridad: <strong>${formatter.format(asNumber(properties.crime_rate_per_1000))} delitos/1.000 hab.</strong><br>
                 Lluvia anual: <strong>${formatter.format(asNumber(properties.precipitation_annual_mm))} mm</strong>
                 <hr style="margin: 6px 0;">
                 <table>
@@ -1054,6 +1059,7 @@ class WeightedIndexControl(MacroElement):
                 Ranking: #${properties.dynamic_rank}<br>
                 Indice recalculado: ${formatter.format(properties.dynamic_index)}<br>
                 Alquiler: ${formatter.format(asNumber(properties.rent_eur_month))} EUR/mes<br>
+                Seguridad: ${formatter.format(asNumber(properties.crime_rate_per_1000))} delitos/1.000 hab.<br>
                 Cobertura 1 Gbps: ${formatter.format(asNumber(properties.coverage_1gbps_2024_pct))}%<br>
                 Lluvia anual: ${formatter.format(asNumber(properties.precipitation_annual_mm))} mm
               </div>
@@ -1209,9 +1215,9 @@ class WeightedIndexControl(MacroElement):
                     "default": int(WEIGHTS["rent_score_low_price"] * 100),
                 },
                 {
-                    "key": "rent_growth_score",
-                    "label": "Subida moderada",
-                    "default": int(WEIGHTS["rent_growth_score"] * 100),
+                    "key": "safety_score",
+                    "label": "Seguridad",
+                    "default": int(WEIGHTS["safety_score"] * 100),
                 },
                 {
                     "key": "availability_score",
@@ -1248,7 +1254,7 @@ def add_score_layer(
         "index_class",
         "tech_destination_index",
         "rent_eur_month",
-        "rent_growth_annual_label",
+        "crime_rate_label",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
@@ -1261,7 +1267,7 @@ def add_score_layer(
         "Clase",
         "Indice final",
         "Alquiler mensual",
-        "Crecimiento alquiler",
+        "Criminalidad",
         "Viviendas alquiler / 1.000 hogares",
         "Cobertura 1 Gbps",
         "Precipitacion anual",
@@ -1270,16 +1276,15 @@ def add_score_layer(
     ]
     popup_fields = [
         "province_name",
-        "rent_baseline_label",
         "rent_score_low_price",
-        "rent_growth_score",
+        "safety_score",
         "availability_score",
         "connectivity_score",
         "temperature_comfort_score",
         "rain_comfort_score",
         "climate_score",
         "rent_contribution",
-        "growth_contribution",
+        "safety_contribution",
         "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
@@ -1287,16 +1292,15 @@ def add_score_layer(
     ]
     popup_aliases = [
         "Provincia",
-        "Historico alquiler",
         "Score alquiler bajo",
-        "Score subida moderada",
+        "Score seguridad",
         "Score disponibilidad",
         "Score conectividad",
         "Score temperatura",
         "Score lluvia",
         "Score clima final",
         "Aporte alquiler",
-        "Aporte evolucion",
+        "Aporte seguridad",
         "Aporte disponibilidad",
         "Aporte conectividad",
         "Aporte clima",
@@ -1450,11 +1454,9 @@ def save_tables(map_data: gpd.GeoDataFrame, current_year: int) -> None:
         "tech_destination_index",
         "index_class",
         "rent_eur_month",
-        "baseline_year",
-        "baseline_rent_eur_month",
-        "rent_growth_total_pct",
-        "rent_growth_annual_pct",
-        "has_growth_history",
+        "crime_total",
+        "crime_rate_per_1000",
+        "crime_rate_label",
         "rental_homes",
         "rental_homes_per_1000_households",
         "municipalities",
@@ -1465,12 +1467,12 @@ def save_tables(map_data: gpd.GeoDataFrame, current_year: int) -> None:
         "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
-        "rent_growth_score",
+        "safety_score",
         "availability_score",
         "connectivity_score",
         "climate_score",
         "rent_contribution",
-        "growth_contribution",
+        "safety_contribution",
         "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
@@ -1492,7 +1494,7 @@ def main() -> None:
     save_tables(map_data, current_year)
 
     top = map_data.nsmallest(5, "rank_tech")[["rank_tech", "province_name", "tech_destination_index"]]
-    print(f"Mapa 6 generado con datos de alquiler {current_year}.")
+    print(f"Mapa 6 generado con alquiler, seguridad, conectividad y clima ({current_year}).")
     print("Top 5 del indice final:")
     for _, row in top.iterrows():
         print(f"  {int(row['rank_tech'])}. {row['province_name']}: {row['tech_destination_index']:.1f}")
