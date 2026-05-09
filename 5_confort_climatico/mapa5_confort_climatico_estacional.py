@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from calendar import monthrange
+from html import escape
+from math import ceil
 from pathlib import Path
 import json
 import os
@@ -61,6 +63,36 @@ SEASONS = {
         "months": [9, 10, 11],
         "timestamp": "2024-10-15",
     },
+}
+
+MONTHS = {
+    "jan_c": {"label": "Enero", "month": 1, "timestamp": "2024-01-15"},
+    "feb_c": {"label": "Febrero", "month": 2, "timestamp": "2024-02-15"},
+    "mar_c": {"label": "Marzo", "month": 3, "timestamp": "2024-03-15"},
+    "apr_c": {"label": "Abril", "month": 4, "timestamp": "2024-04-15"},
+    "may_c": {"label": "Mayo", "month": 5, "timestamp": "2024-05-15"},
+    "jun_c": {"label": "Junio", "month": 6, "timestamp": "2024-06-15"},
+    "jul_c": {"label": "Julio", "month": 7, "timestamp": "2024-07-15"},
+    "aug_c": {"label": "Agosto", "month": 8, "timestamp": "2024-08-15"},
+    "sep_c": {"label": "Septiembre", "month": 9, "timestamp": "2024-09-15"},
+    "oct_c": {"label": "Octubre", "month": 10, "timestamp": "2024-10-15"},
+    "nov_c": {"label": "Noviembre", "month": 11, "timestamp": "2024-11-15"},
+    "dec_c": {"label": "Diciembre", "month": 12, "timestamp": "2024-12-15"},
+}
+
+MONTH_ABBREVIATIONS = {
+    "jan_c": "Ene",
+    "feb_c": "Feb",
+    "mar_c": "Mar",
+    "apr_c": "Abr",
+    "may_c": "May",
+    "jun_c": "Jun",
+    "jul_c": "Jul",
+    "aug_c": "Ago",
+    "sep_c": "Sep",
+    "oct_c": "Oct",
+    "nov_c": "Nov",
+    "dec_c": "Dic",
 }
 
 PALETTE = ["#2b83ba", "#abdda4", "#ffffbf", "#fdae61", "#d7191c"]
@@ -244,9 +276,29 @@ def weighted_mean_for_months(monthly_values: dict[str, float], months: list[int]
     return weighted_sum / total_days
 
 
+def temperature_summary_from_monthly(monthly_values: dict[str, float]) -> dict[str, float]:
+    month_values = {
+        month_col: weighted_mean_for_months(monthly_values, [month["month"]])
+        for month_col, month in MONTHS.items()
+    }
+    season_values = {
+        season_col: weighted_mean_for_months(monthly_values, season["months"])
+        for season_col, season in SEASONS.items()
+    }
+    annual_mean = weighted_mean_for_months(monthly_values, list(range(1, 13)))
+    return {
+        "annual_mean_c": annual_mean,
+        **month_values,
+        **season_values,
+    }
+
+
 def load_seasonal_temperature_by_province(provinces: gpd.GeoDataFrame) -> pd.DataFrame:
+    required_columns = {"annual_mean_c", *SEASONS.keys(), *MONTHS.keys()}
     if SEASONAL_TEMPERATURE_FILE.exists() and SEASONAL_TEMPERATURE_FILE.stat().st_size > 0:
-        return pd.read_csv(SEASONAL_TEMPERATURE_FILE, dtype={"COD_PROVINCIA": str})
+        cached = pd.read_csv(SEASONAL_TEMPERATURE_FILE, dtype={"COD_PROVINCIA": str})
+        if required_columns.issubset(cached.columns):
+            return cached
 
     rows = []
     points = provinces.copy()
@@ -255,11 +307,7 @@ def load_seasonal_temperature_by_province(provinces: gpd.GeoDataFrame) -> pd.Dat
     for _, row in points.sort_values("COD_PROVINCIA").iterrows():
         point = row["point"]
         monthly_values = fetch_monthly_temperature(point.y, point.x)
-        season_values = {
-            season_col: weighted_mean_for_months(monthly_values, season["months"])
-            for season_col, season in SEASONS.items()
-        }
-        annual_mean = weighted_mean_for_months(monthly_values, list(range(1, 13)))
+        temperature_values = temperature_summary_from_monthly(monthly_values)
 
         rows.append(
             {
@@ -267,8 +315,7 @@ def load_seasonal_temperature_by_province(provinces: gpd.GeoDataFrame) -> pd.Dat
                 "province_name": row["province_name"],
                 "latitude": point.y,
                 "longitude": point.x,
-                "annual_mean_c": annual_mean,
-                **season_values,
+                **temperature_values,
                 "start_year": START_YEAR,
                 "end_year": END_YEAR,
             }
@@ -284,7 +331,10 @@ def load_seasonal_temperature_by_province(provinces: gpd.GeoDataFrame) -> pd.Dat
 def add_climate_metrics(map_data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     data = map_data.copy()
     projected = data.to_crs("EPSG:3035")
+    month_cols = list(MONTHS.keys())
     data["area_km2"] = projected.area / 1_000_000
+    data["monthly_std_c"] = data[month_cols].std(axis=1, ddof=0).round(2)
+    data["monthly_range_c"] = (data[month_cols].max(axis=1) - data[month_cols].min(axis=1)).round(2)
     data["seasonal_range_c"] = data["summer_c"] - data["winter_c"]
     data["annual_anomaly_c"] = data["annual_mean_c"] - data["annual_mean_c"].mean()
 
@@ -315,7 +365,7 @@ def build_dataset() -> gpd.GeoDataFrame:
 
 
 def build_temperature_bins(map_data: gpd.GeoDataFrame) -> list[float]:
-    values = pd.concat([map_data[col] for col in [*SEASONS.keys(), "annual_mean_c"]])
+    values = pd.concat([map_data[col] for col in [*MONTHS.keys(), "annual_mean_c"]])
     classifier = mapclassify.NaturalBreaks(values, k=5)
     bins = [float(values.min())] + [float(value) for value in classifier.bins]
     bins[0] -= 0.1
@@ -327,6 +377,80 @@ def color_for_value(value: float, bins: list[float]) -> str:
         if value <= upper:
             return PALETTE[index]
     return PALETTE[-1]
+
+
+def scaled_radius(
+    value: float,
+    min_value: float,
+    max_value: float,
+    min_radius: float = 4.0,
+    max_radius: float = 14.0,
+) -> float:
+    if max_value <= min_value:
+        return (min_radius + max_radius) / 2
+    return min_radius + (max_radius - min_radius) * (value - min_value) / (max_value - min_value)
+
+
+def max_monthly_temperature_scale(map_data: gpd.GeoDataFrame) -> float:
+    max_value = max(float(map_data[month_col].max()) for month_col in MONTHS)
+    return float(max(5, ceil(max_value / 5) * 5))
+
+
+def build_monthly_temperature_chart(
+    row: pd.Series,
+    bins: list[float],
+    max_temp_scale: float,
+) -> str:
+    month_items = [
+        (month_col, MONTH_ABBREVIATIONS[month_col], float(row[month_col]))
+        for month_col in MONTHS
+    ]
+    hottest = max(month_items, key=lambda item: item[2])
+    coldest = min(month_items, key=lambda item: item[2])
+
+    bars = []
+    month_labels = []
+    for _, month_label, value in month_items:
+        height = min(100.0, max(3.0, (value / max_temp_scale) * 100))
+        color = color_for_value(value, bins)
+        safe_month = escape(month_label)
+        bars.append(
+            f"""
+            <div class="monthly-chart-bar-cell">
+              <div class="monthly-chart-bar"
+                   title="{safe_month}: {value:.1f} C"
+                   style="height:{height:.1f}%; background:{color};"></div>
+            </div>
+            """
+        )
+        month_labels.append(f"<span>{safe_month}</span>")
+
+    province_name = escape(str(row["province_name"]))
+    hottest_label = escape(hottest[1])
+    coldest_label = escape(coldest[1])
+
+    return f"""
+    <div class="monthly-chart-popup">
+      <div class="monthly-chart-title">{province_name}</div>
+      <div class="monthly-chart-subtitle">Temperatura media mensual {START_YEAR}-{END_YEAR}</div>
+      <div class="monthly-chart-grid">
+        <div class="monthly-chart-axis">
+          <span>{max_temp_scale:.0f} C</span>
+          <span>{max_temp_scale / 2:.0f} C</span>
+          <span>0 C</span>
+        </div>
+        <div>
+          <div class="monthly-chart-bars">{''.join(bars)}</div>
+          <div class="monthly-chart-months">{''.join(month_labels)}</div>
+        </div>
+      </div>
+      <div class="monthly-chart-stats">
+        <div class="monthly-chart-stat"><span>Media</span><b>{row['annual_mean_c']:.1f} C</b></div>
+        <div class="monthly-chart-stat"><span>Max</span><b>{hottest_label} {hottest[2]:.1f} C</b></div>
+        <div class="monthly-chart-stat"><span>Min</span><b>{coldest_label} {coldest[2]:.1f} C</b></div>
+      </div>
+    </div>
+    """
 
 
 def annotate_temperature_label(
@@ -471,15 +595,15 @@ def build_slider_style(map_data: gpd.GeoDataFrame, bins: list[float]) -> dict[st
     style_dict: dict[str, dict[str, dict[str, object]]] = {}
     for _, row in map_data.iterrows():
         province_styles = {}
-        for season_col, season in SEASONS.items():
-            epoch = str(timestamp_to_epoch(season["timestamp"]))
-            season_color = color_for_value(float(row[season_col]), bins)
+        for month_col, month in MONTHS.items():
+            epoch = str(timestamp_to_epoch(month["timestamp"]))
+            month_color = color_for_value(float(row[month_col]), bins)
             # TimeSliderChoropleth usa "color" y "opacity" para el relleno dinamico.
             province_styles[epoch] = {
-                "color": season_color,
+                "color": month_color,
                 "opacity": 0.78,
                 "weight": 0.65,
-                "fillColor": season_color,
+                "fillColor": month_color,
                 "fillOpacity": 0.78,
             }
         style_dict[row["COD_PROVINCIA"]] = province_styles
@@ -605,15 +729,15 @@ class SeasonTemperatureLabels(MacroElement):
         super().__init__()
         self._name = "SeasonTemperatureLabels"
         self.slider_name = slider_name
-        self.timestamps = [str(timestamp_to_epoch(season["timestamp"])) for season in SEASONS.values()]
+        self.timestamps = [str(timestamp_to_epoch(month["timestamp"])) for month in MONTHS.values()]
         self.label_data = self._build_label_data(map_data)
 
     def _build_label_data(self, map_data: gpd.GeoDataFrame) -> list[dict[str, object]]:
         rows = []
         for _, row in map_data.iterrows():
             values = {
-                str(timestamp_to_epoch(season["timestamp"])): round(float(row[season_col]), 1)
-                for season_col, season in SEASONS.items()
+                str(timestamp_to_epoch(month["timestamp"])): round(float(row[month_col]), 1)
+                for month_col, month in MONTHS.items()
             }
             rows.append(
                 {
@@ -626,6 +750,129 @@ class SeasonTemperatureLabels(MacroElement):
         return rows
 
 
+def add_monthly_chart_styles(web_map: folium.Map) -> None:
+    css = """
+    <style>
+      .monthly-chart-popup {
+        width: 334px;
+        max-width: calc(100vw - 72px);
+        color: #1f2933;
+        font-family: Arial, sans-serif;
+      }
+
+      .monthly-chart-title {
+        color: #111111;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 2px;
+      }
+
+      .monthly-chart-subtitle {
+        color: #59636e;
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+
+      .monthly-chart-grid {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        column-gap: 8px;
+        align-items: stretch;
+      }
+
+      .monthly-chart-axis {
+        height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 4px 0 18px;
+        color: #68727d;
+        font-size: 10px;
+        text-align: right;
+      }
+
+      .monthly-chart-bars {
+        height: 140px;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 4px;
+        align-items: end;
+        padding: 4px 3px 0;
+        border-left: 1px solid #c8d0d8;
+        border-bottom: 1px solid #8d98a3;
+        background:
+          linear-gradient(to bottom, rgba(141, 152, 163, 0.2) 1px, transparent 1px) 0 4px / 100% 50%;
+      }
+
+      .monthly-chart-bar-cell {
+        height: 100%;
+        min-width: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .monthly-chart-bar {
+        width: 100%;
+        max-width: 16px;
+        min-height: 3px;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        border-radius: 2px 2px 0 0;
+        box-sizing: border-box;
+      }
+
+      .monthly-chart-months {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 4px;
+        margin-top: 3px;
+        color: #46515c;
+        font-size: 9px;
+        line-height: 1.1;
+        text-align: center;
+      }
+
+      .monthly-chart-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 9px;
+        font-size: 11px;
+      }
+
+      .monthly-chart-stat {
+        padding: 5px 6px;
+        background: #f6f8fa;
+        border: 1px solid #d8dee4;
+        border-radius: 4px;
+      }
+
+      .monthly-chart-stat span {
+        display: block;
+        color: #59636e;
+      }
+
+      .monthly-chart-stat b {
+        display: block;
+        color: #111111;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      .folium-monthly-chart-popup table,
+      .folium-monthly-chart-popup tr,
+      .folium-monthly-chart-popup td {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+    </style>
+    """
+    web_map.get_root().header.add_child(folium.Element(css))
+
+
 def add_season_panel(web_map: folium.Map) -> None:
     html = """
     <div style="
@@ -634,11 +881,53 @@ def add_season_panel(web_map: folium.Map) -> None:
       border: 1px solid #999; border-radius: 4px;
       font-family: Arial, sans-serif; font-size: 12px; line-height: 1.35;
       box-shadow: 0 1px 5px rgba(0,0,0,0.25);">
-      <b>Slider estacional</b><br>
-      Ene: invierno · Abr: primavera<br>
-      Jul: verano · Oct: otono<br>
-      Numeros: estacion activa.<br>
-      Puntos: media anual.
+      <b>Slider mensual</b><br>
+      Recorre enero-diciembre.<br>
+      Numeros: mes activo.<br>
+      Click provincia: grafico mensual.<br>
+      Puntos: tamano = dispersion mensual.
+    </div>
+    """
+    web_map.get_root().html.add_child(folium.Element(html))
+
+
+def add_dispersion_legend(web_map: folium.Map, map_data: gpd.GeoDataFrame) -> None:
+    min_std = float(map_data["monthly_std_c"].min())
+    median_std = float(map_data["monthly_std_c"].median())
+    max_std = float(map_data["monthly_std_c"].max())
+    legend_values = [
+        ("Baja", min_std),
+        ("Media", median_std),
+        ("Alta", max_std),
+    ]
+    rows = []
+    for label, value in legend_values:
+        radius = scaled_radius(value, min_std, max_std)
+        diameter = radius * 2
+        rows.append(
+            f"""
+            <div style="display:flex; align-items:center; gap:8px; margin:4px 0;">
+              <span style="
+                width:{diameter:.1f}px; height:{diameter:.1f}px;
+                border-radius:50%; display:inline-block;
+                background:rgba(45, 123, 182, 0.42);
+                border:1.5px solid #ffffff;
+                box-shadow:0 0 0 1px rgba(0,0,0,0.35);"></span>
+              <span>{label}: {value:.1f} C</span>
+            </div>
+            """
+        )
+
+    html = f"""
+    <div style="
+      position: fixed; bottom: 130px; left: 28px; z-index: 9999;
+      background: rgba(255,255,255,0.94); padding: 10px 12px;
+      border: 1px solid #999; border-radius: 4px;
+      font-family: Arial, sans-serif; font-size: 12px; line-height: 1.35;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.25);">
+      <b>Dispersion mensual</b><br>
+      Desviacion tipica de los 12 meses.<br>
+      {''.join(rows)}
     </div>
     """
     web_map.get_root().html.add_child(folium.Element(html))
@@ -650,6 +939,13 @@ def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
     bins = build_temperature_bins(map_data)
     geojson = map_data.set_index("COD_PROVINCIA").to_json()
     style_dict = build_slider_style(map_data, bins)
+    max_temp_scale = max_monthly_temperature_scale(map_data)
+    chart_data = map_data.copy()
+    chart_data["monthly_chart_html"] = [
+        build_monthly_temperature_chart(row, bins, max_temp_scale)
+        for _, row in chart_data.iterrows()
+    ]
+    chart_html_by_code = dict(zip(chart_data["COD_PROVINCIA"], chart_data["monthly_chart_html"]))
 
     web_map = folium.Map(
         location=[40.1, -3.7],
@@ -667,7 +963,7 @@ def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
         styledict=style_dict,
         date_options="MMM",
         highlight=True,
-        name="Temperatura media por epoca",
+        name="Temperatura media mensual",
         overlay=True,
         show=True,
         init_timestamp=0,
@@ -682,32 +978,31 @@ def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
         index=bins,
         vmin=bins[0],
         vmax=bins[-1],
-        caption="Temperatura media estacional (C), cortes naturales",
+        caption="Temperatura media mensual (C), cortes naturales",
     )
     step.add_to(web_map)
+    add_monthly_chart_styles(web_map)
 
     tooltip_fields = [
         "province_name",
-        "winter_c",
-        "spring_c",
-        "summer_c",
-        "autumn_c",
+        *MONTHS.keys(),
         "annual_mean_c",
+        "monthly_std_c",
+        "monthly_range_c",
         "seasonal_range_c",
         "climate_comfort_score",
     ]
     tooltip_aliases = [
         "Provincia",
-        "Invierno",
-        "Primavera",
-        "Verano",
-        "Otono",
+        *[month["label"] for month in MONTHS.values()],
         "Media anual",
+        "Dispersion mensual",
+        "Amplitud anual",
         "Amplitud estacional",
         "Indice confort",
     ]
     detail_layer = folium.GeoJson(
-        map_data,
+        chart_data,
         name="Detalle provincial",
         style_function=lambda _: {"fillOpacity": 0, "color": "#222222", "weight": 0.25},
         highlight_function=lambda _: {"weight": 2.0, "color": "#111111", "fillOpacity": 0.06},
@@ -718,21 +1013,21 @@ def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
             labels=True,
             sticky=False,
         ),
+        popup=folium.GeoJsonPopup(
+            fields=["monthly_chart_html"],
+            labels=False,
+            localize=False,
+            max_width=390,
+            class_name="folium-monthly-chart-popup",
+            style="margin:0;",
+        ),
     ).add_to(web_map)
 
-    annual_layer = folium.FeatureGroup(name="Puntos media anual", show=True)
-    min_temp = map_data["annual_mean_c"].min()
-    max_temp = map_data["annual_mean_c"].max()
+    annual_layer = folium.FeatureGroup(name="Puntos dispersion mensual", show=True)
+    min_std = float(map_data["monthly_std_c"].min())
+    max_std = float(map_data["monthly_std_c"].max())
     for _, row in map_data.iterrows():
-        radius = 4 + 8 * (row["annual_mean_c"] - min_temp) / (max_temp - min_temp)
-        popup = (
-            f"<b>{row['province_name']}</b><br>"
-            f"Media anual: <b>{row['annual_mean_c']:.1f} C</b><br>"
-            f"Invierno: {row['winter_c']:.1f} C<br>"
-            f"Primavera: {row['spring_c']:.1f} C<br>"
-            f"Verano: {row['summer_c']:.1f} C<br>"
-            f"Otono: {row['autumn_c']:.1f} C"
-        )
+        radius = scaled_radius(float(row["monthly_std_c"]), min_std, max_std)
         folium.CircleMarker(
             location=[row["latitude"], row["longitude"]],
             radius=radius,
@@ -741,13 +1036,21 @@ def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
             fill=True,
             fill_color=color_for_value(float(row["annual_mean_c"]), bins),
             fill_opacity=0.9,
-            tooltip=f"{row['province_name']}: media anual {row['annual_mean_c']:.1f} C",
-            popup=folium.Popup(popup, max_width=280),
+            tooltip=(
+                f"{row['province_name']}: dispersion mensual {row['monthly_std_c']:.1f} C; "
+                f"media anual {row['annual_mean_c']:.1f} C"
+            ),
+            popup=folium.Popup(
+                chart_html_by_code[row["COD_PROVINCIA"]],
+                max_width=390,
+                class_name="folium-monthly-chart-popup",
+            ),
         ).add_to(annual_layer)
     annual_layer.add_to(web_map)
 
     SeasonTemperatureLabels(map_data, slider_layer.get_name()).add_to(web_map)
     add_season_panel(web_map)
+    add_dispersion_legend(web_map, map_data)
     plugins.MiniMap(toggle_display=True, minimized=True).add_to(web_map)
     plugins.Fullscreen(position="topright").add_to(web_map)
     plugins.MeasureControl(position="topleft", primary_length_unit="kilometers").add_to(web_map)
@@ -768,11 +1071,14 @@ def save_tables(map_data: gpd.GeoDataFrame) -> None:
     columns = [
         "COD_PROVINCIA",
         "province_name",
+        *MONTHS.keys(),
         "winter_c",
         "spring_c",
         "summer_c",
         "autumn_c",
         "annual_mean_c",
+        "monthly_std_c",
+        "monthly_range_c",
         "seasonal_range_c",
         "annual_anomaly_c",
         "climate_comfort_score",
@@ -792,7 +1098,7 @@ def main() -> None:
     save_interactive_map(map_data)
     save_tables(map_data)
 
-    print(f"Mapa 5 generado con temperaturas estacionales {START_YEAR}-{END_YEAR}.")
+    print(f"Mapa 5 generado con temperaturas mensuales y estacionales {START_YEAR}-{END_YEAR}.")
     print(f"Salidas en: {OUTPUT_DIR}")
 
 
