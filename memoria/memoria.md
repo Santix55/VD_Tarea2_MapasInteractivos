@@ -13,11 +13,11 @@ geometry: margin=2.5cm
 
 # Resumen
 
-Este trabajo estudia qué provincias españolas ofrecen un equilibrio razonable para una persona que termina el Máster de IA en la UPV y se plantea dónde vivir. La pregunta no se reduce a encontrar el alquiler más barato: también importa la seguridad relativa, si existe infraestructura suficiente para teletrabajar, si se está cerca de ecosistemas tecnológicos y si las condiciones climáticas son habitables a largo plazo.
+Este trabajo estudia qué provincias españolas ofrecen un equilibrio razonable para una persona que termina el Máster de IA en la UPV y se plantea dónde vivir. La pregunta no se reduce a encontrar el alquiler más barato: también importa la movilidad intermodal, si existe infraestructura suficiente para teletrabajar, si se está cerca de ecosistemas tecnológicos y si las condiciones climáticas son habitables a largo plazo.
 
-Para responderla se integran datos de alquiler municipal del MIVAU, criminalidad del Ministerio del Interior, cobertura de banda ancha del Ministerio para la Transformación Digital, temperatura histórica de NASA POWER y cartografía administrativa de Eurostat/GISCO. El resultado son seis mapas provinciales, todos con coropletas de al menos cinco clases, acompañados por capas interactivas, gráficas de apoyo y un índice sintético final.
+Para responderla se integran datos de alquiler municipal del MIVAU, estaciones y recorridos GTFS de Renfe, aeropuertos AENA/ENAIRE, cobertura de banda ancha del Ministerio para la Transformación Digital, temperatura histórica de NASA POWER y cartografía administrativa de Eurostat/GISCO. El resultado son seis mapas provinciales, todos con coropletas de al menos cinco clases, acompañados por capas interactivas, gráficas de apoyo y un índice sintético final.
 
-La lectura principal es que las grandes provincias tecnológicas no siempre son las mejores desde el punto de vista residencial. Madrid, Barcelona, Bizkaia, Gipuzkoa o Málaga concentran oportunidades y buena conectividad, pero también soportan precios elevados. En cambio, provincias como Ciudad Real, Lugo, Cáceres, Ourense o Teruel aparecen como alternativas competitivas cuando se ponderan alquiler, seguridad relativa, disponibilidad, conectividad y confort climático.
+La lectura principal es que las grandes provincias tecnológicas no siempre son las mejores desde el punto de vista residencial. Madrid, Barcelona, Bizkaia, Gipuzkoa o Málaga concentran oportunidades y buena conectividad, pero también soportan precios elevados. En cambio, otras provincias aparecen como alternativas competitivas cuando se ponderan alquiler, movilidad, disponibilidad, conectividad y confort climático.
 
 # Introducción
 
@@ -29,7 +29,7 @@ El objetivo del informe es construir una lectura geográfica integrada de Españ
 
 La pregunta de trabajo es:
 
-> Qué provincias ofrecen mejor equilibrio entre coste de vivienda, seguridad relativa, accesibilidad a ecosistemas tecnológicos, conectividad para teletrabajo y confort climático para un perfil universitario de IA.
+> Qué provincias ofrecen mejor equilibrio entre coste de vivienda, movilidad intermodal, accesibilidad a ecosistemas tecnológicos, conectividad para teletrabajo y confort climático para un perfil universitario de IA.
 
 ## Fuentes de datos
 
@@ -38,19 +38,19 @@ Las fuentes utilizadas combinan repositorios oficiales, una API científica y ca
 | Ámbito | Fuente | Escala original | Rango | Uso en el informe |
 |---|---:|---:|---:|---|
 | Alquiler | MIVAU, Sistema Estatal de Referencia del Precio del Alquiler de Vivienda | Municipal | 2024 | Precio actual, percentiles y viviendas observadas |
-| Seguridad | Ministerio del Interior, Portal Estadístico de Criminalidad | Provincia y municipios disponibles | 2024 | Infracciones penales conocidas y tasa por población |
+| Movilidad | Renfe Data, AENA/ENAIRE | Estaciones, recorridos GTFS y aeropuertos | 2024-2026 | Nodos intermodales, recorridos y acceso estratégico |
 | Conectividad | SETELECO / Ministerio para la Transformación Digital | Provincial y otras escalas | 2021-2024 | Cobertura de hogares con banda ancha fija >= 1 Gbps |
 | Clima | NASA POWER, parámetro T2M | Punto representativo provincial | 1995-2024 | Temperatura media estacional y confort climático |
 | Cartografía | Eurostat/GISCO NUTS 2024 y LAU 2024 | Provincia y municipio | 2024 | Geometrías para coropletas, puntos y cálculos espaciales |
 
-El fichero principal de alquiler contiene 531.585 registros, 9 columnas, 7.331 municipios y 52 provincias. Sus columnas principales son código de provincia, provincia, código municipal, nombre del municipio, elemento medido, tipo de vivienda, tipo de medida, año y valor. Para seguridad se usa el balance oficial de criminalidad de 2024. Para la conectividad se usa un libro Excel oficial de cobertura 2021-2024. Para el clima se construye una tabla provincial de 52 filas a partir de la API mensual de NASA POWER. La cartografía provincial se toma de NUTS3 2024, y la municipal de LAU 2024 se usa para ubicar puntos representativos.
+El fichero principal de alquiler contiene 531.585 registros, 9 columnas, 7.331 municipios y 52 provincias. Sus columnas principales son código de provincia, provincia, código municipal, nombre del municipio, elemento medido, tipo de vivienda, tipo de medida, año y valor. Para movilidad se combinan estaciones ferroviarias, recorridos GTFS de alta velocidad, larga distancia y media distancia, y aeropuertos. Para la conectividad se usa un libro Excel oficial de cobertura 2021-2024. Para el clima se construye una tabla provincial de 52 filas a partir de la API mensual de NASA POWER. La cartografía provincial se toma de NUTS3 2024, y la municipal de LAU 2024 se usa para ubicar puntos representativos del mapa de alquiler.
 
 ## Criterio metodológico
 
 La memoria no busca producir seis mapas independientes, sino una narrativa de decisión. Por eso cada mapa responde a una pregunta distinta:
 
 1. Cuánto cuesta alquilar ahora y dónde hay dispersión interna.
-2. Qué zonas muestran menor presión delictiva relativa.
+2. Qué zonas combinan transporte ferroviario, aeropuertos y accesibilidad estratégica.
 3. Qué provincias quedan cerca de hubs tecnológicos o de IA.
 4. Dónde la conectividad permite teletrabajo avanzado.
 5. Qué provincias tienen condiciones climáticas más confortables.
@@ -62,7 +62,7 @@ La memoria no busca producir seis mapas independientes, sino una narrativa de de
 
 La preparación se realizó con `pandas` y `GeoPandas`. En primer lugar, se homogeneizaron códigos territoriales, nombres de provincia y tipos numéricos. Esta fase es importante porque las fuentes no comparten exactamente el mismo formato: los datos de MIVAU están a escala municipal y separados por tipo de vivienda y medida; la conectividad llega en hojas de Excel; la cartografía NUTS3 tiene códigos europeos; y NASA POWER devuelve series temporales por coordenadas.
 
-En el alquiler se filtraron los registros de precio y vivienda observada. Para el precio actual se utilizaron percentiles 25, mediana y 75; y como peso de agregación se empleó el recuento de viviendas. Este criterio evita que municipios con pocos registros tengan la misma influencia que mercados mucho mayores. En criminalidad se filtró el total de infracciones penales conocidas de enero a diciembre de 2024 y se normalizó por población.
+En el alquiler se filtraron los registros de precio y vivienda observada. Para el precio actual se utilizaron percentiles 25, mediana y 75; y como peso de agregación se empleó el recuento de viviendas. Este criterio evita que municipios con pocos registros tengan la misma influencia que mercados mucho mayores. En movilidad se separaron nodos de alta velocidad, larga distancia, media distancia, Cercanías, FEVE y aeropuertos, y se normalizó el recuento ponderado por población para evitar que el mapa sea solo una lectura demográfica.
 
 ## Agregación espacial
 
@@ -83,7 +83,7 @@ Todos los mapas de coropletas usan al menos cinco intervalos, como exige el enun
 - Cuantiles para comparar distribuciones relativas, como precio de alquiler o índice final.
 - Intervalos definidos por usuario cuando existe una lectura operativa, como la cobertura de 1 Gbps o la distancia a hubs.
 - Cortes naturales de Jenks para el confort climático, porque la temperatura presenta agrupaciones territoriales no lineales.
-- Cuantiles también para seguridad relativa, donde la tasa por 1.000 habitantes permite comparar provincias con poblaciones muy distintas.
+- Cuantiles también para movilidad, donde el índice combina cercanía a nodos estratégicos y densidad de nodos por población.
 
 # Visualización de datos
 
@@ -99,17 +99,17 @@ Técnicas principales: `merge` entre datos y geometría, agregación ponderada, 
 
 Salida interactiva: `../1_precio_medio_alquiler_provincia/salidas/mapa1_alquiler_provincias_interactivo.html`.
 
-## Mapa 2. Seguridad y población
+## Mapa 2. Movilidad y transporte
 
-![Mapa 2. Seguridad y población](../2_evolucion_alquiler/salidas/mapa2_seguridad_poblacion.png)
+![Mapa 2. Movilidad y transporte](../2_evolucion_alquiler/salidas/mapa2_movilidad_transportes.png)
 
-El segundo mapa introduce seguridad relativa. La coropleta provincial muestra infracciones penales conocidas por cada 1.000 habitantes en 2024, lo que permite comparar provincias de distinto tamaño sin confundir volumen total con presión relativa.
+El segundo mapa introduce movilidad intermodal. La coropleta provincial muestra un `mobility_score` entre 0 y 100 que combina cercanía a nodos estratégicos y densidad de transporte normalizada por población.
 
-La capa de puntos muestra municipios agregados disponibles en el Balance de Criminalidad, principalmente capitales, municipios de más de 20.000 habitantes e islas. El tamaño del punto representa hechos conocidos y el color la tasa por población. No son coordenadas de delitos individuales, sino una lectura municipal agregada.
+La capa de puntos muestra estaciones de alta velocidad, larga distancia, media distancia, Cercanías, FEVE y aeropuertos en grupos `MarkerCluster`. Las líneas visibles ya no son una red ferroviaria completa, sino recorridos derivados del GTFS de Renfe y unidos por secuencias de paradas. Los aeropuertos se tratan como nodos estratégicos, no como rutas aéreas. Esta lectura ayuda a detectar provincias asequibles que no quedan desconectadas del resto del territorio.
 
-Técnicas principales: normalización por población, coropleta de cinco cuantiles, puntos municipales con tamaño y color, `representative_point()`, `MarkerCluster`, tooltips y popups con advertencia metodológica.
+Técnicas principales: normalización por población, distancia al nodo estratégico más cercano, coropleta de cinco cuantiles en escala azul, recorridos GTFS por modo, `MarkerCluster`, capas checkbox filtrables, tooltips y popups con fuente.
 
-Salida interactiva: `../2_evolucion_alquiler/salidas/mapa2_seguridad_poblacion_interactivo.html`.
+Salida interactiva: `../2_evolucion_alquiler/salidas/mapa2_movilidad_transportes_interactivo.html`.
 
 ## Mapa 3. Accesibilidad laboral a hubs tech/IA
 
@@ -151,9 +151,9 @@ Salida interactiva: `../5_confort_climatico/salidas/mapa5_confort_climatico_esta
 
 ![Mapa 6. Índice final de destino residencial tech](../6_indice_destino_tech/salidas/mapa6_indice_destino_tech.png)
 
-El sexto mapa sintetiza el proyecto. El índice final combina cinco componentes normalizados entre 0 y 100: alquiler bajo, seguridad relativa, disponibilidad del mercado, conectividad de 1 Gbps y confort climático. Los pesos iniciales son 35%, 20%, 15%, 20% y 10%, respectivamente.
+El sexto mapa sintetiza el proyecto. El índice final combina cinco componentes normalizados entre 0 y 100: alquiler bajo, movilidad, disponibilidad del mercado, conectividad de 1 Gbps y confort climático. Los pesos iniciales son 35%, 20%, 15%, 20% y 10%, respectivamente.
 
-El ranking resultante sitúa en cabeza a Ciudad Real, Lugo, Cáceres, Ourense y Teruel. Esta salida no significa que las provincias peor clasificadas sean malas opciones absolutas: muchas tienen ecosistemas laborales fuertes. Lo que indica es que, bajo los pesos elegidos, el equilibrio residencial favorece provincias de coste más contenido, menor presión delictiva relativa y conectividad suficiente.
+El ranking resultante sitúa en cabeza a Asturias, Ciudad Real, Tarragona, Castellón/Castelló y Zaragoza. Esta salida no significa que las provincias peor clasificadas sean malas opciones absolutas: muchas tienen ecosistemas laborales fuertes. Lo que indica es que, bajo los pesos elegidos, el equilibrio residencial favorece provincias de coste contenido, movilidad suficiente y conectividad razonable.
 
 Técnicas principales: normalización min-max, inversión de variables cuando un valor bajo es favorable, índice compuesto ponderado, coropleta de cinco cuantiles, ranking top 10, popups con desglose de componentes y app Streamlit con pesos ajustables.
 
@@ -163,22 +163,23 @@ Salida interactiva: `../6_indice_destino_tech/salidas/mapa6_indice_destino_tech_
 
 La primera conclusión es que el precio del alquiler sigue siendo el factor que más condiciona la decisión residencial. Madrid, Barcelona y varias provincias vascas concentran precios altos, mientras que Lugo, Ourense, Ciudad Real, Zamora y Teruel mantienen niveles más accesibles. Para un egresado reciente, esta diferencia puede ser más determinante que pequeñas variaciones en clima o conectividad.
 
-La segunda conclusión es que no basta con mirar el precio actual. La seguridad relativa añade una capa residencial distinta: los municipios con más hechos conocidos suelen concentrarse en áreas urbanas y turísticas, pero la comparación útil se hace con la tasa por población, no con el volumen bruto.
+La segunda conclusión es que no basta con mirar el precio actual. La movilidad añade una capa residencial distinta: una provincia barata puede ser interesante, pero pierde atractivo si queda aislada de estaciones estratégicas, aeropuertos o recorridos ferroviarios.
 
 La tercera conclusión es que la conectividad abre oportunidades fuera de los grandes hubs. Muchas provincias no metropolitanas tienen cobertura de 1 Gbps suficientemente alta para teletrabajo o trabajo híbrido. Sin embargo, todavía hay territorios que combinan alquiler bajo con brecha digital, por lo que el mapa de conectividad actúa como filtro necesario antes de recomendar un destino.
 
 La cuarta conclusión es que la proximidad a hubs tecnológicos y el índice final no siempre coinciden. Estar cerca de Madrid, Barcelona, Bilbao, Málaga o Valencia puede mejorar la exposición a empleo, eventos y redes profesionales, pero suele venir acompañado de costes residenciales más altos. El índice final favorece una estrategia distinta: vivir en provincias con buena relación coste-infraestructura y mantener conexión laboral remota o puntual con los hubs.
 
-Como recomendación general, Ciudad Real, Lugo, Cáceres, Ourense y Teruel forman un grupo de destinos competitivos bajo los pesos propuestos. No son necesariamente los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, seguridad relativa, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
+Como recomendación general, Asturias, Ciudad Real, Tarragona, Castellón/Castelló y Zaragoza forman el grupo inicial de destinos competitivos bajo los pesos propuestos. No coinciden necesariamente con los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, movilidad suficiente, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
 
 Aun así, la elección final depende mucho de las preferencias de cada persona. No todo el mundo valora igual el ahorro en alquiler, la cercanía a empresas tecnológicas, el clima, el tamaño de la ciudad, la vida cultural, la movilidad, la proximidad a familia y amistades o la posibilidad de construir una red profesional presencial. Para alguien que priorice oportunidades laborales inmediatas, Madrid, Barcelona, Málaga, Bilbao o Valencia pueden seguir siendo opciones muy atractivas aunque tengan peor puntuación residencial. Para otra persona que busque estabilidad económica, menor presión de gasto y buena conexión para trabajar en remoto, provincias con menor coste pueden resultar mucho más adecuadas.
 
-Por eso, el índice final debe entenderse como una herramienta de apoyo a la decisión, no como una respuesta única. Su utilidad está en ordenar variables comparables y hacer visibles los compromisos entre vivienda, seguridad, conectividad, accesibilidad laboral y confort climático. La mejor provincia no es necesariamente la que obtiene la puntuación más alta para todos los casos, sino la que encaja mejor con el proyecto vital y profesional de cada persona.
+Por eso, el índice final debe entenderse como una herramienta de apoyo a la decisión, no como una respuesta única. Su utilidad está en ordenar variables comparables y hacer visibles los compromisos entre vivienda, movilidad, conectividad, accesibilidad laboral y confort climático. La mejor provincia no es necesariamente la que obtiene la puntuación más alta para todos los casos, sino la que encaja mejor con el proyecto vital y profesional de cada persona.
 
 # Referencias de datos
 
 - MIVAU. Sistema Estatal de Referencia del Precio del Alquiler de Vivienda. `VDP001_01.csv`.
-- Ministerio del Interior. Portal Estadístico de Criminalidad, Balance de Criminalidad 2024.
+- Renfe Data. Listado completo de estaciones y GTFS de alta velocidad, larga distancia y media distancia.
+- AENA/ENAIRE. Aeropuertos españoles usados como nodos estratégicos.
 - Ministerio para la Transformación Digital y de la Función Pública / SETELECO. Cobertura Banda Ancha España 2021-2024.
 - NASA POWER. Monthly API, parámetro `T2M`, período 1995-2024.
 - Eurostat/GISCO. NUTS 2024, nivel 3, escala 1:1M.

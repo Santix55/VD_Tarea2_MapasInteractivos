@@ -17,27 +17,30 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson  
   Uso: geometria municipal para crear puntos representativos reales de los municipios con dato de alquiler.
 
-## Mapa 2: seguridad y poblacion
+## Mapa 2: movilidad y transporte
 
-- **Ministerio del Interior - Portal Estadistico de Criminalidad**  
-  Dataset CSV: Balance de Criminalidad 2024, municipios mayores de 20.000 habitantes, capitales e islas  
-  URL: https://estadisticasdecriminalidad.ses.mir.es/sec/jaxiPx/files/_px/es/csv_bdsc/DatosBalanceAnt/l0/1409012.csv_bdsc  
-  Uso: infracciones penales conocidas en enero-diciembre de 2024, agregadas por provincia y por municipios disponibles.
+- **Renfe Data - listado completo de estaciones**  
+  Dataset CSV: `listado-estaciones-completo-act.csv`  
+  URL: https://data.renfe.com/dataset/listado-completo-de-estaciones  
+  Uso: estaciones ferroviarias con coordenadas y banderas de Cercanias/FEVE.
+
+- **Renfe Data - horarios de alta velocidad, larga distancia y media distancia**  
+  Dataset GTFS: `google_transit.zip`  
+  URL: https://data.renfe.com/dataset/horarios-de-alta-velocidad-larga-distancia-y-media-distancia  
+  Uso: separacion de servicios en alta velocidad, larga distancia y media distancia, y generacion de recorridos a partir de secuencias de paradas.
+
+- **AENA/ENAIRE - aeropuertos espanoles**  
+  Uso: nodos aeroportuarios estrategicos. Se muestran como puntos, no como rutas aereas.
 
 - **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
   Dataset XLSX: `cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx`  
   URL: https://digital.gob.es/content/dam/portal-mtdfp/avance-digital/telecomunicacion-e-infraestructuras-digitales/areas_interes/banda-ancha/cobertura/documents/cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx  
-  Uso: poblacion municipal y provincial para calcular tasas por 1.000 habitantes.
+  Uso: poblacion provincial para normalizar nodos de transporte por 100.000 habitantes.
 
 - **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometria provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometria insular a provincia.
-
-- **Eurostat/GISCO - LAU 2024, escala 1:1M**  
-  Dataset GeoJSON: `LAU_RG_01M_2024_4326.geojson`  
-  URL: https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson  
-  Uso: geometria municipal para ubicar los puntos agregados.
 
 ## Mapa 3: accesibilidad laboral a hubs tech/IA
 
@@ -88,10 +91,9 @@
   URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
   Uso: alquiler medio ponderado provincial en 2024 y recuento de viviendas de alquiler observadas.
 
-- **Ministerio del Interior - Portal Estadistico de Criminalidad**  
-  Dataset CSV: Balance de Criminalidad 2024  
-  URL: https://estadisticasdecriminalidad.ses.mir.es/sec/jaxiPx/files/_px/es/csv_bdsc/DatosBalanceAnt/l0/1409012.csv_bdsc  
-  Uso: tasa provincial de infracciones penales conocidas por 1.000 habitantes como componente de seguridad relativa.
+- **Mapa 2 de movilidad y transporte**  
+  Dataset CSV generado: `2_evolucion_alquiler/salidas/mapa2_movilidad_transportes_datos.csv`  
+  Uso: `mobility_score` provincial como componente del indice final, calculado con cercania a nodo estrategico y nodos ponderados por 100.000 habitantes.
 
 - **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
   Dataset XLSX: `cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx`  

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 import html
+import math
 import os
-import re
 import shutil
 import sys
 import unicodedata
+import zipfile
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -26,32 +27,53 @@ import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
+import urllib3
+from shapely.geometry import LineString, Point
 
 
 DATA_DIR = BASE_DIR / "datos"
 OUTPUT_DIR = Path(__file__).resolve().parent / "salidas"
 
-CRIME_URL = (
-    "https://estadisticasdecriminalidad.ses.mir.es/sec/jaxiPx/files/_px/es/"
-    "csv_bdsc/DatosBalanceAnt/l0/1409012.csv_bdsc"
+RENFE_ALL_URL = (
+    "https://data.renfe.com/dataset/ed3d44e5-1d04-41d6-9aa5-396442bf3e07/"
+    "resource/783e0626-6fa8-4ac7-a880-fa53144654ff/download/"
+    "listado-estaciones-completo-act.csv"
 )
+RENFE_GTFS_URL = "https://ssl.renfe.com/gtransit/Fichero_AV_LD/google_transit.zip"
 BROADBAND_URL = (
     "https://digital.gob.es/content/dam/portal-mtdfp/avance-digital/"
     "telecomunicacion-e-infraestructuras-digitales/areas_interes/banda-ancha/"
     "cobertura/documents/cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx"
 )
 NUTS_URL = "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson"
-LAU_URL = "https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson"
 
-CRIME_FILE = DATA_DIR / "criminalidad_balance_2024_municipios_mas_20000.csv"
+RENFE_ALL_FILE = DATA_DIR / "renfe_estaciones_listado_completo.csv"
+RENFE_GTFS_FILE = DATA_DIR / "renfe_gtfs_av_ld_md.zip"
 BROADBAND_FILE = DATA_DIR / "cobertura_ba_espana_2021_2024.xlsx"
 NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
-LAU_FILE = DATA_DIR / "lau_2024_01m.geojson"
 
-CRIME_TYPE = "III. TOTAL INFRACCIONES PENALES"
-CRIME_PERIOD = "enero-diciembre 2024"
-PROVINCE_PALETTE = ["#f0f9e8", "#bae4bc", "#7bccc4", "#fdae61", "#d7301f"]
-POINT_PALETTE = ["#2c7bb6", "#abd9e9", "#ffffbf", "#fdae61", "#d7191c"]
+PROJECTED_CRS = "EPSG:3035"
+MOBILITY_WEIGHTS = {
+    "Alta velocidad": 2.0,
+    "Larga distancia": 2.0,
+    "Media distancia": 2.0,
+    "Cercanias": 1.0,
+    "FEVE": 1.0,
+    "Aeropuerto": 3.0,
+}
+MOBILITY_PALETTE = ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"]
+MODE_COLORS = {
+    "Alta velocidad": "#08519c",
+    "Larga distancia": "#3182bd",
+    "Media distancia": "#6baed6",
+    "Cercanias": "#31a354",
+    "FEVE": "#756bb1",
+    "Aeropuerto": "#ca6702",
+}
+RAIL_ROUTE_MODES = ["Alta velocidad", "Larga distancia", "Media distancia"]
+STRATEGIC_MODES = RAIL_ROUTE_MODES + ["Aeropuerto"]
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 PROVINCE_BY_NUTS = {
     "ES111": "15", "ES112": "27", "ES113": "32", "ES114": "36", "ES120": "33",
@@ -69,33 +91,89 @@ PROVINCE_BY_NUTS = {
 }
 
 PROVINCE_CODE_BY_NAME = {
-    "araba/alava": "01", "albacete": "02", "alicante/alacant": "03", "almeria": "04",
-    "avila": "05", "badajoz": "06", "balears, illes": "07", "illes balears": "07",
-    "balears (illes)": "07", "barcelona": "08", "burgos": "09", "caceres": "10",
-    "cadiz": "11", "castellon/castello": "12", "castellon": "12",
+    "araba/alava": "01", "albacete": "02", "alicante/alacant": "03", "alicante": "03",
+    "almeria": "04", "avila": "05", "badajoz": "06", "balears, illes": "07",
+    "illes balears": "07", "baleares": "07", "barcelona": "08", "burgos": "09",
+    "caceres": "10", "cadiz": "11", "castellon/castello": "12", "castellon": "12",
     "ciudad real": "13", "cordoba": "14", "coruna, a": "15", "a coruna": "15",
-    "coruna (a)": "15", "cuenca": "16", "girona": "17", "granada": "18", "guadalajara": "19",
-    "gipuzkoa": "20", "huelva": "21", "huesca": "22", "jaen": "23", "leon": "24",
-    "lleida": "25", "rioja, la": "26", "la rioja": "26", "rioja (la)": "26",
-    "lugo": "27", "madrid": "28", "madrid (comunidad de)": "28", "malaga": "29",
-    "murcia": "30", "murcia (region de)": "30", "navarra": "31",
-    "navarra (comunidad foral de)": "31", "ourense": "32",
-    "asturias": "33", "asturias (principado de)": "33", "palencia": "34",
-    "palmas, las": "35", "palmas (las)": "35", "las palmas": "35", "pontevedra": "36", "salamanca": "37",
-    "santa cruz de tenerife": "38", "cantabria": "39", "segovia": "40",
-    "sevilla": "41", "soria": "42", "tarragona": "43", "teruel": "44",
-    "toledo": "45", "valencia/valencia": "46", "valencia": "46",
-    "valladolid": "47", "bizkaia": "48", "zamora": "49", "zaragoza": "50",
-    "ceuta": "51", "ciudad autonoma de ceuta": "51", "melilla": "52",
-    "ciudad autonoma de melilla": "52",
+    "la coruna": "15", "cuenca": "16", "girona": "17", "gerona": "17",
+    "granada": "18", "guadalajara": "19", "gipuzkoa": "20", "guipuzcoa": "20",
+    "huelva": "21", "huesca": "22", "jaen": "23", "leon": "24", "lleida": "25",
+    "lerida": "25", "rioja, la": "26", "la rioja": "26", "lugo": "27",
+    "madrid": "28", "malaga": "29", "murcia": "30", "navarra": "31",
+    "ourense": "32", "orense": "32", "asturias": "33", "palencia": "34",
+    "palmas, las": "35", "las palmas": "35", "pontevedra": "36",
+    "salamanca": "37", "santa cruz de tenerife": "38", "cantabria": "39",
+    "segovia": "40", "sevilla": "41", "soria": "42", "tarragona": "43",
+    "teruel": "44", "toledo": "45", "valencia/valencia": "46", "valencia": "46",
+    "valladolid": "47", "bizkaia": "48", "vizcaya": "48", "zamora": "49",
+    "zaragoza": "50", "ceuta": "51", "melilla": "52",
 }
+
+AIRPORTS = [
+    ("A Coruña", "LCG", "15", 43.3021, -8.3773),
+    ("Adolfo Suárez Madrid-Barajas", "MAD", "28", 40.4983, -3.5676),
+    ("Albacete", "ABC", "02", 38.9485, -1.8635),
+    ("Algeciras", "AEI", "11", 36.1289, -5.4411),
+    ("Alicante-Elche Miguel Hernández", "ALC", "03", 38.2822, -0.5582),
+    ("Almería", "LEI", "04", 36.8439, -2.3701),
+    ("Asturias", "OVD", "33", 43.5636, -6.0346),
+    ("Badajoz", "BJZ", "06", 38.8913, -6.8213),
+    ("Bilbao", "BIO", "48", 43.3011, -2.9106),
+    ("Burgos", "RGS", "09", 42.3576, -3.6208),
+    ("Castellón", "CDT", "12", 40.2139, 0.0733),
+    ("Ceuta", "JCU", "51", 35.8969, -5.3064),
+    ("Córdoba", "ODB", "14", 37.8419, -4.8489),
+    ("El Hierro", "VDE", "38", 27.8148, -17.8871),
+    ("Federico García Lorca Granada-Jaén", "GRX", "18", 37.1887, -3.7774),
+    ("Fuerteventura", "FUE", "35", 28.4527, -13.8638),
+    ("Girona-Costa Brava", "GRO", "17", 41.9010, 2.7606),
+    ("Gran Canaria", "LPA", "35", 27.9319, -15.3866),
+    ("Huesca-Pirineos", "HSK", "22", 42.0761, -0.3167),
+    ("Ibiza", "IBZ", "07", 38.8729, 1.3731),
+    ("Internacional Región de Murcia", "RMU", "30", 37.8030, -1.1250),
+    ("Jerez", "XRY", "11", 36.7446, -6.0601),
+    ("Josep Tarradellas Barcelona-El Prat", "BCN", "08", 41.2974, 2.0833),
+    ("La Gomera", "GMZ", "38", 28.0296, -17.2146),
+    ("La Palma", "SPC", "38", 28.6265, -17.7556),
+    ("León", "LEN", "24", 42.5890, -5.6556),
+    ("Lleida-Alguaire", "ILD", "25", 41.7282, 0.5350),
+    ("Logroño-Agoncillo", "RJL", "26", 42.4609, -2.3222),
+    ("Madrid-Cuatro Vientos", "MCV", "28", 40.3707, -3.7851),
+    ("Málaga-Costa del Sol", "AGP", "29", 36.6749, -4.4991),
+    ("Melilla", "MLN", "52", 35.2798, -2.9563),
+    ("Menorca", "MAH", "07", 39.8626, 4.2186),
+    ("Palma de Mallorca", "PMI", "07", 39.5517, 2.7388),
+    ("Pamplona", "PNA", "31", 42.7700, -1.6463),
+    ("Reus", "REU", "43", 41.1474, 1.1672),
+    ("Sabadell", "QSA", "08", 41.5209, 2.1051),
+    ("Salamanca", "SLM", "37", 40.9521, -5.5019),
+    ("San Sebastián", "EAS", "20", 43.3565, -1.7906),
+    ("Santiago-Rosalía de Castro", "SCQ", "15", 42.8963, -8.4151),
+    ("Seve Ballesteros-Santander", "SDR", "39", 43.4271, -3.8200),
+    ("Sevilla", "SVQ", "41", 37.4180, -5.8931),
+    ("Son Bonet", "SBO", "07", 39.5989, 2.7028),
+    ("Tenerife Norte-Ciudad de La Laguna", "TFN", "38", 28.4827, -16.3415),
+    ("Tenerife Sur", "TFS", "38", 28.0445, -16.5725),
+    ("Valencia", "VLC", "46", 39.4893, -0.4816),
+    ("Valladolid", "VLL", "47", 41.7061, -4.8519),
+    ("Vigo", "VGO", "36", 42.2318, -8.6268),
+    ("Vitoria", "VIT", "01", 42.8828, -2.7245),
+    ("Zaragoza", "ZAZ", "50", 41.6662, -1.0416),
+]
 
 
 def download_file(url: str, target: Path) -> None:
     if target.exists() and target.stat().st_size > 0:
         return
     target.parent.mkdir(parents=True, exist_ok=True)
-    response = requests.get(url, timeout=90, headers={"User-Agent": "VD-map-project/1.0"})
+    verify_ssl = "ssl.renfe.com" not in url
+    response = requests.get(
+        url,
+        timeout=120,
+        headers={"User-Agent": "VD-map-project/1.0"},
+        verify=verify_ssl,
+    )
     response.raise_for_status()
     target.write_bytes(response.content)
 
@@ -111,13 +189,14 @@ def normalize_columns(columns: pd.Index) -> dict[str, str]:
         column: unicodedata.normalize("NFKD", str(column))
         .encode("ascii", "ignore")
         .decode("ascii")
+        .replace("\ufeff", "")
+        .strip()
         for column in columns
     }
 
 
-def parse_number(value: object) -> float:
-    text = str(value).strip().replace(".", "").replace(",", ".")
-    return pd.to_numeric(text, errors="coerce")
+def clean_coord(series: pd.Series) -> pd.Series:
+    return pd.to_numeric(series.astype(str).str.replace(",", ".", regex=False), errors="coerce")
 
 
 def format_int(value: float | int | None) -> str:
@@ -126,10 +205,22 @@ def format_int(value: float | int | None) -> str:
     return f"{float(value):,.0f}".replace(",", ".")
 
 
-def format_rate(value: float | int | None) -> str:
+def format_float(value: float | int | None, decimals: int = 1) -> str:
     if pd.isna(value):
         return "sin dato"
-    return f"{float(value):.1f}"
+    return f"{float(value):.{decimals}f}"
+
+
+def rescale_0_100(series: pd.Series, higher_is_better: bool = True) -> pd.Series:
+    clean = pd.to_numeric(series, errors="coerce")
+    minimum = clean.min()
+    maximum = clean.max()
+    if pd.isna(minimum) or pd.isna(maximum) or maximum == minimum:
+        return pd.Series(50.0, index=series.index)
+    score = (clean - minimum) / (maximum - minimum) * 100
+    if not higher_is_better:
+        score = 100 - score
+    return score.clip(0, 100)
 
 
 def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
@@ -144,7 +235,7 @@ def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
 
 
 def color_for_bins(value: float | int | None, bins: list[float], colors: list[str]) -> str:
-    if pd.isna(value):
+    if value is None or pd.isna(value):
         return "#cfcfcf"
     for index, upper in enumerate(bins[1:]):
         if float(value) <= upper or index == len(colors) - 1:
@@ -166,20 +257,6 @@ def build_bin_labels(bins: list[float]) -> list[str]:
     return labels
 
 
-def classify_reading(rate: float) -> str:
-    if pd.isna(rate):
-        return "Sin dato"
-    if rate < 32:
-        return "Presion baja"
-    if rate < 42:
-        return "Presion media-baja"
-    if rate < 52:
-        return "Presion media"
-    if rate < 65:
-        return "Presion alta"
-    return "Presion muy alta"
-
-
 def load_province_geometries() -> gpd.GeoDataFrame:
     nuts = gpd.read_file(NUTS_FILE)
     nuts = nuts[nuts["CNTR_CODE"].eq("ES")].copy()
@@ -189,165 +266,368 @@ def load_province_geometries() -> gpd.GeoDataFrame:
     return provinces[["COD_PROVINCIA", "geometry"]].to_crs("EPSG:4326")
 
 
-def load_lau_points() -> gpd.GeoDataFrame:
-    lau = gpd.read_file(LAU_FILE)
-    lau = lau[lau["CNTR_CODE"].eq("ES")].copy()
-    lau["CMUN"] = lau["GISCO_ID"].str.replace("ES_", "", regex=False)
-    projected = lau.to_crs("EPSG:3035")
-    points = projected.geometry.representative_point().to_crs("EPSG:4326")
-    lau["lon"] = points.x
-    lau["lat"] = points.y
-    return lau[["CMUN", "LAU_NAME", "lat", "lon", "geometry"]].to_crs("EPSG:4326")
-
-
-def load_population() -> tuple[pd.DataFrame, pd.DataFrame]:
-    municipal = pd.read_excel(BROADBAND_FILE, sheet_name="Municipio_%hogar")
-    municipal = municipal.rename(columns=normalize_columns(municipal.columns))
-    municipal["CMUN"] = municipal["CMUN"].astype(str).str.zfill(5)
-    municipal["COD_PROVINCIA"] = municipal["CMUN"].str[:2]
-    municipal["population"] = pd.to_numeric(municipal["Habitantes"], errors="coerce")
-    municipal = municipal[["CMUN", "COD_PROVINCIA", "Municipio", "population"]].copy()
-
+def load_population() -> pd.DataFrame:
     provincial = pd.read_excel(BROADBAND_FILE, sheet_name="Provincia_%hogar")
     provincial = provincial.rename(columns=normalize_columns(provincial.columns))
     provincial["COD_PROVINCIA"] = provincial["Provincia"].map(
         lambda value: PROVINCE_CODE_BY_NAME.get(normalize_text(value))
     )
     provincial["population"] = pd.to_numeric(provincial["Habitantes"], errors="coerce")
-    provincial = provincial[["COD_PROVINCIA", "Provincia", "population"]].rename(
+    return provincial[["COD_PROVINCIA", "Provincia", "population"]].rename(
         columns={"Provincia": "province_name"}
     )
-    return municipal, provincial
 
 
-def load_crime() -> pd.DataFrame:
-    crime = pd.read_csv(CRIME_FILE, sep=";", encoding="utf-8-sig")
-    crime = crime[
-        crime["Tipología penal"].eq(CRIME_TYPE) & crime["Periodos:"].eq(CRIME_PERIOD)
+def classify_rail_service(service_name: object) -> str:
+    name = normalize_text(service_name).replace(".", "").replace(" ", "")
+    if name in {"ave", "avlo", "avant", "avantexp", "aveint"}:
+        return "Alta velocidad"
+    if name in {"alvia", "intercity", "euromed", "trenhotel", "talgo"}:
+        return "Larga distancia"
+    return "Media distancia"
+
+
+def read_gtfs_table(zip_file: zipfile.ZipFile, name: str, **kwargs) -> pd.DataFrame:
+    with zip_file.open(name) as file:
+        table = pd.read_csv(file, **kwargs)
+    table.columns = table.columns.str.strip()
+    return table
+
+
+def load_gtfs_tables() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    with zipfile.ZipFile(RENFE_GTFS_FILE) as gtfs:
+        routes = read_gtfs_table(gtfs, "routes.txt", dtype=str)
+        trips = read_gtfs_table(gtfs, "trips.txt", dtype=str)
+        stop_times = read_gtfs_table(
+            gtfs,
+            "stop_times.txt",
+            dtype={"trip_id": str, "stop_id": str, "stop_sequence": int},
+        )
+        stops = read_gtfs_table(gtfs, "stops.txt", dtype={"stop_id": str})
+
+    routes["rail_mode"] = routes["route_short_name"].map(classify_rail_service)
+    stops["stop_id"] = stops["stop_id"].astype(str).str.zfill(5)
+    stop_times["stop_id"] = stop_times["stop_id"].astype(str).str.zfill(5)
+    stops["stop_lat"] = pd.to_numeric(stops["stop_lat"], errors="coerce")
+    stops["stop_lon"] = pd.to_numeric(stops["stop_lon"], errors="coerce")
+    return routes, trips, stop_times, stops
+
+
+def load_station_reference() -> pd.DataFrame:
+    all_stations = pd.read_csv(RENFE_ALL_FILE, sep=";", encoding="latin1")
+    all_stations = all_stations.rename(columns=normalize_columns(all_stations.columns))
+    all_stations["CODIGO"] = all_stations["CODIGO"].astype(str).str.zfill(5)
+    all_stations["LATITUD"] = clean_coord(all_stations["LATITUD"])
+    all_stations["LONGITUD"] = clean_coord(all_stations["LONGITUD"])
+    all_stations["province_name_raw"] = all_stations["PROVINCIA"].astype(str)
+    all_stations["COD_PROVINCIA"] = all_stations["province_name_raw"].map(
+        lambda value: PROVINCE_CODE_BY_NAME.get(normalize_text(value))
+    )
+    return all_stations.dropna(subset=["LATITUD", "LONGITUD", "COD_PROVINCIA"])
+
+
+def complete_missing_province_codes(
+    nodes: gpd.GeoDataFrame,
+    provinces: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    result = nodes.copy()
+    missing = result["COD_PROVINCIA"].isna()
+    if not missing.any():
+        return result
+
+    province_lookup = provinces[["COD_PROVINCIA", "geometry"]].copy()
+    spatial = gpd.sjoin(
+        result[missing].drop(columns=["COD_PROVINCIA"]),
+        province_lookup,
+        how="left",
+        predicate="within",
+    )
+    result.loc[missing, "COD_PROVINCIA"] = spatial["COD_PROVINCIA"].values
+    return result
+
+
+def load_renfe_stations(
+    station_reference: pd.DataFrame,
+    routes: pd.DataFrame,
+    trips: pd.DataFrame,
+    stop_times: pd.DataFrame,
+    stops: pd.DataFrame,
+    provinces: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    trip_modes = trips[["trip_id", "route_id"]].merge(
+        routes[["route_id", "rail_mode"]], on="route_id", how="left"
+    )
+    served_stops = (
+        stop_times[["trip_id", "stop_id"]]
+        .merge(trip_modes, on="trip_id", how="left")
+        .dropna(subset=["rail_mode"])
+        .drop_duplicates(["stop_id", "rail_mode"])
+        .merge(
+            stops[["stop_id", "stop_name", "stop_lat", "stop_lon"]],
+            on="stop_id",
+            how="left",
+        )
+    )
+    served_stops = served_stops.dropna(subset=["stop_lat", "stop_lon"])
+    served_stops = served_stops.merge(
+        station_reference[
+            ["CODIGO", "DESCRIPCION", "POBLACION", "PROVINCIA", "COD_PROVINCIA"]
+        ],
+        left_on="stop_id",
+        right_on="CODIGO",
+        how="left",
+    )
+    served_stops["CODIGO"] = served_stops["stop_id"]
+    served_stops["DESCRIPCION"] = served_stops["DESCRIPCION"].fillna(
+        served_stops["stop_name"]
+    )
+    served_stops["POBLACION"] = served_stops["POBLACION"].fillna(served_stops["stop_name"])
+    served_stops["LATITUD"] = served_stops["stop_lat"]
+    served_stops["LONGITUD"] = served_stops["stop_lon"]
+    served_stops["mode"] = served_stops["rail_mode"]
+    served_stops["source"] = "Renfe Data GTFS alta/larga/media"
+    served_stops["node_weight"] = served_stops["mode"].map(MOBILITY_WEIGHTS)
+    rail_geometry = [
+        Point(lon, lat) for lon, lat in zip(served_stops["LONGITUD"], served_stops["LATITUD"])
+    ]
+    rail_nodes = gpd.GeoDataFrame(served_stops, geometry=rail_geometry, crs="EPSG:4326")
+    rail_nodes = complete_missing_province_codes(rail_nodes, provinces)
+
+    frames = [rail_nodes]
+    cercanias = station_reference[
+        station_reference["CERCANIAS"].astype(str).str.upper().eq("SI")
     ].copy()
-    crime["crime_total"] = crime["Total"].map(parse_number)
-    return crime[["Geografía", "crime_total"]]
+    cercanias["mode"] = "Cercanias"
+    frames.append(cercanias)
+
+    feve = station_reference[station_reference["FEVE"].astype(str).str.upper().eq("SI")].copy()
+    feve["mode"] = "FEVE"
+    frames.append(feve)
+
+    stations = pd.concat(frames, ignore_index=True).drop_duplicates(["CODIGO", "mode"])
+    stations["node_weight"] = stations["mode"].map(MOBILITY_WEIGHTS)
+    stations["source"] = stations["source"].fillna("Renfe Data")
+    geometry = [Point(lon, lat) for lon, lat in zip(stations["LONGITUD"], stations["LATITUD"])]
+    return gpd.GeoDataFrame(stations, geometry=geometry, crs="EPSG:4326").dropna(
+        subset=["COD_PROVINCIA"]
+    )
 
 
-def extract_province_code(geography: str) -> str | None:
-    text = str(geography).strip()
-    if text.startswith("Provincia de "):
-        name = text.replace("Provincia de ", "", 1)
-        return PROVINCE_CODE_BY_NAME.get(normalize_text(name))
-    if text in {"NACIONAL", "EXTRANJERA"}:
-        return None
-    if re.match(r"^\d{5}\s+", text):
-        return None
-    if text.startswith("Isla de "):
-        return None
-    return PROVINCE_CODE_BY_NAME.get(normalize_text(text))
+def load_airports() -> gpd.GeoDataFrame:
+    airports = pd.DataFrame(
+        AIRPORTS,
+        columns=["DESCRIPCION", "iata", "COD_PROVINCIA", "LATITUD", "LONGITUD"],
+    )
+    airports["mode"] = "Aeropuerto"
+    airports["node_weight"] = MOBILITY_WEIGHTS["Aeropuerto"]
+    airports["source"] = "AENA/ENAIRE"
+    airports["CODIGO"] = airports["iata"]
+    airports["POBLACION"] = airports["DESCRIPCION"]
+    airports["PROVINCIA"] = airports["COD_PROVINCIA"]
+    geometry = [Point(lon, lat) for lon, lat in zip(airports["LONGITUD"], airports["LATITUD"])]
+    return gpd.GeoDataFrame(airports, geometry=geometry, crs="EPSG:4326")
 
 
-def build_dataset() -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame, list[float], list[float]]:
-    download_file(CRIME_URL, CRIME_FILE)
+def build_route_lines(
+    routes: pd.DataFrame,
+    trips: pd.DataFrame,
+    stop_times: pd.DataFrame,
+    stops: pd.DataFrame,
+) -> gpd.GeoDataFrame:
+    trip_lengths = (
+        stop_times.groupby("trip_id", as_index=False)
+        .agg(stop_count=("stop_id", "count"))
+        .merge(trips[["trip_id", "route_id"]], on="trip_id", how="left")
+    )
+    representative_trips = (
+        trip_lengths.sort_values(["route_id", "stop_count"], ascending=[True, False])
+        .drop_duplicates("route_id")
+        [["trip_id", "route_id", "stop_count"]]
+    )
+    route_meta = routes[["route_id", "route_short_name", "rail_mode"]]
+    route_stops = (
+        stop_times.merge(representative_trips, on="trip_id", how="inner")
+        .merge(stops[["stop_id", "stop_name", "stop_lat", "stop_lon"]], on="stop_id", how="left")
+        .merge(route_meta, on="route_id", how="left")
+        .dropna(subset=["stop_lat", "stop_lon", "rail_mode"])
+        .sort_values(["route_id", "stop_sequence"])
+    )
+
+    rows = []
+    for route_id, group in route_stops.groupby("route_id", sort=False):
+        points = [
+            (float(lon), float(lat))
+            for lon, lat in zip(group["stop_lon"], group["stop_lat"])
+            if pd.notna(lon) and pd.notna(lat)
+        ]
+        if len(points) < 2:
+            continue
+        rows.append(
+            {
+                "route_id": route_id,
+                "route_short_name": group["route_short_name"].iloc[0],
+                "mode": group["rail_mode"].iloc[0],
+                "stop_count": int(group["stop_count"].iloc[0]),
+                "from_stop": group["stop_name"].iloc[0],
+                "to_stop": group["stop_name"].iloc[-1],
+                "source": "Renfe Data GTFS alta/larga/media",
+                "geometry": LineString(points),
+            }
+        )
+    return gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
+
+
+def add_geographic_metrics(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    result = data.copy()
+    projected = result.to_crs(PROJECTED_CRS)
+    points = projected.geometry.representative_point().to_crs("EPSG:4326")
+    result["label_lon"] = points.x
+    result["label_lat"] = points.y
+    result["area_km2"] = (projected.area / 1_000_000).round(1)
+    return result
+
+
+def calculate_province_mobility(
+    provinces: gpd.GeoDataFrame,
+    population: pd.DataFrame,
+    nodes: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
+    map_data = provinces.merge(population, on="COD_PROVINCIA", how="left")
+    node_summary = (
+        nodes.groupby("COD_PROVINCIA", as_index=False)
+        .agg(
+            transport_nodes=("CODIGO", "count"),
+            weighted_transport_nodes=("node_weight", "sum"),
+            high_speed_nodes=("mode", lambda values: int((values == "Alta velocidad").sum())),
+            long_distance_nodes=("mode", lambda values: int((values == "Larga distancia").sum())),
+            medium_distance_nodes=("mode", lambda values: int((values == "Media distancia").sum())),
+            cercanias_nodes=("mode", lambda values: int((values == "Cercanias").sum())),
+            feve_nodes=("mode", lambda values: int((values == "FEVE").sum())),
+            airport_nodes=("mode", lambda values: int((values == "Aeropuerto").sum())),
+        )
+    )
+    map_data = map_data.merge(node_summary, on="COD_PROVINCIA", how="left")
+    count_columns = [
+        "transport_nodes",
+        "weighted_transport_nodes",
+        "high_speed_nodes",
+        "long_distance_nodes",
+        "medium_distance_nodes",
+        "cercanias_nodes",
+        "feve_nodes",
+        "airport_nodes",
+    ]
+    map_data[count_columns] = map_data[count_columns].fillna(0)
+    map_data["av_ld_md_nodes"] = (
+        map_data["high_speed_nodes"]
+        + map_data["long_distance_nodes"]
+        + map_data["medium_distance_nodes"]
+    )
+    map_data["nodes_per_100k"] = (
+        map_data["weighted_transport_nodes"] / map_data["population"] * 100000
+    )
+
+    province_points = map_data.to_crs(PROJECTED_CRS).geometry.representative_point()
+    strategic = nodes[nodes["mode"].isin(STRATEGIC_MODES)].to_crs(PROJECTED_CRS)
+    strategic_union = strategic.geometry.union_all()
+    map_data["nearest_strategic_km"] = province_points.distance(strategic_union) / 1000
+    map_data["strategic_access_score"] = rescale_0_100(
+        map_data["nearest_strategic_km"], higher_is_better=False
+    )
+    map_data["node_density_score"] = rescale_0_100(
+        map_data["nodes_per_100k"], higher_is_better=True
+    )
+    map_data["mobility_score"] = (
+        map_data["strategic_access_score"] * 0.60
+        + map_data["node_density_score"] * 0.40
+    ).clip(0, 100)
+    return add_geographic_metrics(map_data)
+
+
+def build_dataset() -> tuple[
+    gpd.GeoDataFrame,
+    gpd.GeoDataFrame,
+    gpd.GeoDataFrame,
+    list[float],
+]:
+    download_file(RENFE_ALL_URL, RENFE_ALL_FILE)
+    download_file(RENFE_GTFS_URL, RENFE_GTFS_FILE)
     download_file(BROADBAND_URL, BROADBAND_FILE)
     download_file(NUTS_URL, NUTS_FILE)
-    download_file(LAU_URL, LAU_FILE)
-
-    municipal_population, provincial_population = load_population()
-    crime = load_crime()
-
-    provincial_crime = crime.copy()
-    provincial_crime["COD_PROVINCIA"] = provincial_crime["Geografía"].map(extract_province_code)
-    provincial_crime = provincial_crime.dropna(subset=["COD_PROVINCIA"])
-    provincial_crime = provincial_crime.groupby("COD_PROVINCIA", as_index=False).agg(
-        crime_total=("crime_total", "sum")
-    )
 
     provinces = load_province_geometries()
-    map_data = (
-        provinces.merge(provincial_population, on="COD_PROVINCIA", how="left")
-        .merge(provincial_crime, on="COD_PROVINCIA", how="left")
+    population = load_population()
+    station_reference = load_station_reference()
+    routes, trips, stop_times, stops = load_gtfs_tables()
+    stations = load_renfe_stations(
+        station_reference, routes, trips, stop_times, stops, provinces
     )
-    map_data["crime_rate_per_1000"] = map_data["crime_total"] / map_data["population"] * 1000
-    map_data["safety_score"] = 100 - (
-        (map_data["crime_rate_per_1000"] - map_data["crime_rate_per_1000"].min())
-        / (map_data["crime_rate_per_1000"].max() - map_data["crime_rate_per_1000"].min())
-        * 100
-    )
-    map_data["safety_reading"] = map_data["crime_rate_per_1000"].map(classify_reading)
+    airports = load_airports()
+    nodes = pd.concat([stations, airports], ignore_index=True)
+    nodes = gpd.GeoDataFrame(nodes, geometry="geometry", crs="EPSG:4326")
+    route_lines = build_route_lines(routes, trips, stop_times, stops)
+    map_data = calculate_province_mobility(provinces, population, nodes)
 
-    projected = map_data.to_crs("EPSG:3035")
-    points = projected.geometry.representative_point().to_crs("EPSG:4326")
-    map_data["label_lon"] = points.x
-    map_data["label_lat"] = points.y
+    required = ["population", "mobility_score", "nearest_strategic_km"]
+    missing = map_data[map_data[required].isna().any(axis=1)]
+    if not missing.empty:
+        raise ValueError(
+            "Faltan datos de movilidad/poblacion para: "
+            + ", ".join(missing["COD_PROVINCIA"].tolist())
+        )
 
-    municipal_crime = crime[crime["Geografía"].str.match(r"^\d{5}\s+", na=False)].copy()
-    municipal_crime["CMUN"] = municipal_crime["Geografía"].str.extract(r"^(\d{5})")
-    municipal_crime["municipality_name_crime"] = municipal_crime["Geografía"].str.replace(
-        r"^\d{5}\s+", "", regex=True
+    bins = build_quantile_bins(map_data["mobility_score"], 5)
+    map_data["mobility_color"] = map_data["mobility_score"].map(
+        lambda value: color_for_bins(value, bins, MOBILITY_PALETTE)
     )
-    municipal_points = (
-        municipal_crime.merge(municipal_population, on="CMUN", how="left")
-        .merge(load_lau_points()[["CMUN", "lat", "lon", "geometry"]], on="CMUN", how="left")
-    )
-    municipal_points["crime_rate_per_1000"] = (
-        municipal_points["crime_total"] / municipal_points["population"] * 1000
-    )
-    municipal_points["safety_reading"] = municipal_points["crime_rate_per_1000"].map(
-        classify_reading
-    )
-    municipal_points = gpd.GeoDataFrame(
-        municipal_points.dropna(subset=["lat", "lon", "population", "crime_rate_per_1000"]),
-        geometry="geometry",
-        crs="EPSG:4326",
-    )
-
-    province_bins = build_quantile_bins(map_data["crime_rate_per_1000"], 5)
-    point_bins = build_quantile_bins(municipal_points["crime_rate_per_1000"], 5)
-    map_data["province_color"] = map_data["crime_rate_per_1000"].map(
-        lambda value: color_for_bins(value, province_bins, PROVINCE_PALETTE)
-    )
-    municipal_points["point_color"] = municipal_points["crime_rate_per_1000"].map(
-        lambda value: color_for_bins(value, point_bins, POINT_PALETTE)
-    )
-    return map_data, municipal_points, province_bins, point_bins
+    return map_data, nodes, route_lines, bins
 
 
 def save_static_map(
     map_data: gpd.GeoDataFrame,
-    municipal_points: gpd.GeoDataFrame,
-    province_bins: list[float],
-    point_bins: list[float],
+    nodes: gpd.GeoDataFrame,
+    route_lines: gpd.GeoDataFrame,
+    bins: list[float],
 ) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
     fig = plt.figure(figsize=(16, 9.5), dpi=180)
     grid = fig.add_gridspec(2, 3, width_ratios=[1.25, 1.25, 0.95], hspace=0.34, wspace=0.2)
     map_ax = fig.add_subplot(grid[:, :2])
-    ranking_ax = fig.add_subplot(grid[0, 2])
-    points_ax = fig.add_subplot(grid[1, 2])
+    rank_ax = fig.add_subplot(grid[0, 2])
+    mode_ax = fig.add_subplot(grid[1, 2])
 
-    map_data.plot(
-        ax=map_ax,
-        color=map_data["province_color"],
-        linewidth=0.42,
-        edgecolor="#ffffff",
-    )
+    map_data.plot(ax=map_ax, color=map_data["mobility_color"], linewidth=0.42, edgecolor="white")
     map_data.boundary.plot(ax=map_ax, color="#555555", linewidth=0.14, alpha=0.55)
+    for mode in RAIL_ROUTE_MODES:
+        route_lines[route_lines["mode"].eq(mode)].plot(
+            ax=map_ax,
+            color=MODE_COLORS[mode],
+            linewidth=0.55 if mode == "Alta velocidad" else 0.38,
+            alpha=0.34,
+            zorder=2,
+        )
 
-    top_points = municipal_points.nlargest(65, "crime_total")
-    sizes = (top_points["crime_total"] ** 0.5).clip(8, 46)
-    map_ax.scatter(
-        top_points["lon"],
-        top_points["lat"],
-        s=sizes,
-        c=top_points["point_color"],
-        edgecolor="#1f1f1f",
-        linewidth=0.25,
-        alpha=0.78,
-        zorder=4,
-    )
+    visible_nodes = nodes[nodes["mode"].isin(STRATEGIC_MODES)]
+    for mode, group in visible_nodes.groupby("mode"):
+        size = 58 if mode == "Aeropuerto" else 22
+        marker = "^" if mode == "Aeropuerto" else "o"
+        map_ax.scatter(
+            group.geometry.x,
+            group.geometry.y,
+            s=size,
+            c=MODE_COLORS[mode],
+            marker=marker,
+            edgecolor="#1f1f1f",
+            linewidth=0.25,
+            alpha=0.82,
+            label=mode,
+            zorder=4,
+        )
 
-    safest = map_data.nsmallest(7, "crime_rate_per_1000")
-    for _, row in safest.iterrows():
+    top_labels = map_data.nlargest(7, "mobility_score")
+    for _, row in top_labels.iterrows():
         text = map_ax.annotate(
-            f"{row['province_name']}\n{row['crime_rate_per_1000']:.1f}",
+            f"{row['province_name']}\n{row['mobility_score']:.1f}",
             xy=(row["label_lon"], row["label_lat"]),
             ha="center",
             va="center",
@@ -364,11 +644,11 @@ def save_static_map(
     map_ax.set_axis_off()
     legend_handles = [
         mpatches.Patch(facecolor=color, edgecolor="#666666", label=label)
-        for color, label in zip(PROVINCE_PALETTE, build_bin_labels(province_bins))
+        for color, label in zip(MOBILITY_PALETTE, build_bin_labels(bins))
     ]
     map_ax.legend(
         handles=legend_handles,
-        title="Delitos por 1.000 hab.",
+        title="Indice movilidad",
         loc="lower right",
         fontsize=7.6,
         title_fontsize=8.7,
@@ -376,68 +656,63 @@ def save_static_map(
         framealpha=0.96,
     )
     map_ax.set_title(
-        "Seguridad relativa y poblacion: tasa provincial y puntos municipales disponibles",
+        "Movilidad intermodal: recorridos Renfe y aeropuertos",
         fontsize=16.2,
         fontweight="bold",
         pad=12,
     )
 
-    safest_rank = map_data.nsmallest(10, "crime_rate_per_1000").sort_values(
-        "crime_rate_per_1000"
-    )
-    ranking_ax.barh(
-        safest_rank["province_name"],
-        safest_rank["crime_rate_per_1000"],
-        color="#7bccc4",
+    top = map_data.nlargest(10, "mobility_score").sort_values("mobility_score")
+    rank_ax.barh(
+        top["province_name"],
+        top["mobility_score"],
+        color=top["mobility_color"],
         edgecolor="#555555",
         linewidth=0.35,
     )
-    ranking_ax.set_title("Menor presion delictiva", fontsize=11, fontweight="bold")
-    ranking_ax.set_xlabel("Delitos por 1.000 habitantes", fontsize=8.5)
-    ranking_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    ranking_ax.tick_params(axis="both", labelsize=8)
+    rank_ax.set_title("Mejor movilidad relativa", fontsize=11, fontweight="bold")
+    rank_ax.set_xlabel("Score 0-100", fontsize=8.5)
+    rank_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
+    rank_ax.tick_params(axis="both", labelsize=8)
 
-    largest_points = municipal_points.nlargest(10, "crime_total").sort_values("crime_total")
-    points_ax.barh(
-        largest_points["municipality_name_crime"],
-        largest_points["crime_total"],
-        color=largest_points["point_color"],
+    mode_counts = (
+        nodes.groupby("mode", as_index=False)
+        .agg(nodos=("CODIGO", "count"), peso=("node_weight", "sum"))
+        .sort_values("peso")
+    )
+    mode_ax.barh(
+        mode_counts["mode"],
+        mode_counts["peso"],
+        color=[MODE_COLORS[mode] for mode in mode_counts["mode"]],
         edgecolor="#555555",
         linewidth=0.35,
     )
-    points_ax.set_title("Municipios con mas hechos", fontsize=11, fontweight="bold")
-    points_ax.set_xlabel("Hechos conocidos", fontsize=8.5)
-    points_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    points_ax.tick_params(axis="both", labelsize=8)
+    mode_ax.set_title("Nodos ponderados por modo", fontsize=11, fontweight="bold")
+    mode_ax.set_xlabel("Peso total", fontsize=8.5)
+    mode_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
+    mode_ax.tick_params(axis="both", labelsize=8)
 
-    for side_ax in [ranking_ax, points_ax]:
+    for axis in [rank_ax, mode_ax]:
         for spine in ["top", "right", "left"]:
-            side_ax.spines[spine].set_visible(False)
+            axis.spines[spine].set_visible(False)
 
-    fig.suptitle(
-        "Mapa 2. Seguridad y poblacion (criminalidad 2024)",
-        fontsize=20,
-        fontweight="bold",
-        x=0.44,
-        y=0.985,
-    )
+    fig.suptitle("Mapa 2. Movilidad y transporte", fontsize=20, fontweight="bold", x=0.44, y=0.985)
     fig.text(
         0.02,
         0.018,
-        "Fuente: Ministerio del Interior, Balance de Criminalidad 2024; poblacion/hogares de SETELECO "
-        "y cartografia Eurostat/GISCO. Los puntos son municipios agregados disponibles, no delitos individuales.",
+        "Fuentes: Renfe Data GTFS alta/larga/media, Renfe Data estaciones, AENA/ENAIRE, SETELECO poblacion "
+        "y Eurostat/GISCO. Las lineas unen paradas de recorridos GTFS; los aeropuertos son nodos, no rutas aereas.",
         fontsize=8,
         color="#555555",
     )
-
-    fig.savefig(OUTPUT_DIR / "mapa2_seguridad_poblacion.png", bbox_inches="tight")
-    fig.savefig(OUTPUT_DIR / "mapa2_seguridad_poblacion.pdf", bbox_inches="tight")
+    fig.savefig(OUTPUT_DIR / "mapa2_movilidad_transportes.png", bbox_inches="tight")
+    fig.savefig(OUTPUT_DIR / "mapa2_movilidad_transportes.pdf", bbox_inches="tight")
     fig.savefig(OUTPUT_DIR / "mapa2_evolucion_alquiler.png", bbox_inches="tight")
     fig.savefig(OUTPUT_DIR / "mapa2_evolucion_alquiler.pdf", bbox_inches="tight")
     plt.close(fig)
 
 
-def add_legend(web_map: folium.Map, bins: list[float], colors: list[str], title: str) -> None:
+def add_legend(web_map: folium.Map, bins: list[float]) -> None:
     rows = "".join(
         f"""
         <div style="display:flex; align-items:center; gap:6px; margin:3px 0;">
@@ -446,7 +721,7 @@ def add_legend(web_map: folium.Map, bins: list[float], colors: list[str], title:
           <span>{label}</span>
         </div>
         """
-        for color, label in zip(colors, build_bin_labels(bins))
+        for color, label in zip(MOBILITY_PALETTE, build_bin_labels(bins))
     )
     html_block = f"""
     <div style="
@@ -455,18 +730,118 @@ def add_legend(web_map: folium.Map, bins: list[float], colors: list[str], title:
       border: 1px solid rgba(80,80,80,0.55); border-radius: 4px;
       font-family: Arial, sans-serif; font-size: 12px; line-height: 1.25;
       box-shadow: 0 1px 5px rgba(0,0,0,0.22);">
-      <div style="font-weight:700; margin-bottom:5px;">{html.escape(title)}</div>
+      <div style="font-weight:700; margin-bottom:5px;">Indice movilidad</div>
       {rows}
     </div>
     """
     web_map.get_root().html.add_child(folium.Element(html_block))
 
 
+def add_transport_radio_control(
+    web_map: folium.Map,
+    transport_layers: dict[str, list[str]],
+) -> None:
+    labels = {
+        "none": "Ninguno",
+        "Alta velocidad": "Alta velocidad",
+        "Larga distancia": "Larga distancia",
+        "Media distancia": "Media distancia",
+        "Aeropuerto": "Aeropuertos",
+        "Cercanias": "Cercanias",
+        "FEVE": "FEVE",
+    }
+    radios = "\n".join(
+        f"""
+        <label class="transport-radio-option">
+          <input type="radio" name="transport-layer-mode" value="{html.escape(key)}"
+                 {"checked" if key == "none" else ""}>
+          <span>{html.escape(labels[key])}</span>
+        </label>
+        """
+        for key in labels
+    )
+    layer_entries = ",\n".join(
+        f'"{key}": [{", ".join(layer_names)}]' for key, layer_names in transport_layers.items()
+    )
+    map_name = web_map.get_name()
+    control_css = """
+    <style>
+      .transport-radio-control {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(80, 80, 80, 0.45);
+        border-radius: 4px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
+        color: #222;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        line-height: 1.25;
+        padding: 10px 12px;
+        min-width: 170px;
+      }
+      .transport-radio-control-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .transport-radio-option {
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        gap: 6px;
+        margin: 5px 0;
+        white-space: nowrap;
+      }
+      .transport-radio-option input {
+        margin: 0;
+      }
+    </style>
+    """
+    control_script = f"""
+      setTimeout(function() {{
+        const map = {map_name};
+        const transportLayers = {{
+          none: [],
+          {layer_entries}
+        }};
+        const allLayers = Object.values(transportLayers).flat();
+
+        function setTransportMode(mode) {{
+          allLayers.forEach((layer) => {{
+            if (map.hasLayer(layer)) {{
+              map.removeLayer(layer);
+            }}
+          }});
+          (transportLayers[mode] || []).forEach((layer) => {{
+            map.addLayer(layer);
+          }});
+        }}
+
+        const control = L.control({{position: "topright"}});
+        control.onAdd = function() {{
+          const container = L.DomUtil.create("div", "transport-radio-control leaflet-bar");
+          container.innerHTML = `
+            <div class="transport-radio-control-title">Recorridos y nodos</div>
+            {radios}
+          `;
+          L.DomEvent.disableClickPropagation(container);
+          L.DomEvent.disableScrollPropagation(container);
+          container.querySelectorAll("input[name='transport-layer-mode']").forEach((input) => {{
+            input.addEventListener("change", () => setTransportMode(input.value));
+          }});
+          return container;
+        }};
+        control.addTo(map);
+        setTransportMode("none");
+      }}, 0);
+    """
+    web_map.get_root().header.add_child(folium.Element(control_css))
+    web_map.get_root().script.add_child(folium.Element(control_script))
+
+
 def save_interactive_map(
     map_data: gpd.GeoDataFrame,
-    municipal_points: gpd.GeoDataFrame,
-    province_bins: list[float],
-    point_bins: list[float],
+    nodes: gpd.GeoDataFrame,
+    route_lines: gpd.GeoDataFrame,
+    bins: list[float],
 ) -> None:
     web_map = folium.Map(location=[40.2, -3.7], zoom_start=6, tiles="cartodbpositron")
     plugins.Fullscreen(position="topleft").add_to(web_map)
@@ -475,31 +850,31 @@ def save_interactive_map(
         web_map
     )
 
-    province_layer = folium.FeatureGroup(name="Tasa provincial por 1.000 habitantes", show=True)
+    province_layer = folium.FeatureGroup(name="Indice provincial de movilidad", show=True)
     folium.GeoJson(
         map_data,
-        name="Tasa provincial",
+        name="Indice provincial",
         style_function=lambda feature: {
-            "fillColor": feature["properties"]["province_color"],
+            "fillColor": feature["properties"]["mobility_color"],
             "color": "#555555",
             "weight": 0.55,
-            "fillOpacity": 0.82,
+            "fillOpacity": 0.78,
         },
         highlight_function=lambda feature: {"weight": 2, "color": "#111111"},
         tooltip=folium.GeoJsonTooltip(
             fields=[
                 "province_name",
-                "crime_total",
-                "population",
-                "crime_rate_per_1000",
-                "safety_reading",
+                "mobility_score",
+                "weighted_transport_nodes",
+                "nodes_per_100k",
+                "nearest_strategic_km",
             ],
             aliases=[
                 "Provincia",
-                "Hechos conocidos",
-                "Habitantes",
-                "Delitos / 1.000 hab.",
-                "Lectura",
+                "Score movilidad",
+                "Nodos ponderados",
+                "Nodos ponderados / 100.000 hab.",
+                "Distancia a nodo estrategico",
             ],
             localize=True,
             sticky=False,
@@ -507,110 +882,163 @@ def save_interactive_map(
         popup=folium.GeoJsonPopup(
             fields=[
                 "province_name",
-                "crime_total",
                 "population",
-                "crime_rate_per_1000",
-                "safety_score",
-                "safety_reading",
+                "transport_nodes",
+                "high_speed_nodes",
+                "long_distance_nodes",
+                "medium_distance_nodes",
+                "cercanias_nodes",
+                "feve_nodes",
+                "airport_nodes",
+                "nodes_per_100k",
+                "nearest_strategic_km",
+                "mobility_score",
             ],
             aliases=[
                 "Provincia",
-                "Hechos conocidos",
                 "Habitantes",
-                "Delitos / 1.000 hab.",
-                "Score seguridad",
-                "Lectura",
+                "Nodos totales",
+                "Alta velocidad",
+                "Larga distancia",
+                "Media distancia",
+                "Cercanias",
+                "FEVE",
+                "Aeropuertos",
+                "Nodos ponderados / 100.000 hab.",
+                "Km a nodo estrategico",
+                "Score movilidad",
             ],
             localize=True,
-            max_width=360,
+            max_width=390,
         ),
     ).add_to(province_layer)
     province_layer.add_to(web_map)
 
-    point_layer = plugins.MarkerCluster(name="Municipios disponibles en el balance", show=True)
-    for _, row in municipal_points.iterrows():
-        radius = max(4, min(18, float(row["crime_total"]) ** 0.5 / 8))
-        popup_html = (
-            f"<b>{html.escape(str(row['municipality_name_crime']))}</b><br>"
-            f"Provincia: {html.escape(str(row['COD_PROVINCIA']))}<br>"
-            f"Hechos conocidos: {format_int(row['crime_total'])}<br>"
-            f"Habitantes: {format_int(row['population'])}<br>"
-            f"Tasa: {format_rate(row['crime_rate_per_1000'])} por 1.000 hab.<br>"
-            f"{html.escape(str(row['safety_reading']))}<br><br>"
-            "Punto municipal agregado; no localiza delitos individuales."
-        )
-        folium.CircleMarker(
-            location=[row["lat"], row["lon"]],
-            radius=radius,
-            color="#262626",
-            weight=0.45,
-            fill=True,
-            fill_color=row["point_color"],
-            fill_opacity=0.78,
-            tooltip=(
-                f"{row['municipality_name_crime']}: "
-                f"{format_rate(row['crime_rate_per_1000'])} delitos/1.000 hab."
-            ),
-            popup=folium.Popup(popup_html, max_width=340),
-        ).add_to(point_layer)
-    point_layer.add_to(web_map)
+    transport_layers: dict[str, list[str]] = {}
 
-    add_legend(web_map, province_bins, PROVINCE_PALETTE, "Tasa provincial")
+    for mode in RAIL_ROUTE_MODES:
+        route_group = route_lines[route_lines["mode"].eq(mode)].copy()
+        route_layer = folium.GeoJson(
+            route_group,
+            name=f"Recorridos: {mode}",
+            show=False,
+            control=False,
+            style_function=lambda feature, local_mode=mode: {
+                "color": MODE_COLORS[local_mode],
+                "weight": 2.0 if local_mode == "Alta velocidad" else 1.45,
+                "opacity": 0.58,
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=["route_short_name", "from_stop", "to_stop", "stop_count"],
+                aliases=["Servicio", "Desde", "Hasta", "Paradas"],
+                sticky=False,
+            ),
+            popup=folium.GeoJsonPopup(
+                fields=["route_short_name", "mode", "from_stop", "to_stop", "source"],
+                aliases=["Servicio", "Modo", "Desde", "Hasta", "Fuente"],
+                max_width=360,
+            ),
+        )
+        route_layer.add_to(web_map)
+        transport_layers.setdefault(mode, []).append(route_layer.get_name())
+
+    for mode in RAIL_ROUTE_MODES + ["Aeropuerto", "Cercanias", "FEVE"]:
+        cluster = plugins.MarkerCluster(name=f"Nodos: {mode}", show=False, control=False)
+        group = nodes[nodes["mode"].eq(mode)]
+        for _, row in group.iterrows():
+            radius = 6 if mode != "Aeropuerto" else 8
+            popup_html = (
+                f"<b>{html.escape(str(row['DESCRIPCION']))}</b><br>"
+                f"Modo: {html.escape(str(row['mode']))}<br>"
+                f"Provincia/codigo: {html.escape(str(row['COD_PROVINCIA']))}<br>"
+                f"Poblacion local: {html.escape(str(row.get('POBLACION', 'sin dato')))}<br>"
+                f"Fuente: {html.escape(str(row['source']))}"
+            )
+            folium.CircleMarker(
+                location=[row.geometry.y, row.geometry.x],
+                radius=radius,
+                color="#262626",
+                weight=0.5,
+                fill=True,
+                fill_color=MODE_COLORS[mode],
+                fill_opacity=0.82,
+                tooltip=f"{row['DESCRIPCION']} ({mode})",
+                popup=folium.Popup(popup_html, max_width=340),
+            ).add_to(cluster)
+        cluster.add_to(web_map)
+        transport_layers.setdefault(mode, []).append(cluster.get_name())
+
+    add_legend(web_map, bins)
+    add_transport_radio_control(web_map, transport_layers)
     folium.LayerControl(collapsed=False).add_to(web_map)
-    web_map.save(OUTPUT_DIR / "mapa2_seguridad_poblacion_interactivo.html")
+    web_map.save(OUTPUT_DIR / "mapa2_movilidad_transportes_interactivo.html")
     shutil.copyfile(
-        OUTPUT_DIR / "mapa2_seguridad_poblacion_interactivo.html",
+        OUTPUT_DIR / "mapa2_movilidad_transportes_interactivo.html",
         OUTPUT_DIR / "mapa2_evolucion_alquiler_interactivo.html",
     )
 
 
-def save_tables(map_data: gpd.GeoDataFrame, municipal_points: gpd.GeoDataFrame) -> None:
+def save_tables(
+    map_data: gpd.GeoDataFrame,
+    nodes: gpd.GeoDataFrame,
+    route_lines: gpd.GeoDataFrame,
+) -> None:
     province_columns = [
         "COD_PROVINCIA",
         "province_name",
         "population",
-        "crime_total",
-        "crime_rate_per_1000",
-        "safety_score",
-        "safety_reading",
+        "transport_nodes",
+        "weighted_transport_nodes",
+        "high_speed_nodes",
+        "long_distance_nodes",
+        "medium_distance_nodes",
+        "av_ld_md_nodes",
+        "cercanias_nodes",
+        "feve_nodes",
+        "airport_nodes",
+        "nodes_per_100k",
+        "nearest_strategic_km",
+        "strategic_access_score",
+        "node_density_score",
+        "mobility_score",
         "label_lat",
         "label_lon",
+        "area_km2",
     ]
-    municipal_columns = [
-        "CMUN",
+    node_columns = [
+        "CODIGO",
+        "DESCRIPCION",
+        "mode",
         "COD_PROVINCIA",
-        "municipality_name_crime",
-        "population",
-        "crime_total",
-        "crime_rate_per_1000",
-        "safety_reading",
-        "lat",
-        "lon",
+        "POBLACION",
+        "node_weight",
+        "source",
+        "LATITUD",
+        "LONGITUD",
     ]
     map_data[province_columns].round(2).to_csv(
-        OUTPUT_DIR / "mapa2_seguridad_poblacion_datos.csv", index=False
+        OUTPUT_DIR / "mapa2_movilidad_transportes_datos.csv", index=False
     )
     map_data[province_columns].round(2).to_csv(
         OUTPUT_DIR / "mapa2_evolucion_alquiler_datos.csv", index=False
     )
-    municipal_points[municipal_columns].round(2).to_csv(
-        OUTPUT_DIR / "mapa2_seguridad_poblacion_municipios.csv", index=False
+    nodes[node_columns].to_csv(
+        OUTPUT_DIR / "mapa2_movilidad_transportes_nodos.csv", index=False
     )
+    route_lines[
+        ["route_id", "route_short_name", "mode", "from_stop", "to_stop", "stop_count", "source"]
+    ].to_csv(OUTPUT_DIR / "mapa2_movilidad_transportes_recorridos.csv", index=False)
 
 
 def main() -> None:
-    map_data, municipal_points, province_bins, point_bins = build_dataset()
-    missing = map_data[map_data[["crime_total", "population", "crime_rate_per_1000"]].isna().any(axis=1)]
-    if not missing.empty:
-        raise ValueError(
-            "Faltan datos provinciales de criminalidad/poblacion para: "
-            + ", ".join(missing["COD_PROVINCIA"].tolist())
-        )
-    save_static_map(map_data, municipal_points, province_bins, point_bins)
-    save_interactive_map(map_data, municipal_points, province_bins, point_bins)
-    save_tables(map_data, municipal_points)
-    print("Mapa 2 generado: seguridad y poblacion con criminalidad 2024.")
-    print(f"Provincias: {len(map_data)} | municipios disponibles: {len(municipal_points)}")
+    map_data, nodes, route_lines, bins = build_dataset()
+    save_static_map(map_data, nodes, route_lines, bins)
+    save_interactive_map(map_data, nodes, route_lines, bins)
+    save_tables(map_data, nodes, route_lines)
+    print("Mapa 2 generado: movilidad y transporte.")
+    print(
+        f"Provincias: {len(map_data)} | nodos: {len(nodes)} | recorridos: {len(route_lines)}"
+    )
 
 
 if __name__ == "__main__":

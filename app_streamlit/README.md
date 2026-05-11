@@ -1,12 +1,12 @@
 # Apps Streamlit del proyecto
 
-## Mapa 2: seguridad y poblacion
+## Mapa 2: movilidad y transporte
 
-El mapa 2 actual se presenta como HTML generado por Folium. La antigua app del mapa 2 queda fuera de la presentacion porque esa variable ha sido sustituida por seguridad relativa.
+El mapa 2 actual se presenta como HTML generado por Folium. La antigua app del mapa 2 queda fuera de la presentacion porque esa variable ha sido sustituida por movilidad intermodal.
 
 ## Mapa 6: indice final de destino tech
 
-App complementaria del mapa 6. Permite recalcular el indice final con pesos ajustables, aplicar filtros, consultar un ranking dinamico, explorar el mapa Folium recalculado y revisar el perfil de cada provincia. El componente de seguridad forma parte de la formula final.
+App complementaria del mapa 6. Permite recalcular el indice final con pesos ajustables, aplicar filtros, consultar un ranking dinamico, explorar el mapa Folium recalculado y revisar el perfil de cada provincia. El componente de movilidad forma parte de la formula final.
 
 
 ```bash

@@ -21,7 +21,7 @@ from streamlit_folium import st_folium
 
 COMPONENT_LABELS = {
     "rent_score_low_price": "Alquiler bajo",
-    "safety_score": "Seguridad",
+    "mobility_score": "Movilidad",
     "availability_score": "Disponibilidad",
     "connectivity_score": "Conectividad",
     "climate_score": "Clima temp+lluvia",
@@ -29,7 +29,7 @@ COMPONENT_LABELS = {
 
 DEFAULT_RAW_WEIGHTS = {
     "rent_score_low_price": 35,
-    "safety_score": 20,
+    "mobility_score": 20,
     "availability_score": 15,
     "connectivity_score": 20,
     "climate_score": 10,
@@ -37,7 +37,7 @@ DEFAULT_RAW_WEIGHTS = {
 
 COMPONENT_COLORS = {
     "rent_score_low_price": "#2a9d8f",
-    "safety_score": "#577590",
+    "mobility_score": "#577590",
     "availability_score": "#f4a261",
     "connectivity_score": "#277da1",
     "climate_score": "#90be6d",
@@ -166,7 +166,8 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "app_index",
         "app_index_class",
         "rent_eur_month",
-        "crime_rate_label",
+        "mobility_label",
+        "nearest_strategic_label",
         "coverage_1gbps_2024_pct",
         "rental_homes_per_1000_households",
         "precipitation_annual_mm",
@@ -179,7 +180,8 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
         "Indice recalculado",
         "Clase",
         "Alquiler mensual",
-        "Criminalidad",
+        "Movilidad",
+        "Nodo estrategico cercano",
         "Cobertura 1 Gbps",
         "Alquiler / 1.000 hogares",
         "Precipitacion anual",
@@ -216,7 +218,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
             fields=[
                 "province_name",
                 "rent_score_low_price",
-                "safety_score",
+                "mobility_score",
                 "availability_score",
                 "connectivity_score",
                 "temperature_comfort_score",
@@ -228,7 +230,7 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
             aliases=[
                 "Provincia",
                 "Score alquiler bajo",
-                "Score seguridad",
+                "Score movilidad",
                 "Score disponibilidad",
                 "Score conectividad",
                 "Score temperatura",
@@ -291,8 +293,16 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "app_index",
         "default_index",
         "rent_eur_month",
-        "crime_total",
-        "crime_rate_per_1000",
+        "mobility_score",
+        "transport_nodes",
+        "weighted_transport_nodes",
+        "high_speed_nodes",
+        "long_distance_nodes",
+        "medium_distance_nodes",
+        "nodes_per_100k",
+        "nearest_strategic_km",
+        "strategic_access_score",
+        "node_density_score",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
@@ -300,7 +310,6 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "rain_comfort_score",
         "climate_comfort_score",
         "rent_score_low_price",
-        "safety_score",
         "availability_score",
         "connectivity_score",
         "climate_score",
@@ -368,7 +377,7 @@ def main() -> None:
     metric_cols[0].metric("Destino #1", winner["province_name"])
     metric_cols[1].metric("Indice", f"{winner['app_index']:.1f}")
     metric_cols[2].metric("Alquiler", f"{winner['rent_eur_month']:.0f} euros/mes")
-    metric_cols[3].metric("Seguridad", winner["crime_rate_label"])
+    metric_cols[3].metric("Movilidad", f"{winner['mobility_score']:.1f} / 100")
     metric_cols[4].metric("Provincias filtradas", f"{len(filtered)} / {len(data)}")
 
     tab_map, tab_ranking, tab_province, tab_method = st.tabs(
@@ -391,7 +400,8 @@ def main() -> None:
                 "province_name",
                 "app_index",
                 "rent_eur_month",
-                "crime_rate_label",
+                "mobility_score",
+                "nearest_strategic_km",
                 "coverage_1gbps_2024_pct",
                 "precipitation_annual_mm",
                 "rank_change_vs_default",
@@ -405,7 +415,8 @@ def main() -> None:
                     "province_name": "Provincia",
                     "app_index": "Indice",
                     "rent_eur_month": "Alquiler",
-                    "crime_rate_label": "Criminalidad",
+                    "mobility_score": "Movilidad",
+                    "nearest_strategic_km": "Nodo cercano km",
                     "coverage_1gbps_2024_pct": "1 Gbps",
                     "precipitation_annual_mm": "Lluvia anual",
                     "rank_change_vs_default": "Cambio vs base",
@@ -467,7 +478,7 @@ def main() -> None:
         province_cols[0].metric("Ranking filtrado", selected["filtered_rank_label"])
         province_cols[1].metric("Indice", f"{selected['app_index']:.1f}")
         province_cols[2].metric("Alquiler", f"{selected['rent_eur_month']:.0f} euros")
-        province_cols[3].metric("Seguridad", selected["crime_rate_label"])
+        province_cols[3].metric("Movilidad", f"{selected['mobility_score']:.1f} / 100")
         province_cols[4].metric("Lluvia anual", f"{selected['precipitation_annual_mm']:.0f} mm")
         province_cols[5].metric("Cambio vs base", f"{selected['rank_change_vs_default']:+.0f}")
 
@@ -530,7 +541,7 @@ def main() -> None:
             }
             for column, variable in [
                 ("rent_score_low_price", "Alquiler medio ponderado bajo"),
-                ("safety_score", "Menor tasa de infracciones penales por 1.000 habitantes"),
+                ("mobility_score", "Acceso a AV/LD/MD o aeropuerto y nodos ponderados por 100.000 habitantes"),
                 ("availability_score", "Viviendas de alquiler por 1.000 hogares"),
                 ("connectivity_score", "Cobertura fija >= 1 Gbps"),
                 (

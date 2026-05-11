@@ -7,12 +7,12 @@ Este mapa sintetiza los resultados del proyecto en un ranking provincial pensado
 El indice final se calcula con cinco componentes normalizados en una escala 0-100:
 
 - 35% alquiler bajo: cuanto menor es el alquiler mensual medio ponderado, mejor puntuacion.
-- 20% seguridad relativa: menor tasa de infracciones penales conocidas por 1.000 habitantes en 2024.
+- 20% movilidad: acceso a nodos de alta velocidad, larga distancia, media distancia o aeropuerto y densidad de nodos ponderados por 100.000 habitantes.
 - 15% disponibilidad del mercado: viviendas de alquiler observadas por cada 1.000 hogares.
 - 20% conectividad: porcentaje de hogares con cobertura fija de al menos 1 Gbps en junio de 2024.
 - 10% confort climatico: combina el confort termico del mapa 5 con la lluvia anual. Dentro de este componente, 70% depende de la cercania a una temperatura media anual de referencia y 30% de una precipitacion equilibrada, penalizando tanto provincias muy secas como excesivamente lluviosas frente a la mediana provincial.
 
-La formula es una decision metodologica: favorece provincias con alquiler contenido, menor presion delictiva relativa y buena infraestructura, sin dejar fuera mercado residencial y confort de vida. El CSV de salida conserva cada componente, la lluvia anual, los sub-scores climaticos y su aportacion ponderada para poder justificar o cambiar los pesos.
+La formula es una decision metodologica: favorece provincias con alquiler contenido, buena movilidad intermodal y buena infraestructura digital, sin dejar fuera mercado residencial y confort de vida. El CSV de salida conserva cada componente, la lluvia anual, los sub-scores climaticos y su aportacion ponderada para poder justificar o cambiar los pesos.
 
 ## Lectura visual
 

@@ -1,0 +1,676 @@
+route_id,route_short_name,mode,from_stop,to_stop,stop_count,source
+0100751003VRX,MD,Media distancia,Osuna,Sevilla-Santa Justa,8,Renfe Data GTFS alta/larga/media
+0203055020VRX,MD,Media distancia,Antequera AV,Algeciras,18,Renfe Data GTFS alta/larga/media
+0310017000VRX,MD,Media distancia,Jaen,Madrid-Chamartín-Clara Campoamor,13,Renfe Data GTFS alta/larga/media
+0310050500VRX,MD,Media distancia,Jaen,Cordoba,5,Renfe Data GTFS alta/larga/media
+0310051405VRX,MD,Media distancia,Jaen,Cádiz,22,Renfe Data GTFS alta/larga/media
+0321303216AV008,AVANT,Alta velocidad,Requena Utiel,Valencia Joaquin Sorolla,2,Renfe Data GTFS alta/larga/media
+0321317000AV006,AVE,Alta velocidad,Requena Utiel,Madrid-Chamartín-Clara Campoamor,3,Renfe Data GTFS alta/larga/media
+0321317000LC112,AVLO,Alta velocidad,Requena Utiel,Madrid-Chamartín-Clara Campoamor,3,Renfe Data GTFS alta/larga/media
+0321360000AV006,AVE,Alta velocidad,Requena Utiel,Madrid Pta.Atocha - Almudena Grandes,3,Renfe Data GTFS alta/larga/media
+0321603213AV008,AVANT,Alta velocidad,Valencia Joaquin Sorolla,Requena Utiel,2,Renfe Data GTFS alta/larga/media
+0321611014AV006,AVE,Alta velocidad,Valencia Joaquin Sorolla,Burgos Rosa Manzano,4,Renfe Data GTFS alta/larga/media
+0321615100AV006,AVE,Alta velocidad,Valencia Joaquin Sorolla,Leon,8,Renfe Data GTFS alta/larga/media
+0321617000AV006,AVE,Alta velocidad,Valencia Joaquin Sorolla,Madrid-Chamartín-Clara Campoamor,4,Renfe Data GTFS alta/larga/media
+0321617000LC112,AVLO,Alta velocidad,Valencia Joaquin Sorolla,Madrid-Chamartín-Clara Campoamor,4,Renfe Data GTFS alta/larga/media
+0321651003AV006,AVE,Alta velocidad,Valencia Joaquin Sorolla,Sevilla-Santa Justa,6,Renfe Data GTFS alta/larga/media
+0321665300AV006,AVE,Alta velocidad,Valencia Joaquin Sorolla,Castelló,2,Renfe Data GTFS alta/larga/media
+0404010600GL026,Intercity,Larga distancia,Zaragoza-Delicias,Valladolid,6,Renfe Data GTFS alta/larga/media
+0404011200GL026,Intercity,Larga distancia,Zaragoza-Delicias,Miranda De Ebro,4,Renfe Data GTFS alta/larga/media
+0404011200VRX,MD,Media distancia,Zaragoza-Delicias,Miranda De Ebro,7,Renfe Data GTFS alta/larga/media
+0404011208VRX,MD,Media distancia,Zaragoza-Delicias,Vitoria/Gasteiz,6,Renfe Data GTFS alta/larga/media
+0404017000VRE,REG.EXP.,Media distancia,Zaragoza-Delicias,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+0404017000VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Madrid-Chamartín-Clara Campoamor,14,Renfe Data GTFS alta/larga/media
+0404030100GL026,Intercity,Larga distancia,Zaragoza-Delicias,Salamanca,12,Renfe Data GTFS alta/larga/media
+0404060000AV006,AVE,Alta velocidad,Zaragoza-Delicias,Madrid Pta.Atocha - Almudena Grandes,2,Renfe Data GTFS alta/larga/media
+0404065000VRX,MD,Media distancia,Zaragoza-Delicias,Valencia-Estaciò Del Nord,18,Renfe Data GTFS alta/larga/media
+0404067017VRX,MD,Media distancia,Zaragoza-Delicias,Ferreruela,9,Renfe Data GTFS alta/larga/media
+0404067200VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Teruel,22,Renfe Data GTFS alta/larga/media
+0404070300VRE,REG.EXP.,Media distancia,Zaragoza-Delicias,Baides,7,Renfe Data GTFS alta/larga/media
+0404070300VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Baides,11,Renfe Data GTFS alta/larga/media
+0404070403VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Arcos De Jalón,25,Renfe Data GTFS alta/larga/media
+0404070500VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Ariza,23,Renfe Data GTFS alta/larga/media
+0404070600AV008,AVANT,Alta velocidad,Zaragoza-Delicias,Calatayud,2,Renfe Data GTFS alta/larga/media
+0404070600VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Calatayud,17,Renfe Data GTFS alta/larga/media
+0404071300VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Móra La Nova,18,Renfe Data GTFS alta/larga/media
+0404071801AV006,AVE,Alta velocidad,Zaragoza-Delicias,Barcelona-Sants,4,Renfe Data GTFS alta/larga/media
+0404071801GL023,ALVIA,Larga distancia,Zaragoza-Delicias,Barcelona-Sants,4,Renfe Data GTFS alta/larga/media
+0404074200AV006,AVE,Alta velocidad,Zaragoza-Delicias,Huesca,3,Renfe Data GTFS alta/larga/media
+0404074200VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Huesca,7,Renfe Data GTFS alta/larga/media
+0404074217VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Canfranc,17,Renfe Data GTFS alta/larga/media
+0404078302VRE,REG.EXP.,Media distancia,Zaragoza-Delicias,Binefar,9,Renfe Data GTFS alta/larga/media
+0404078302VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Binefar,10,Renfe Data GTFS alta/larga/media
+0404078400AV006,AVE,Alta velocidad,Zaragoza-Delicias,Lleida-Pirineus,2,Renfe Data GTFS alta/larga/media
+0404078400GL023,ALVIA,Larga distancia,Zaragoza-Delicias,Lleida-Pirineus,2,Renfe Data GTFS alta/larga/media
+0404078400VRE,REG.EXP.,Media distancia,Zaragoza-Delicias,Lleida-Pirineus,10,Renfe Data GTFS alta/larga/media
+0404078400VRR,REGIONAL,Media distancia,Zaragoza-Delicias,Lleida-Pirineus,11,Renfe Data GTFS alta/larga/media
+0404079400VRE,REG.EXP.,Media distancia,Zaragoza-Delicias,Barcelona-Estació De França,32,Renfe Data GTFS alta/larga/media
+0430760000AV006,AVE,Alta velocidad,Figueres Vilafant,Madrid Pta.Atocha - Almudena Grandes,8,Renfe Data GTFS alta/larga/media
+0430760911GL012,EUROMED,Larga distancia,Figueres Vilafant,Alicante/Alacant,7,Renfe Data GTFS alta/larga/media
+0430765000GL012,EUROMED,Larga distancia,Figueres Vilafant,Valencia-Estaciò Del Nord,6,Renfe Data GTFS alta/larga/media
+0430771801AV008,AVANT,Alta velocidad,Figueres Vilafant,Barcelona-Sants,3,Renfe Data GTFS alta/larga/media
+0430787089AV016,AVE INT,Alta velocidad,Figueres Vilafant,Marseille St Charles,8,Renfe Data GTFS alta/larga/media
+0430787303AV016,AVE INT,Alta velocidad,Figueres Vilafant,Lyon Part Dieu,7,Renfe Data GTFS alta/larga/media
+0500051003AV008,AVANT,Alta velocidad,Granada,Sevilla-Santa Justa,7,Renfe Data GTFS alta/larga/media
+0500054413AV008,AVANT,Alta velocidad,Granada,Malaga Maria Zambrano,4,Renfe Data GTFS alta/larga/media
+0500056312VRX,MD,Media distancia,Granada,Almeria,9,Renfe Data GTFS alta/larga/media
+0500060000AV006,AVE,Alta velocidad,Granada,Madrid Pta.Atocha - Almudena Grandes,6,Renfe Data GTFS alta/larga/media
+0500060000GL023,ALVIA,Larga distancia,Granada,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+0500071801AV006,AVE,Alta velocidad,Granada,Barcelona-Sants,9,Renfe Data GTFS alta/larga/media
+0519321010VRFV,REGIONAL,Media distancia,Ribadeo,Ferrol,52,Renfe Data GTFS alta/larga/media
+0545105778VRFV,REGIONAL,Media distancia,Bilbao la Concordia,Feve-Leon,64,Renfe Data GTFS alta/larga/media
+0545114223VRFV,REGIONAL,Media distancia,Bilbao la Concordia,Santander,32,Renfe Data GTFS alta/larga/media
+0549705451VRFV,REGIONAL,Media distancia,Karrantza,Bilbao la Concordia,13,Renfe Data GTFS alta/larga/media
+0557115211VRFV,REGIONAL,Media distancia,Llanes,Oviedo/Uviéu,40,Renfe Data GTFS alta/larga/media
+0577805451VRFV,REGIONAL,Media distancia,Feve-Leon,Bilbao la Concordia,55,Renfe Data GTFS alta/larga/media
+0600665000GL026,Intercity,Larga distancia,Lorca Sutullena,Valencia-Estaciò Del Nord,11,Renfe Data GTFS alta/larga/media
+0700461200GL026,Intercity,Larga distancia,Aguilas,Murcia,3,Renfe Data GTFS alta/larga/media
+0800411014AV006,AVE,Alta velocidad,Segovia Guiomar,Burgos Rosa Manzano,3,Renfe Data GTFS alta/larga/media
+0800417000AV008,AVANT,Alta velocidad,Segovia Guiomar,Madrid-Chamartín-Clara Campoamor,2,Renfe Data GTFS alta/larga/media
+0800430100GL023,ALVIA,Larga distancia,Segovia Guiomar,Salamanca,3,Renfe Data GTFS alta/larga/media
+0822311208GL023,ALVIA,Larga distancia,Vigo Urzaiz,Vitoria/Gasteiz,17,Renfe Data GTFS alta/larga/media
+0822315100VRM,MD,Media distancia,Vigo Urzaiz,Leon,13,Renfe Data GTFS alta/larga/media
+0822317000AV006,AVE,Alta velocidad,Vigo Urzaiz,Madrid-Chamartín-Clara Campoamor,6,Renfe Data GTFS alta/larga/media
+0822317000LC112,AVLO,Alta velocidad,Vigo Urzaiz,Madrid-Chamartín-Clara Campoamor,10,Renfe Data GTFS alta/larga/media
+0822322100VRM,MD,Media distancia,Vigo Urzaiz,Ourense,5,Renfe Data GTFS alta/larga/media
+0822331400VRR,REGIONAL,Media distancia,Vigo Urzaiz,Santiago de Compostela,11,Renfe Data GTFS alta/larga/media
+0822331412VRR,REGIONAL,Media distancia,Vigo Urzaiz,A Coruña,14,Renfe Data GTFS alta/larga/media
+0822331412VRX,MD,Media distancia,Vigo Urzaiz,A Coruña,9,Renfe Data GTFS alta/larga/media
+0822371801GL023,ALVIA,Larga distancia,Vigo Urzaiz,Barcelona-Sants,25,Renfe Data GTFS alta/larga/media
+1000010600VRX,MD,Media distancia,Madrid-Principe Pio,Valladolid,13,Renfe Data GTFS alta/larga/media
+1000011208VRE,REG.EXP.,Media distancia,Madrid-Principe Pio,Vitoria/Gasteiz,18,Renfe Data GTFS alta/larga/media
+1000011300VRX,MD,Media distancia,Madrid-Principe Pio,Altsasu/Alsasua-Estación,25,Renfe Data GTFS alta/larga/media
+1000011600VRX,MD,Media distancia,Madrid-Principe Pio,Irun,34,Renfe Data GTFS alta/larga/media
+1000014100VRX,MD,Media distancia,Madrid-Principe Pio,Palencia,16,Renfe Data GTFS alta/larga/media
+1000015100VRX,MD,Media distancia,Madrid-Principe Pio,Leon,19,Renfe Data GTFS alta/larga/media
+1000030110VRX,MD,Media distancia,Madrid-Principe Pio,Salamanca-La Alamedilla,15,Renfe Data GTFS alta/larga/media
+1040010600VRE,REG.EXP.,Media distancia,Ávila,Valladolid,8,Renfe Data GTFS alta/larga/media
+1040010610VRE,REG.EXP.,Media distancia,Ávila,Valladolid-Universidad,9,Renfe Data GTFS alta/larga/media
+1040017000VRR,REGIONAL,Media distancia,Ávila,Madrid-Chamartín-Clara Campoamor,21,Renfe Data GTFS alta/larga/media
+1040018000VRR,REGIONAL,Media distancia,Ávila,Madrid - Atocha Cercanías,23,Renfe Data GTFS alta/larga/media
+1050010600VRN,PROXIMDAD,Media distancia,Medina Del Campo,Valladolid,6,Renfe Data GTFS alta/larga/media
+1050010610VRN,PROXIMDAD,Media distancia,Medina Del Campo,Valladolid-Universidad,7,Renfe Data GTFS alta/larga/media
+1050011000VRN,PROXIMDAD,Media distancia,Medina Del Campo,Venta De Baños,3,Renfe Data GTFS alta/larga/media
+1050014100VRN,PROXIMDAD,Media distancia,Medina Del Campo,Palencia,9,Renfe Data GTFS alta/larga/media
+1060004040GL026,Intercity,Larga distancia,Valladolid,Zaragoza-Delicias,6,Renfe Data GTFS alta/larga/media
+1060008004GL023,ALVIA,Larga distancia,Valladolid,Segovia Guiomar,2,Renfe Data GTFS alta/larga/media
+1060010000VRX,MD,Media distancia,Valladolid,Madrid-Principe Pio,17,Renfe Data GTFS alta/larga/media
+1060010400VRE,REG.EXP.,Media distancia,Valladolid,Ávila,8,Renfe Data GTFS alta/larga/media
+1060010500VRN,PROXIMDAD,Media distancia,Valladolid,Medina Del Campo,6,Renfe Data GTFS alta/larga/media
+1060011014AV006,AVE,Alta velocidad,Valladolid,Burgos Rosa Manzano,2,Renfe Data GTFS alta/larga/media
+1060011200VRX,MD,Media distancia,Valladolid,Miranda De Ebro,3,Renfe Data GTFS alta/larga/media
+1060014100VRN,PROXIMDAD,Media distancia,Valladolid,Palencia,8,Renfe Data GTFS alta/larga/media
+1060014223VRE,REG.EXP.,Media distancia,Valladolid,Santander,29,Renfe Data GTFS alta/larga/media
+1060014223VRX,MD,Media distancia,Valladolid,Santander,6,Renfe Data GTFS alta/larga/media
+1060015100AV006,AVE,Alta velocidad,Valladolid,Leon,3,Renfe Data GTFS alta/larga/media
+1060015100VRX,MD,Media distancia,Valladolid,Leon,3,Renfe Data GTFS alta/larga/media
+1060015410VRR,REGIONAL,Media distancia,Valladolid,Gijón/Xixón,28,Renfe Data GTFS alta/larga/media
+1060015410VRX,MD,Media distancia,Valladolid,Gijón/Xixón,6,Renfe Data GTFS alta/larga/media
+1060017000AV008,AVANT,Alta velocidad,Valladolid,Madrid-Chamartín-Clara Campoamor,3,Renfe Data GTFS alta/larga/media
+1060017000GL023,ALVIA,Larga distancia,Valladolid,Madrid-Chamartín-Clara Campoamor,3,Renfe Data GTFS alta/larga/media
+1060020200VRX,MD,Media distancia,Valladolid,Ponferrada,11,Renfe Data GTFS alta/larga/media
+1060030100GL026,Intercity,Larga distancia,Valladolid,Salamanca,7,Renfe Data GTFS alta/larga/media
+1060030100VRX,MD,Media distancia,Valladolid,Salamanca,7,Renfe Data GTFS alta/larga/media
+1060030110VRE,REG.EXP.,Media distancia,Valladolid,Salamanca-La Alamedilla,15,Renfe Data GTFS alta/larga/media
+1060030110VRX,MD,Media distancia,Valladolid,Salamanca-La Alamedilla,4,Renfe Data GTFS alta/larga/media
+1060031200VRE,REG.EXP.,Media distancia,Valladolid,Puebla de Sanabria,16,Renfe Data GTFS alta/larga/media
+1060060911AV006,AVE,Alta velocidad,Valladolid,Alicante/Alacant,5,Renfe Data GTFS alta/larga/media
+1060060911GL023,ALVIA,Larga distancia,Valladolid,Alicante/Alacant,7,Renfe Data GTFS alta/larga/media
+1060060911LC112,AVLO,Alta velocidad,Valladolid,Alicante/Alacant,6,Renfe Data GTFS alta/larga/media
+1100010500VRN,PROXIMDAD,Media distancia,Venta De Baños,Medina Del Campo,3,Renfe Data GTFS alta/larga/media
+1101403216AV006,AVE,Alta velocidad,Burgos Rosa Manzano,Valencia Joaquin Sorolla,4,Renfe Data GTFS alta/larga/media
+1101408004AV006,AVE,Alta velocidad,Burgos Rosa Manzano,Segovia Guiomar,3,Renfe Data GTFS alta/larga/media
+1101410600AV006,AVE,Alta velocidad,Burgos Rosa Manzano,Valladolid,2,Renfe Data GTFS alta/larga/media
+1101461200AV006,AVE,Alta velocidad,Burgos Rosa Manzano,Murcia,7,Renfe Data GTFS alta/larga/media
+1101480100VRE,REG.EXP.,Media distancia,Burgos Rosa Manzano,Pamplona/Iruña,12,Renfe Data GTFS alta/larga/media
+1120004040GL026,Intercity,Larga distancia,Miranda De Ebro,Zaragoza-Delicias,4,Renfe Data GTFS alta/larga/media
+1120004040VRX,MD,Media distancia,Miranda De Ebro,Zaragoza-Delicias,7,Renfe Data GTFS alta/larga/media
+1120010600VRX,MD,Media distancia,Miranda De Ebro,Valladolid,3,Renfe Data GTFS alta/larga/media
+1120011014VRE,REG.EXP.,Media distancia,Miranda De Ebro,Burgos Rosa Manzano,4,Renfe Data GTFS alta/larga/media
+1120011300VRE,REG.EXP.,Media distancia,Miranda De Ebro,Altsasu/Alsasua-Estación,9,Renfe Data GTFS alta/larga/media
+1120011300VRR,REGIONAL,Media distancia,Miranda De Ebro,Altsasu/Alsasua-Estación,9,Renfe Data GTFS alta/larga/media
+1120011600GL023,ALVIA,Larga distancia,Miranda De Ebro,Irun,6,Renfe Data GTFS alta/larga/media
+1120011600VRE,REG.EXP.,Media distancia,Miranda De Ebro,Irun,21,Renfe Data GTFS alta/larga/media
+1120013200GL023,ALVIA,Larga distancia,Miranda De Ebro,Bilbao-Abando Indalecio Prieto,3,Renfe Data GTFS alta/larga/media
+1120013200GL026,Intercity,Larga distancia,Miranda De Ebro,Bilbao-Abando Indalecio Prieto,3,Renfe Data GTFS alta/larga/media
+1120071100VRE,REG.EXP.,Media distancia,Miranda De Ebro,Zaragoza Miraflores,31,Renfe Data GTFS alta/larga/media
+1120080100VRE,REG.EXP.,Media distancia,Miranda De Ebro,Pamplona/Iruña,9,Renfe Data GTFS alta/larga/media
+1120081200VRE,REG.EXP.,Media distancia,Miranda De Ebro,Castejón De Ebro,17,Renfe Data GTFS alta/larga/media
+1120804040VRX,MD,Media distancia,Vitoria/Gasteiz,Zaragoza-Delicias,6,Renfe Data GTFS alta/larga/media
+1120810000VRE,REG.EXP.,Media distancia,Vitoria/Gasteiz,Madrid-Principe Pio,18,Renfe Data GTFS alta/larga/media
+1120811511GL026,Intercity,Larga distancia,Vitoria/Gasteiz,San Sebastián/Donostia,4,Renfe Data GTFS alta/larga/media
+1120815100GL023,ALVIA,Larga distancia,Vitoria/Gasteiz,Leon,5,Renfe Data GTFS alta/larga/media
+1130010000VRX,MD,Media distancia,Altsasu/Alsasua-Estación,Madrid-Principe Pio,20,Renfe Data GTFS alta/larga/media
+1130011200VRE,REG.EXP.,Media distancia,Altsasu/Alsasua-Estación,Miranda De Ebro,9,Renfe Data GTFS alta/larga/media
+1130011200VRR,REGIONAL,Media distancia,Altsasu/Alsasua-Estación,Miranda De Ebro,9,Renfe Data GTFS alta/larga/media
+1130014100VRX,MD,Media distancia,Altsasu/Alsasua-Estación,Palencia,13,Renfe Data GTFS alta/larga/media
+1151111208GL026,Intercity,Larga distancia,San Sebastián/Donostia,Vitoria/Gasteiz,4,Renfe Data GTFS alta/larga/media
+1151117000GL026,Intercity,Larga distancia,San Sebastián/Donostia,Madrid-Chamartín-Clara Campoamor,8,Renfe Data GTFS alta/larga/media
+1151171801GL023,ALVIA,Larga distancia,San Sebastián/Donostia,Barcelona-Sants,11,Renfe Data GTFS alta/larga/media
+1151178400GL023,ALVIA,Larga distancia,San Sebastián/Donostia,Lleida-Pirineus,9,Renfe Data GTFS alta/larga/media
+1160010000VRX,MD,Media distancia,Irun,Madrid-Principe Pio,36,Renfe Data GTFS alta/larga/media
+1160010600GL023,ALVIA,Larga distancia,Irun,Valladolid,8,Renfe Data GTFS alta/larga/media
+1160011200GL023,ALVIA,Larga distancia,Irun,Miranda De Ebro,6,Renfe Data GTFS alta/larga/media
+1160011200VRE,REG.EXP.,Media distancia,Irun,Miranda De Ebro,28,Renfe Data GTFS alta/larga/media
+1160014100VRX,MD,Media distancia,Irun,Palencia,24,Renfe Data GTFS alta/larga/media
+1160017000GL023,ALVIA,Larga distancia,Irun,Madrid-Chamartín-Clara Campoamor,10,Renfe Data GTFS alta/larga/media
+1160017000GL026,Intercity,Larga distancia,Irun,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+1200612100VRR,REGIONAL,Media distancia,Cercedilla,Segovia,9,Renfe Data GTFS alta/larga/media
+1210012006VRR,REGIONAL,Media distancia,Segovia,Cercedilla,9,Renfe Data GTFS alta/larga/media
+1210018000VRR,REGIONAL,Media distancia,Segovia,Madrid - Atocha Cercanías,26,Renfe Data GTFS alta/larga/media
+1320010600GL023,ALVIA,Larga distancia,Bilbao-Abando Indalecio Prieto,Valladolid,5,Renfe Data GTFS alta/larga/media
+1320011200GL023,ALVIA,Larga distancia,Bilbao-Abando Indalecio Prieto,Miranda De Ebro,3,Renfe Data GTFS alta/larga/media
+1320011200GL026,Intercity,Larga distancia,Bilbao-Abando Indalecio Prieto,Miranda De Ebro,3,Renfe Data GTFS alta/larga/media
+1320017000GL023,ALVIA,Larga distancia,Bilbao-Abando Indalecio Prieto,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+1320071801GL023,ALVIA,Larga distancia,Bilbao-Abando Indalecio Prieto,Barcelona-Sants,11,Renfe Data GTFS alta/larga/media
+1410010000VRX,MD,Media distancia,Palencia,Madrid-Principe Pio,17,Renfe Data GTFS alta/larga/media
+1410010500VRN,PROXIMDAD,Media distancia,Palencia,Medina Del Campo,13,Renfe Data GTFS alta/larga/media
+1410010600VRN,PROXIMDAD,Media distancia,Palencia,Valladolid,8,Renfe Data GTFS alta/larga/media
+1410011300VRX,MD,Media distancia,Palencia,Altsasu/Alsasua-Estación,12,Renfe Data GTFS alta/larga/media
+1410011600VRX,MD,Media distancia,Palencia,Irun,21,Renfe Data GTFS alta/larga/media
+1410015100VRE,REG.EXP.,Media distancia,Palencia,Leon,12,Renfe Data GTFS alta/larga/media
+1410030110VRX,MD,Media distancia,Palencia,Salamanca-La Alamedilla,14,Renfe Data GTFS alta/larga/media
+1422305451VRFV,REGIONAL,Media distancia,Santander,Bilbao la Concordia,32,Renfe Data GTFS alta/larga/media
+1422310600VRE,REG.EXP.,Media distancia,Santander,Valladolid,29,Renfe Data GTFS alta/larga/media
+1422310600VRX,MD,Media distancia,Santander,Valladolid,6,Renfe Data GTFS alta/larga/media
+1422315211VRFV,REGIONAL,Media distancia,Santander,Oviedo/Uviéu,46,Renfe Data GTFS alta/larga/media
+1422317000GL023,ALVIA,Larga distancia,Santander,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+1422317000GL026,Intercity,Larga distancia,Santander,Madrid-Chamartín-Clara Campoamor,6,Renfe Data GTFS alta/larga/media
+1422360911GL023,ALVIA,Larga distancia,Santander,Alicante/Alacant,12,Renfe Data GTFS alta/larga/media
+1510003216AV006,AVE,Alta velocidad,Leon,Valencia Joaquin Sorolla,7,Renfe Data GTFS alta/larga/media
+1510008223VRM,MD,Media distancia,Leon,Vigo Urzaiz,14,Renfe Data GTFS alta/larga/media
+1510010000VRX,MD,Media distancia,Leon,Madrid-Principe Pio,20,Renfe Data GTFS alta/larga/media
+1510010600AV006,AVE,Alta velocidad,Leon,Valladolid,3,Renfe Data GTFS alta/larga/media
+1510010600VRE,REG.EXP.,Media distancia,Leon,Valladolid,15,Renfe Data GTFS alta/larga/media
+1510010600VRX,MD,Media distancia,Leon,Valladolid,3,Renfe Data GTFS alta/larga/media
+1510014100VRE,REG.EXP.,Media distancia,Leon,Palencia,12,Renfe Data GTFS alta/larga/media
+1510015410LC112,AVLO,Alta velocidad,Leon,Gijón/Xixón,5,Renfe Data GTFS alta/larga/media
+1510015410VRX,MD,Media distancia,Leon,Gijón/Xixón,5,Renfe Data GTFS alta/larga/media
+1510017000AV006,AVE,Alta velocidad,Leon,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+1510017000GL026,Intercity,Larga distancia,Leon,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+1510017000LC112,AVLO,Alta velocidad,Leon,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+1510020200VRE,REG.EXP.,Media distancia,Leon,Ponferrada,15,Renfe Data GTFS alta/larga/media
+1510060911AV006,AVE,Alta velocidad,Leon,Alicante/Alacant,7,Renfe Data GTFS alta/larga/media
+1510071801GL023,ALVIA,Larga distancia,Leon,Barcelona-Sants,13,Renfe Data GTFS alta/larga/media
+1521105571VRFV,REGIONAL,Media distancia,Oviedo/Uviéu,Llanes,40,Renfe Data GTFS alta/larga/media
+1521114223VRFV,REGIONAL,Media distancia,Oviedo/Uviéu,Santander,46,Renfe Data GTFS alta/larga/media
+1521121010VRFV,REGIONAL,Media distancia,Oviedo/Uviéu,Ferrol,101,Renfe Data GTFS alta/larga/media
+1541010600VRR,REGIONAL,Media distancia,Gijón/Xixón,Valladolid,32,Renfe Data GTFS alta/larga/media
+1541015100GL023,ALVIA,Larga distancia,Gijón/Xixón,Leon,5,Renfe Data GTFS alta/larga/media
+1541015100VRR,REGIONAL,Media distancia,Gijón/Xixón,Leon,16,Renfe Data GTFS alta/larga/media
+1541015100VRX,MD,Media distancia,Gijón/Xixón,Leon,5,Renfe Data GTFS alta/larga/media
+1541017000AV006,AVE,Alta velocidad,Gijón/Xixón,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+1541017000GL023,ALVIA,Larga distancia,Gijón/Xixón,Madrid-Chamartín-Clara Campoamor,8,Renfe Data GTFS alta/larga/media
+1541017000LC112,AVLO,Alta velocidad,Gijón/Xixón,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+1541017000LCLC,AVLO,Alta velocidad,Gijón/Xixón,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+1541060911GL023,ALVIA,Larga distancia,Gijón/Xixón,Alicante/Alacant,12,Renfe Data GTFS alta/larga/media
+1541065300AV006,AVE,Alta velocidad,Gijón/Xixón,Castelló,11,Renfe Data GTFS alta/larga/media
+1640317000GL023,ALVIA,Larga distancia,Avilés,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+1700003100VRX,MD,Media distancia,Madrid-Chamartín-Clara Campoamor,Jaen,15,Renfe Data GTFS alta/larga/media
+1700003213AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Requena Utiel,3,Renfe Data GTFS alta/larga/media
+1700003213LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Requena Utiel,3,Renfe Data GTFS alta/larga/media
+1700003216AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Valencia Joaquin Sorolla,4,Renfe Data GTFS alta/larga/media
+1700003216LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Valencia Joaquin Sorolla,4,Renfe Data GTFS alta/larga/media
+1700004040VRE,REG.EXP.,Media distancia,Madrid-Chamartín-Clara Campoamor,Zaragoza-Delicias,15,Renfe Data GTFS alta/larga/media
+1700004040VRR,REGIONAL,Media distancia,Madrid-Chamartín-Clara Campoamor,Zaragoza-Delicias,19,Renfe Data GTFS alta/larga/media
+1700008004AV008,AVANT,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Segovia Guiomar,2,Renfe Data GTFS alta/larga/media
+1700008223AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Vigo Urzaiz,7,Renfe Data GTFS alta/larga/media
+1700008223LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Vigo Urzaiz,10,Renfe Data GTFS alta/larga/media
+1700010400VRR,REGIONAL,Media distancia,Madrid-Chamartín-Clara Campoamor,Ávila,21,Renfe Data GTFS alta/larga/media
+1700010600AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Valladolid,2,Renfe Data GTFS alta/larga/media
+1700010600AV008,AVANT,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Valladolid,3,Renfe Data GTFS alta/larga/media
+1700010600GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Valladolid,3,Renfe Data GTFS alta/larga/media
+1700010600GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Valladolid,3,Renfe Data GTFS alta/larga/media
+1700010600LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Valladolid,3,Renfe Data GTFS alta/larga/media
+1700011600GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Irun,10,Renfe Data GTFS alta/larga/media
+1700011600GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Irun,9,Renfe Data GTFS alta/larga/media
+1700013200GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Bilbao-Abando Indalecio Prieto,7,Renfe Data GTFS alta/larga/media
+1700014223GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Santander,7,Renfe Data GTFS alta/larga/media
+1700014223GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Santander,6,Renfe Data GTFS alta/larga/media
+1700015100AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Leon,4,Renfe Data GTFS alta/larga/media
+1700015100LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Leon,5,Renfe Data GTFS alta/larga/media
+1700015410AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Gijón/Xixón,7,Renfe Data GTFS alta/larga/media
+1700015410GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Gijón/Xixón,7,Renfe Data GTFS alta/larga/media
+1700015410LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Gijón/Xixón,9,Renfe Data GTFS alta/larga/media
+1700016403GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Avilés,7,Renfe Data GTFS alta/larga/media
+1700020200GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Ponferrada,13,Renfe Data GTFS alta/larga/media
+1700020309GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Lugo,9,Renfe Data GTFS alta/larga/media
+1700022100AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Ourense,3,Renfe Data GTFS alta/larga/media
+1700022100GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Ourense,6,Renfe Data GTFS alta/larga/media
+1700022100LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Ourense,7,Renfe Data GTFS alta/larga/media
+1700030100GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Salamanca,4,Renfe Data GTFS alta/larga/media
+1700031412AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,A Coruña,5,Renfe Data GTFS alta/larga/media
+1700031412LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,A Coruña,9,Renfe Data GTFS alta/larga/media
+1700035400VRX,MD,Media distancia,Madrid-Chamartín-Clara Campoamor,Cáceres,9,Renfe Data GTFS alta/larga/media
+1700037200VRX,MD,Media distancia,Madrid-Chamartín-Clara Campoamor,Ciudad Real,10,Renfe Data GTFS alta/larga/media
+1700037606GL023,ALVIA,Larga distancia,Madrid-Chamartín-Clara Campoamor,Badajoz,12,Renfe Data GTFS alta/larga/media
+1700050300GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Linares-Baeza,5,Renfe Data GTFS alta/larga/media
+1700056312GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Almeria,11,Renfe Data GTFS alta/larga/media
+1700060400VRX,MD,Media distancia,Madrid-Chamartín-Clara Campoamor,Alcazar de San Juan,8,Renfe Data GTFS alta/larga/media
+1700060600VRE,REG.EXP.,Media distancia,Madrid-Chamartín-Clara Campoamor,Albacete-Los Llanos,11,Renfe Data GTFS alta/larga/media
+1700060600VRX,MD,Media distancia,Madrid-Chamartín-Clara Campoamor,Albacete-Los Llanos,15,Renfe Data GTFS alta/larga/media
+1700060911AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Alicante/Alacant,5,Renfe Data GTFS alta/larga/media
+1700061200AV006,AVE,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Murcia,4,Renfe Data GTFS alta/larga/media
+1700061200LC112,AVLO,Alta velocidad,Madrid-Chamartín-Clara Campoamor,Murcia,8,Renfe Data GTFS alta/larga/media
+1700070300VRE,REG.EXP.,Media distancia,Madrid-Chamartín-Clara Campoamor,Baides,9,Renfe Data GTFS alta/larga/media
+1700070300VRR,REGIONAL,Media distancia,Madrid-Chamartín-Clara Campoamor,Baides,26,Renfe Data GTFS alta/larga/media
+1700070302VRR,REGIONAL,Media distancia,Madrid-Chamartín-Clara Campoamor,Siguenza,26,Renfe Data GTFS alta/larga/media
+1700081100GL026,Intercity,Larga distancia,Madrid-Chamartín-Clara Campoamor,Logroño,7,Renfe Data GTFS alta/larga/media
+1700082100VRE,REG.EXP.,Media distancia,Madrid-Chamartín-Clara Campoamor,Soria,10,Renfe Data GTFS alta/larga/media
+1700084101VRE,REG.EXP.,Media distancia,Madrid-Chamartín-Clara Campoamor,Almazan,5,Renfe Data GTFS alta/larga/media
+1800010400VRR,REGIONAL,Media distancia,Madrid - Atocha Cercanías,Ávila,24,Renfe Data GTFS alta/larga/media
+1800012100VRR,REGIONAL,Media distancia,Madrid - Atocha Cercanías,Segovia,26,Renfe Data GTFS alta/larga/media
+1800030002VRE,REG.EXP.,Media distancia,Madrid - Atocha Cercanías,Plasencia,11,Renfe Data GTFS alta/larga/media
+1800030002VRM,REG.EXP.,Media distancia,Madrid - Atocha Cercanías,Plasencia,11,Renfe Data GTFS alta/larga/media
+1800030002VRX,MD,Media distancia,Madrid - Atocha Cercanías,Plasencia,9,Renfe Data GTFS alta/larga/media
+1800035005VRN,PROXIMDAD,Media distancia,Madrid - Atocha Cercanías,Illescas,5,Renfe Data GTFS alta/larga/media
+1800035200VRR,REGIONAL,Media distancia,Madrid - Atocha Cercanías,Talavera De La Reina,7,Renfe Data GTFS alta/larga/media
+1800035400VRE,REG.EXP.,Media distancia,Madrid - Atocha Cercanías,Cáceres,14,Renfe Data GTFS alta/larga/media
+1800037500VRM,REG.EXP.,Media distancia,Madrid - Atocha Cercanías,Mérida,12,Renfe Data GTFS alta/larga/media
+1800051003VRX,MD,Media distancia,Madrid - Atocha Cercanías,Sevilla-Santa Justa,25,Renfe Data GTFS alta/larga/media
+1800060400VRX,MD,Media distancia,Madrid - Atocha Cercanías,Alcazar de San Juan,5,Renfe Data GTFS alta/larga/media
+2020010600VRE,REG.EXP.,Media distancia,Ponferrada,Valladolid,28,Renfe Data GTFS alta/larga/media
+2020010600VRX,MD,Media distancia,Ponferrada,Valladolid,8,Renfe Data GTFS alta/larga/media
+2020015100VRE,REG.EXP.,Media distancia,Ponferrada,Leon,15,Renfe Data GTFS alta/larga/media
+2020015100VRX,MD,Media distancia,Ponferrada,Leon,6,Renfe Data GTFS alta/larga/media
+2020017000GL026,Intercity,Larga distancia,Ponferrada,Madrid-Chamartín-Clara Campoamor,10,Renfe Data GTFS alta/larga/media
+2020022100VRE,REG.EXP.,Media distancia,Ponferrada,Ourense,19,Renfe Data GTFS alta/larga/media
+2020022308VRE,REG.EXP.,Media distancia,Ponferrada,Vigo Guixar,23,Renfe Data GTFS alta/larga/media
+2030031412VRM,MD,Media distancia,Monforte de Lemos,A Coruña,19,Renfe Data GTFS alta/larga/media
+2030917000GL023,ALVIA,Larga distancia,Lugo,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+2030922100GL026,Intercity,Larga distancia,Lugo,Ourense,4,Renfe Data GTFS alta/larga/media
+2030922100VRM,MD,Media distancia,Lugo,Ourense,4,Renfe Data GTFS alta/larga/media
+2101005193VRFV,REGIONAL,Media distancia,Ferrol,Ribadeo,52,Renfe Data GTFS alta/larga/media
+2101015211VRFV,REGIONAL,Media distancia,Ferrol,Oviedo/Uviéu,104,Renfe Data GTFS alta/larga/media
+2101031412VRM,MD,Media distancia,Ferrol,A Coruña,13,Renfe Data GTFS alta/larga/media
+2210008223VRM,MD,Media distancia,Ourense,Vigo Urzaiz,6,Renfe Data GTFS alta/larga/media
+2210017000AV006,AVE,Alta velocidad,Ourense,Madrid-Chamartín-Clara Campoamor,3,Renfe Data GTFS alta/larga/media
+2210017000GL023,ALVIA,Larga distancia,Ourense,Madrid-Chamartín-Clara Campoamor,6,Renfe Data GTFS alta/larga/media
+2210017000LC112,AVLO,Alta velocidad,Ourense,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+2210020309GL026,Intercity,Larga distancia,Ourense,Lugo,4,Renfe Data GTFS alta/larga/media
+2210020309VRM,MD,Media distancia,Ourense,Lugo,4,Renfe Data GTFS alta/larga/media
+2210022308VRE,REG.EXP.,Media distancia,Ourense,Vigo Guixar,14,Renfe Data GTFS alta/larga/media
+2210031304VRR,REGIONAL,Media distancia,Ourense,O Carballiño,2,Renfe Data GTFS alta/larga/media
+2210031400VRR,REGIONAL,Media distancia,Ourense,Santiago de Compostela,6,Renfe Data GTFS alta/larga/media
+2210031412AV008,AVANT,Alta velocidad,Ourense,A Coruña,4,Renfe Data GTFS alta/larga/media
+2210031412VRM,MD,Media distancia,Ourense,A Coruña,20,Renfe Data GTFS alta/larga/media
+2210060911AV006,AVE,Alta velocidad,Ourense,Alicante/Alacant,6,Renfe Data GTFS alta/larga/media
+2210071801GL023,ALVIA,Larga distancia,Ourense,Barcelona-Sants,21,Renfe Data GTFS alta/larga/media
+2230820200VRE,REG.EXP.,Media distancia,Vigo Guixar,Ponferrada,33,Renfe Data GTFS alta/larga/media
+2230831400VRR,REGIONAL,Media distancia,Vigo Guixar,Santiago de Compostela,13,Renfe Data GTFS alta/larga/media
+2230831412VRR,REGIONAL,Media distancia,Vigo Guixar,A Coruña,15,Renfe Data GTFS alta/larga/media
+2230894346GL026,TRENCELTA,Media distancia,Vigo Guixar,Porto Campanha,6,Renfe Data GTFS alta/larga/media
+2300831400VRR,REGIONAL,Media distancia,Vilagarcia de Arousa,Santiago de Compostela,4,Renfe Data GTFS alta/larga/media
+3000218000VRE,REG.EXP.,Media distancia,Plasencia,Madrid - Atocha Cercanías,11,Renfe Data GTFS alta/larga/media
+3000218000VRX,MD,Media distancia,Plasencia,Madrid - Atocha Cercanías,9,Renfe Data GTFS alta/larga/media
+3000235400VRE,REG.EXP.,Media distancia,Plasencia,Cáceres,5,Renfe Data GTFS alta/larga/media
+3000237500VRM,REG.EXP.,Media distancia,Plasencia,Mérida,3,Renfe Data GTFS alta/larga/media
+3000251003VRE,REG.EXP.,Media distancia,Plasencia,Sevilla-Santa Justa,18,Renfe Data GTFS alta/larga/media
+3000251003VRX,MD,Media distancia,Plasencia,Sevilla-Santa Justa,18,Renfe Data GTFS alta/larga/media
+3010004040GL026,Intercity,Larga distancia,Salamanca,Zaragoza-Delicias,11,Renfe Data GTFS alta/larga/media
+3010008004GL023,ALVIA,Larga distancia,Salamanca,Segovia Guiomar,3,Renfe Data GTFS alta/larga/media
+3010010000VRX,MD,Media distancia,Salamanca,Madrid-Principe Pio,14,Renfe Data GTFS alta/larga/media
+3010010600GL026,Intercity,Larga distancia,Salamanca,Valladolid,6,Renfe Data GTFS alta/larga/media
+3010010600VRE,REG.EXP.,Media distancia,Salamanca,Valladolid,14,Renfe Data GTFS alta/larga/media
+3010010600VRX,MD,Media distancia,Salamanca,Valladolid,6,Renfe Data GTFS alta/larga/media
+3010014100VRX,MD,Media distancia,Salamanca,Palencia,17,Renfe Data GTFS alta/larga/media
+3010017000GL023,ALVIA,Larga distancia,Salamanca,Madrid-Chamartín-Clara Campoamor,4,Renfe Data GTFS alta/larga/media
+3120010600VRE,REG.EXP.,Media distancia,Puebla de Sanabria,Valladolid,16,Renfe Data GTFS alta/larga/media
+3130422100VRR,REGIONAL,Media distancia,O Carballiño,Ourense,2,Renfe Data GTFS alta/larga/media
+3140008223VRR,REGIONAL,Media distancia,Santiago de Compostela,Vigo Urzaiz,10,Renfe Data GTFS alta/larga/media
+3140022100VRR,REGIONAL,Media distancia,Santiago de Compostela,Ourense,6,Renfe Data GTFS alta/larga/media
+3140022308VRR,REGIONAL,Media distancia,Santiago de Compostela,Vigo Guixar,11,Renfe Data GTFS alta/larga/media
+3140023008VRR,REGIONAL,Media distancia,Santiago de Compostela,Vilagarcia de Arousa,4,Renfe Data GTFS alta/larga/media
+3140031412VRR,REGIONAL,Media distancia,Santiago de Compostela,A Coruña,5,Renfe Data GTFS alta/larga/media
+3141208223VRR,REGIONAL,Media distancia,A Coruña,Vigo Urzaiz,15,Renfe Data GTFS alta/larga/media
+3141208223VRX,MD,Media distancia,A Coruña,Vigo Urzaiz,12,Renfe Data GTFS alta/larga/media
+3141217000AV006,AVE,Alta velocidad,A Coruña,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+3141217000LC112,AVLO,Alta velocidad,A Coruña,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+3141220300VRM,MD,Media distancia,A Coruña,Monforte de Lemos,19,Renfe Data GTFS alta/larga/media
+3141221010VRM,MD,Media distancia,A Coruña,Ferrol,13,Renfe Data GTFS alta/larga/media
+3141222100AV008,AVANT,Alta velocidad,A Coruña,Ourense,4,Renfe Data GTFS alta/larga/media
+3141222100GL026,Intercity,Larga distancia,A Coruña,Ourense,3,Renfe Data GTFS alta/larga/media
+3141222100VRM,MD,Media distancia,A Coruña,Ourense,20,Renfe Data GTFS alta/larga/media
+3141222308VRR,REGIONAL,Media distancia,A Coruña,Vigo Guixar,16,Renfe Data GTFS alta/larga/media
+3141231400VRR,REGIONAL,Media distancia,A Coruña,Santiago de Compostela,5,Renfe Data GTFS alta/larga/media
+3500518000VRN,PROXIMDAD,Media distancia,Illescas,Madrid - Atocha Cercanías,5,Renfe Data GTFS alta/larga/media
+3520018000VRR,REGIONAL,Media distancia,Talavera De La Reina,Madrid - Atocha Cercanías,7,Renfe Data GTFS alta/larga/media
+3540017000VRX,MD,Media distancia,Cáceres,Madrid-Chamartín-Clara Campoamor,9,Renfe Data GTFS alta/larga/media
+3540018000VRE,REG.EXP.,Media distancia,Cáceres,Madrid - Atocha Cercanías,14,Renfe Data GTFS alta/larga/media
+3540030002VRE,REG.EXP.,Media distancia,Cáceres,Plasencia,5,Renfe Data GTFS alta/larga/media
+3540035406VRR,REGIONAL,Media distancia,Cáceres,Valencia de Alcantara,4,Renfe Data GTFS alta/larga/media
+3540037606VRX,MD,Media distancia,Cáceres,Badajoz,4,Renfe Data GTFS alta/larga/media
+3540051003VRE,REG.EXP.,Media distancia,Cáceres,Sevilla-Santa Justa,17,Renfe Data GTFS alta/larga/media
+3540635400VRR,REGIONAL,Media distancia,Valencia de Alcantara,Cáceres,4,Renfe Data GTFS alta/larga/media
+3720017000VRX,MD,Media distancia,Ciudad Real,Madrid-Chamartín-Clara Campoamor,12,Renfe Data GTFS alta/larga/media
+3720037606VRE,REG.EXP.,Media distancia,Ciudad Real,Badajoz,16,Renfe Data GTFS alta/larga/media
+3720060400VRX,MD,Media distancia,Ciudad Real,Alcazar de San Juan,5,Renfe Data GTFS alta/larga/media
+3720060902VRX,MD,Media distancia,Ciudad Real,Villena,13,Renfe Data GTFS alta/larga/media
+3720060911VRX,MD,Media distancia,Ciudad Real,Alicante/Alacant,16,Renfe Data GTFS alta/larga/media
+3720065000VRE,REG.EXP.,Media distancia,Ciudad Real,Valencia-Estaciò Del Nord,16,Renfe Data GTFS alta/larga/media
+3730060000AV008,AVANT,Alta velocidad,Puertollano,Madrid Pta.Atocha - Almudena Grandes,3,Renfe Data GTFS alta/larga/media
+3731137606VRE,REG.EXP.,Media distancia,Cabeza de Buey,Badajoz,14,Renfe Data GTFS alta/larga/media
+3740637606VRR,REGIONAL,Media distancia,Villanueva de La Serena,Badajoz,10,Renfe Data GTFS alta/larga/media
+3750018000VRE,REG.EXP.,Media distancia,Mérida,Madrid - Atocha Cercanías,12,Renfe Data GTFS alta/larga/media
+3750030002VRE,REG.EXP.,Media distancia,Mérida,Plasencia,3,Renfe Data GTFS alta/larga/media
+3750040100VRR,REGIONAL,Media distancia,Mérida,Zafra,7,Renfe Data GTFS alta/larga/media
+3760617000GL023,ALVIA,Larga distancia,Badajoz,Madrid-Chamartín-Clara Campoamor,12,Renfe Data GTFS alta/larga/media
+3760635400VRX,MD,Media distancia,Badajoz,Cáceres,4,Renfe Data GTFS alta/larga/media
+3760637200VRE,REG.EXP.,Media distancia,Badajoz,Ciudad Real,19,Renfe Data GTFS alta/larga/media
+3760637311VRE,REG.EXP.,Media distancia,Badajoz,Cabeza de Buey,14,Renfe Data GTFS alta/larga/media
+3760637406VRR,REGIONAL,Media distancia,Badajoz,Villanueva de La Serena,10,Renfe Data GTFS alta/larga/media
+3760660400VRX,MD,Media distancia,Badajoz,Alcazar de San Juan,22,Renfe Data GTFS alta/larga/media
+4010037500VRR,REGIONAL,Media distancia,Zafra,Mérida,7,Renfe Data GTFS alta/larga/media
+4010043019VRX,MD,Media distancia,Zafra,Huelva,10,Renfe Data GTFS alta/larga/media
+4200843019VRX,MD,Media distancia,Jabugo-Galaroza,Huelva,10,Renfe Data GTFS alta/larga/media
+4301940100VRX,MD,Media distancia,Huelva,Zafra,13,Renfe Data GTFS alta/larga/media
+4301942008VRX,MD,Media distancia,Huelva,Jabugo-Galaroza,10,Renfe Data GTFS alta/larga/media
+4301951003VRX,MD,Media distancia,Huelva,Sevilla-Santa Justa,8,Renfe Data GTFS alta/larga/media
+4301960000GL023,ALVIA,Larga distancia,Huelva,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+4301960000GL026,Intercity,Larga distancia,Huelva,Madrid Pta.Atocha - Almudena Grandes,5,Renfe Data GTFS alta/larga/media
+5030017000GL026,Intercity,Larga distancia,Linares-Baeza,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+5030056312VRX,MD,Media distancia,Linares-Baeza,Almeria,7,Renfe Data GTFS alta/larga/media
+5040750500VRN,PROXIMDAD,Media distancia,Villa del Rio,Cordoba,4,Renfe Data GTFS alta/larga/media
+5040750502VRN,PROXIMDAD,Media distancia,Villa del Rio,Villarrubia de Cordoba,6,Renfe Data GTFS alta/larga/media
+5040750506VRN,PROXIMDAD,Media distancia,Villa del Rio,Palma del Rio,8,Renfe Data GTFS alta/larga/media
+5041350500VRN,PROXIMDAD,Media distancia,Alcolea de Cordoba (apt),Cordoba,3,Renfe Data GTFS alta/larga/media
+5041350502VRN,PROXIMDAD,Media distancia,Alcolea de Cordoba (apt),Villarrubia de Cordoba,5,Renfe Data GTFS alta/larga/media
+5041350506VRN,PROXIMDAD,Media distancia,Alcolea de Cordoba (apt),Palma del Rio,7,Renfe Data GTFS alta/larga/media
+5041750500VRN,PROXIMDAD,Media distancia,Campus Universitario Rabanales/ Cordoba,Cordoba,2,Renfe Data GTFS alta/larga/media
+5041750502VRN,PROXIMDAD,Media distancia,Campus Universitario Rabanales/ Cordoba,Villarrubia de Cordoba,4,Renfe Data GTFS alta/larga/media
+5041750506VRN,PROXIMDAD,Media distancia,Campus Universitario Rabanales/ Cordoba,Palma del Rio,6,Renfe Data GTFS alta/larga/media
+5050003100VRX,MD,Media distancia,Cordoba,Jaen,6,Renfe Data GTFS alta/larga/media
+5050050407VRN,PROXIMDAD,Media distancia,Cordoba,Villa del Rio,4,Renfe Data GTFS alta/larga/media
+5050050413VRN,PROXIMDAD,Media distancia,Cordoba,Alcolea de Cordoba (apt),3,Renfe Data GTFS alta/larga/media
+5050050417VRN,PROXIMDAD,Media distancia,Cordoba,Campus Universitario Rabanales/ Cordoba,2,Renfe Data GTFS alta/larga/media
+5050050502VRN,PROXIMDAD,Media distancia,Cordoba,Villarrubia de Cordoba,3,Renfe Data GTFS alta/larga/media
+5050050506VRN,PROXIMDAD,Media distancia,Cordoba,Palma del Rio,5,Renfe Data GTFS alta/larga/media
+5050051003AV008,AVANT,Alta velocidad,Cordoba,Sevilla-Santa Justa,2,Renfe Data GTFS alta/larga/media
+5050051003VRX,MD,Media distancia,Cordoba,Sevilla-Santa Justa,6,Renfe Data GTFS alta/larga/media
+5050051405VRX,MD,Media distancia,Cordoba,Cádiz,18,Renfe Data GTFS alta/larga/media
+5050071801GL023,ALVIA,Larga distancia,Cordoba,Barcelona-Sants,18,Renfe Data GTFS alta/larga/media
+5050250413VRN,PROXIMDAD,Media distancia,Villarrubia de Cordoba,Alcolea de Cordoba (apt),5,Renfe Data GTFS alta/larga/media
+5050250417VRN,PROXIMDAD,Media distancia,Villarrubia de Cordoba,Campus Universitario Rabanales/ Cordoba,4,Renfe Data GTFS alta/larga/media
+5050250500VRN,PROXIMDAD,Media distancia,Villarrubia de Cordoba,Cordoba,3,Renfe Data GTFS alta/larga/media
+5050650407VRN,PROXIMDAD,Media distancia,Palma del Rio,Villa del Rio,8,Renfe Data GTFS alta/larga/media
+5050650413VRN,PROXIMDAD,Media distancia,Palma del Rio,Alcolea de Cordoba (apt),7,Renfe Data GTFS alta/larga/media
+5050650417VRN,PROXIMDAD,Media distancia,Palma del Rio,Campus Universitario Rabanales/ Cordoba,6,Renfe Data GTFS alta/larga/media
+5050650500VRN,PROXIMDAD,Media distancia,Palma del Rio,Cordoba,5,Renfe Data GTFS alta/larga/media
+5100301007VRX,MD,Media distancia,Sevilla-Santa Justa,Osuna,8,Renfe Data GTFS alta/larga/media
+5100303100VRX,MD,Media distancia,Sevilla-Santa Justa,Jaen,10,Renfe Data GTFS alta/larga/media
+5100303216AV006,AVE,Alta velocidad,Sevilla-Santa Justa,Valencia Joaquin Sorolla,6,Renfe Data GTFS alta/larga/media
+5100305000AV008,AVANT,Alta velocidad,Sevilla-Santa Justa,Granada,7,Renfe Data GTFS alta/larga/media
+5100318000VRX,MD,Media distancia,Sevilla-Santa Justa,Madrid - Atocha Cercanías,25,Renfe Data GTFS alta/larga/media
+5100330002VRE,REG.EXP.,Media distancia,Sevilla-Santa Justa,Plasencia,18,Renfe Data GTFS alta/larga/media
+5100330002VRX,MD,Media distancia,Sevilla-Santa Justa,Plasencia,18,Renfe Data GTFS alta/larga/media
+5100335400VRE,REG.EXP.,Media distancia,Sevilla-Santa Justa,Cáceres,17,Renfe Data GTFS alta/larga/media
+5100343019VRX,MD,Media distancia,Sevilla-Santa Justa,Huelva,8,Renfe Data GTFS alta/larga/media
+5100350500AV008,AVANT,Alta velocidad,Sevilla-Santa Justa,Cordoba,2,Renfe Data GTFS alta/larga/media
+5100351405VRX,MD,Media distancia,Sevilla-Santa Justa,Cádiz,13,Renfe Data GTFS alta/larga/media
+5100354400VRX,MD,Media distancia,Sevilla-Santa Justa,Bobadilla,11,Renfe Data GTFS alta/larga/media
+5100354403VRX,MD,Media distancia,Sevilla-Santa Justa,El Chorro,11,Renfe Data GTFS alta/larga/media
+5100354413AV008,AVANT,Alta velocidad,Sevilla-Santa Justa,Malaga Maria Zambrano,5,Renfe Data GTFS alta/larga/media
+5100354413VRX,MD,Media distancia,Sevilla-Santa Justa,Malaga Maria Zambrano,13,Renfe Data GTFS alta/larga/media
+5100360000AV006,AVE,Alta velocidad,Sevilla-Santa Justa,Madrid Pta.Atocha - Almudena Grandes,5,Renfe Data GTFS alta/larga/media
+5100360000LC112,AVLO,Alta velocidad,Sevilla-Santa Justa,Madrid Pta.Atocha - Almudena Grandes,6,Renfe Data GTFS alta/larga/media
+5100371801AV006,AVE,Alta velocidad,Sevilla-Santa Justa,Barcelona-Sants,8,Renfe Data GTFS alta/larga/media
+5140503100VRX,MD,Media distancia,Cádiz,Jaen,24,Renfe Data GTFS alta/larga/media
+5140550500VRX,MD,Media distancia,Cádiz,Cordoba,18,Renfe Data GTFS alta/larga/media
+5140551003VRX,MD,Media distancia,Cádiz,Sevilla-Santa Justa,12,Renfe Data GTFS alta/larga/media
+5140560000GL023,ALVIA,Larga distancia,Cádiz,Madrid Pta.Atocha - Almudena Grandes,9,Renfe Data GTFS alta/larga/media
+5440051003VRX,MD,Media distancia,Bobadilla,Sevilla-Santa Justa,11,Renfe Data GTFS alta/larga/media
+5440054413VRX,MD,Media distancia,Bobadilla,Malaga Maria Zambrano,2,Renfe Data GTFS alta/larga/media
+5440351003VRX,MD,Media distancia,El Chorro,Sevilla-Santa Justa,11,Renfe Data GTFS alta/larga/media
+5440354413VRN,PROXIMDAD,Media distancia,El Chorro,Malaga Maria Zambrano,4,Renfe Data GTFS alta/larga/media
+5440354413VRX,MD,Media distancia,El Chorro,Malaga Maria Zambrano,2,Renfe Data GTFS alta/larga/media
+5440354517VRN,PROXIMDAD,Media distancia,El Chorro,Málaga Centro Alameda,11,Renfe Data GTFS alta/larga/media
+5441305000AV008,AVANT,Alta velocidad,Malaga Maria Zambrano,Granada,4,Renfe Data GTFS alta/larga/media
+5441351003AV008,AVANT,Alta velocidad,Malaga Maria Zambrano,Sevilla-Santa Justa,5,Renfe Data GTFS alta/larga/media
+5441351003VRX,MD,Media distancia,Malaga Maria Zambrano,Sevilla-Santa Justa,14,Renfe Data GTFS alta/larga/media
+5441354400VRX,MD,Media distancia,Malaga Maria Zambrano,Bobadilla,2,Renfe Data GTFS alta/larga/media
+5441354403VRN,PROXIMDAD,Media distancia,Malaga Maria Zambrano,El Chorro,4,Renfe Data GTFS alta/larga/media
+5441354403VRX,MD,Media distancia,Malaga Maria Zambrano,El Chorro,2,Renfe Data GTFS alta/larga/media
+5441360000AV006,AVE,Alta velocidad,Malaga Maria Zambrano,Madrid Pta.Atocha - Almudena Grandes,8,Renfe Data GTFS alta/larga/media
+5441360000LC112,AVLO,Alta velocidad,Malaga Maria Zambrano,Madrid Pta.Atocha - Almudena Grandes,8,Renfe Data GTFS alta/larga/media
+5441371801AV006,AVE,Alta velocidad,Malaga Maria Zambrano,Barcelona-Sants,9,Renfe Data GTFS alta/larga/media
+5451754403VRN,PROXIMDAD,Media distancia,Málaga Centro Alameda,El Chorro,11,Renfe Data GTFS alta/larga/media
+5500760000GL023,ALVIA,Larga distancia,Ronda,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+5502002030VRX,MD,Media distancia,Algeciras,Antequera AV,18,Renfe Data GTFS alta/larga/media
+5502060000GL023,ALVIA,Larga distancia,Algeciras,Madrid Pta.Atocha - Almudena Grandes,6,Renfe Data GTFS alta/larga/media
+5631205000VRX,MD,Media distancia,Almeria,Granada,9,Renfe Data GTFS alta/larga/media
+5631217000GL026,Intercity,Larga distancia,Almeria,Madrid-Chamartín-Clara Campoamor,11,Renfe Data GTFS alta/larga/media
+5631250300VRX,MD,Media distancia,Almeria,Linares-Baeza,7,Renfe Data GTFS alta/larga/media
+5631260000GL023,ALVIA,Larga distancia,Almeria,Madrid Pta.Atocha - Almudena Grandes,7,Renfe Data GTFS alta/larga/media
+6000003213AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Requena Utiel,3,Renfe Data GTFS alta/larga/media
+6000004307AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Figueres Vilafant,9,Renfe Data GTFS alta/larga/media
+6000005000AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Granada,6,Renfe Data GTFS alta/larga/media
+6000005000GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Granada,4,Renfe Data GTFS alta/larga/media
+6000037300AV008,AVANT,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Puertollano,3,Renfe Data GTFS alta/larga/media
+6000043019GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Huelva,4,Renfe Data GTFS alta/larga/media
+6000043019GL026,Intercity,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Huelva,5,Renfe Data GTFS alta/larga/media
+6000051003AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Sevilla-Santa Justa,5,Renfe Data GTFS alta/larga/media
+6000051003LC112,AVLO,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Sevilla-Santa Justa,6,Renfe Data GTFS alta/larga/media
+6000051405GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Cádiz,9,Renfe Data GTFS alta/larga/media
+6000054413AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Malaga Maria Zambrano,7,Renfe Data GTFS alta/larga/media
+6000054413LC112,AVLO,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Malaga Maria Zambrano,8,Renfe Data GTFS alta/larga/media
+6000055007GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Ronda,4,Renfe Data GTFS alta/larga/media
+6000055020GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Algeciras,6,Renfe Data GTFS alta/larga/media
+6000056312GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Almeria,7,Renfe Data GTFS alta/larga/media
+6000060911AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Alicante/Alacant,5,Renfe Data GTFS alta/larga/media
+6000061200AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Murcia,8,Renfe Data GTFS alta/larga/media
+6000065300AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Castelló,5,Renfe Data GTFS alta/larga/media
+6000070600AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Calatayud,3,Renfe Data GTFS alta/larga/media
+6000071801AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Barcelona-Sants,7,Renfe Data GTFS alta/larga/media
+6000071801AV016,AVE INT,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Barcelona-Sants,5,Renfe Data GTFS alta/larga/media
+6000074200AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Huesca,6,Renfe Data GTFS alta/larga/media
+6000078400AV006,AVE,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Lleida-Pirineus,4,Renfe Data GTFS alta/larga/media
+6000080100GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Pamplona/Iruña,7,Renfe Data GTFS alta/larga/media
+6000080100GL026,Intercity,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Pamplona/Iruña,4,Renfe Data GTFS alta/larga/media
+6000081100GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Logroño,6,Renfe Data GTFS alta/larga/media
+6000081110GL023,ALVIA,Larga distancia,Madrid Pta.Atocha - Almudena Grandes,Alfaro,3,Renfe Data GTFS alta/larga/media
+6000087089AV016,AVE INT,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Marseille St Charles,14,Renfe Data GTFS alta/larga/media
+6000092102AV008,AVANT,Alta velocidad,Madrid Pta.Atocha - Almudena Grandes,Toledo,2,Renfe Data GTFS alta/larga/media
+6040017000VRX,MD,Media distancia,Alcazar de San Juan,Madrid-Chamartín-Clara Campoamor,8,Renfe Data GTFS alta/larga/media
+6040018000VRX,MD,Media distancia,Alcazar de San Juan,Madrid - Atocha Cercanías,6,Renfe Data GTFS alta/larga/media
+6040037200VRX,MD,Media distancia,Alcazar de San Juan,Ciudad Real,6,Renfe Data GTFS alta/larga/media
+6040037606VRX,MD,Media distancia,Alcazar de San Juan,Badajoz,22,Renfe Data GTFS alta/larga/media
+6040065000VRE,REG.EXP.,Media distancia,Alcazar de San Juan,Valencia-Estaciò Del Nord,12,Renfe Data GTFS alta/larga/media
+6060017000VRE,REG.EXP.,Media distancia,Albacete-Los Llanos,Madrid-Chamartín-Clara Campoamor,12,Renfe Data GTFS alta/larga/media
+6060017000VRX,MD,Media distancia,Albacete-Los Llanos,Madrid-Chamartín-Clara Campoamor,15,Renfe Data GTFS alta/larga/media
+6060018000VRX,MD,Media distancia,Albacete-Los Llanos,Madrid - Atocha Cercanías,12,Renfe Data GTFS alta/larga/media
+6060061307GL026,Intercity,Larga distancia,Albacete-Los Llanos,Cartagena,8,Renfe Data GTFS alta/larga/media
+6060065000VRR,REGIONAL,Media distancia,Albacete-Los Llanos,Valencia-Estaciò Del Nord,5,Renfe Data GTFS alta/larga/media
+6060065000VRX,MD,Media distancia,Albacete-Los Llanos,Valencia-Estaciò Del Nord,5,Renfe Data GTFS alta/larga/media
+6060092102AV008,AVANT,Alta velocidad,Albacete-Los Llanos,Toledo,4,Renfe Data GTFS alta/larga/media
+6090237200VRX,MD,Media distancia,Villena,Ciudad Real,13,Renfe Data GTFS alta/larga/media
+6090260911VRR,REGIONAL,Media distancia,Villena,Alicante/Alacant,7,Renfe Data GTFS alta/larga/media
+6090265000VRX,MD,Media distancia,Villena,Valencia-Estaciò Del Nord,3,Renfe Data GTFS alta/larga/media
+6091114223GL023,ALVIA,Larga distancia,Alicante/Alacant,Santander,10,Renfe Data GTFS alta/larga/media
+6091115100AV006,AVE,Alta velocidad,Alicante/Alacant,Leon,7,Renfe Data GTFS alta/larga/media
+6091115410GL023,ALVIA,Larga distancia,Alicante/Alacant,Gijón/Xixón,12,Renfe Data GTFS alta/larga/media
+6091117000AV006,AVE,Alta velocidad,Alicante/Alacant,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+6091117000LC112,AVLO,Alta velocidad,Alicante/Alacant,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+6091122100AV006,AVE,Alta velocidad,Alicante/Alacant,Ourense,6,Renfe Data GTFS alta/larga/media
+6091137200VRX,MD,Media distancia,Alicante/Alacant,Ciudad Real,16,Renfe Data GTFS alta/larga/media
+6091160000AV006,AVE,Alta velocidad,Alicante/Alacant,Madrid Pta.Atocha - Almudena Grandes,5,Renfe Data GTFS alta/larga/media
+6091160902VRR,REGIONAL,Media distancia,Alicante/Alacant,Villena,7,Renfe Data GTFS alta/larga/media
+6091161200VRD,AVANT,Alta velocidad,Alicante/Alacant,Murcia,6,Renfe Data GTFS alta/larga/media
+6091161200VRX,MD,Media distancia,Alicante/Alacant,Murcia,10,Renfe Data GTFS alta/larga/media
+6091165000VRR,REGIONAL,Media distancia,Alicante/Alacant,Valencia-Estaciò Del Nord,6,Renfe Data GTFS alta/larga/media
+6091171801GL012,EUROMED,Larga distancia,Alicante/Alacant,Barcelona-Sants,5,Renfe Data GTFS alta/larga/media
+6091171801GL026,Intercity,Larga distancia,Alicante/Alacant,Barcelona-Sants,15,Renfe Data GTFS alta/larga/media
+6120007004GL026,Intercity,Larga distancia,Murcia,Aguilas,3,Renfe Data GTFS alta/larga/media
+6120010600LC112,AVLO,Alta velocidad,Murcia,Valladolid,9,Renfe Data GTFS alta/larga/media
+6120011014AV006,AVE,Alta velocidad,Murcia,Burgos Rosa Manzano,7,Renfe Data GTFS alta/larga/media
+6120017000AV006,AVE,Alta velocidad,Murcia,Madrid-Chamartín-Clara Campoamor,4,Renfe Data GTFS alta/larga/media
+6120060000AV006,AVE,Alta velocidad,Murcia,Madrid Pta.Atocha - Almudena Grandes,8,Renfe Data GTFS alta/larga/media
+6120060911VRD,AVANT,Alta velocidad,Murcia,Alicante/Alacant,6,Renfe Data GTFS alta/larga/media
+6120060911VRX,MD,Media distancia,Murcia,Alicante/Alacant,8,Renfe Data GTFS alta/larga/media
+6120061307VRN,PROXIMDAD,Media distancia,Murcia,Cartagena,4,Renfe Data GTFS alta/larga/media
+6120065000GL026,Intercity,Larga distancia,Murcia,Valencia-Estaciò Del Nord,8,Renfe Data GTFS alta/larga/media
+6120065000VRX,MD,Media distancia,Murcia,Valencia-Estaciò Del Nord,12,Renfe Data GTFS alta/larga/media
+6130760600GL026,Intercity,Larga distancia,Cartagena,Albacete-Los Llanos,8,Renfe Data GTFS alta/larga/media
+6130761200VRN,PROXIMDAD,Media distancia,Cartagena,Murcia,4,Renfe Data GTFS alta/larga/media
+6130765000GL026,Intercity,Larga distancia,Cartagena,Valencia-Estaciò Del Nord,11,Renfe Data GTFS alta/larga/media
+6130765000VRX,MD,Media distancia,Cartagena,Valencia-Estaciò Del Nord,18,Renfe Data GTFS alta/larga/media
+6500004040VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Zaragoza-Delicias,16,Renfe Data GTFS alta/larga/media
+6500004307GL012,EUROMED,Larga distancia,Valencia-Estaciò Del Nord,Figueres Vilafant,6,Renfe Data GTFS alta/larga/media
+6500006006GL026,Intercity,Larga distancia,Valencia-Estaciò Del Nord,Lorca Sutullena,11,Renfe Data GTFS alta/larga/media
+6500037200VRE,REG.EXP.,Media distancia,Valencia-Estaciò Del Nord,Ciudad Real,17,Renfe Data GTFS alta/larga/media
+6500060400VRE,REG.EXP.,Media distancia,Valencia-Estaciò Del Nord,Alcazar de San Juan,13,Renfe Data GTFS alta/larga/media
+6500060600VRR,REGIONAL,Media distancia,Valencia-Estaciò Del Nord,Albacete-Los Llanos,5,Renfe Data GTFS alta/larga/media
+6500060600VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Albacete-Los Llanos,5,Renfe Data GTFS alta/larga/media
+6500060902VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Villena,3,Renfe Data GTFS alta/larga/media
+6500060911VRE,REG.EXP.,Media distancia,Valencia-Estaciò Del Nord,Alicante/Alacant,6,Renfe Data GTFS alta/larga/media
+6500061200GL026,Intercity,Larga distancia,Valencia-Estaciò Del Nord,Murcia,8,Renfe Data GTFS alta/larga/media
+6500061200VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Murcia,17,Renfe Data GTFS alta/larga/media
+6500061307GL026,Intercity,Larga distancia,Valencia-Estaciò Del Nord,Cartagena,11,Renfe Data GTFS alta/larga/media
+6500061307VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Cartagena,15,Renfe Data GTFS alta/larga/media
+6500065312VRR,REGIONAL,Media distancia,Valencia-Estaciò Del Nord,Vinaròs,25,Renfe Data GTFS alta/larga/media
+6500065400VRE,REG.EXP.,Media distancia,Valencia-Estaciò Del Nord,Tortosa,15,Renfe Data GTFS alta/larga/media
+6500065400VRR,REGIONAL,Media distancia,Valencia-Estaciò Del Nord,Tortosa,15,Renfe Data GTFS alta/larga/media
+6500067011VRX,MD,Media distancia,Valencia-Estaciò Del Nord,Encinacorba,19,Renfe Data GTFS alta/larga/media
+6500069011VRR,REGIONAL,Media distancia,Valencia-Estaciò Del Nord,Alcoy/Alcoi,23,Renfe Data GTFS alta/larga/media
+6500071801GL012,EUROMED,Larga distancia,Valencia-Estaciò Del Nord,Barcelona-Sants,4,Renfe Data GTFS alta/larga/media
+6500071801GL026,Intercity,Larga distancia,Valencia-Estaciò Del Nord,Barcelona-Sants,7,Renfe Data GTFS alta/larga/media
+6500079400VRE,REG.EXP.,Media distancia,Valencia-Estaciò Del Nord,Barcelona-Estació De França,28,Renfe Data GTFS alta/larga/media
+6530003216AV006,AVE,Alta velocidad,Castelló,Valencia Joaquin Sorolla,2,Renfe Data GTFS alta/larga/media
+6530015410AV006,AVE,Alta velocidad,Castelló,Gijón/Xixón,11,Renfe Data GTFS alta/larga/media
+6530060000AV006,AVE,Alta velocidad,Castelló,Madrid Pta.Atocha - Almudena Grandes,5,Renfe Data GTFS alta/larga/media
+6531265000VRR,REGIONAL,Media distancia,Vinaròs,Valencia-Estaciò Del Nord,25,Renfe Data GTFS alta/larga/media
+6531279400VRE,REG.EXP.,Media distancia,Vinaròs,Barcelona-Estació De França,17,Renfe Data GTFS alta/larga/media
+6540065000VRE,REG.EXP.,Media distancia,Tortosa,Valencia-Estaciò Del Nord,15,Renfe Data GTFS alta/larga/media
+6540065000VRR,REGIONAL,Media distancia,Tortosa,Valencia-Estaciò Del Nord,15,Renfe Data GTFS alta/larga/media
+6540071801AV008,AVANT EXP,Alta velocidad,Tortosa,Barcelona-Sants,8,Renfe Data GTFS alta/larga/media
+6540079400VRE,REG.EXP.,Media distancia,Tortosa,Barcelona-Estació De França,16,Renfe Data GTFS alta/larga/media
+6541171500VRR,REGIONAL,Media distancia,Salou - Port Aventura,Tarragona,2,Renfe Data GTFS alta/larga/media
+6541179400VRE,REG.EXP.,Media distancia,Salou - Port Aventura,Barcelona-Estació De França,9,Renfe Data GTFS alta/larga/media
+6701104040VRR,REGIONAL,Media distancia,Encinacorba,Zaragoza-Delicias,6,Renfe Data GTFS alta/larga/media
+6701104040VRX,MD,Media distancia,Encinacorba,Zaragoza-Delicias,4,Renfe Data GTFS alta/larga/media
+6701165000VRX,MD,Media distancia,Encinacorba,Valencia-Estaciò Del Nord,21,Renfe Data GTFS alta/larga/media
+6701167017VRX,MD,Media distancia,Encinacorba,Ferreruela,6,Renfe Data GTFS alta/larga/media
+6701167200VRR,REGIONAL,Media distancia,Encinacorba,Teruel,17,Renfe Data GTFS alta/larga/media
+6701367017VRX,MD,Media distancia,Villarreal de Huerva,Ferreruela,5,Renfe Data GTFS alta/larga/media
+6701704040VRX,MD,Media distancia,Ferreruela,Zaragoza-Delicias,8,Renfe Data GTFS alta/larga/media
+6702004040VRR,REGIONAL,Media distancia,Navarrete,Zaragoza-Delicias,13,Renfe Data GTFS alta/larga/media
+6720004040VRR,REGIONAL,Media distancia,Teruel,Zaragoza-Delicias,13,Renfe Data GTFS alta/larga/media
+6720067011VRR,REGIONAL,Media distancia,Teruel,Encinacorba,17,Renfe Data GTFS alta/larga/media
+6901165000VRR,REGIONAL,Media distancia,Alcoy/Alcoi,Valencia-Estaciò Del Nord,23,Renfe Data GTFS alta/larga/media
+7030004040VRE,REG.EXP.,Media distancia,Baides,Zaragoza-Delicias,8,Renfe Data GTFS alta/larga/media
+7030004040VRR,REGIONAL,Media distancia,Baides,Zaragoza-Delicias,11,Renfe Data GTFS alta/larga/media
+7030017000VRE,REG.EXP.,Media distancia,Baides,Madrid-Chamartín-Clara Campoamor,10,Renfe Data GTFS alta/larga/media
+7030017000VRR,REGIONAL,Media distancia,Baides,Madrid-Chamartín-Clara Campoamor,26,Renfe Data GTFS alta/larga/media
+7030070302VRR,REGIONAL,Media distancia,Baides,Siguenza,2,Renfe Data GTFS alta/larga/media
+7030204040VRR,REGIONAL,Media distancia,Siguenza,Zaragoza-Delicias,11,Renfe Data GTFS alta/larga/media
+7030217000VRR,REGIONAL,Media distancia,Siguenza,Madrid-Chamartín-Clara Campoamor,26,Renfe Data GTFS alta/larga/media
+7030270300VRR,REGIONAL,Media distancia,Siguenza,Baides,2,Renfe Data GTFS alta/larga/media
+7040304040VRR,REGIONAL,Media distancia,Arcos De Jalón,Zaragoza-Delicias,11,Renfe Data GTFS alta/larga/media
+7050004040VRR,REGIONAL,Media distancia,Ariza,Zaragoza-Delicias,9,Renfe Data GTFS alta/larga/media
+7060004040AV008,AVANT,Alta velocidad,Calatayud,Zaragoza-Delicias,2,Renfe Data GTFS alta/larga/media
+7060004040VRR,REGIONAL,Media distancia,Calatayud,Zaragoza-Delicias,17,Renfe Data GTFS alta/larga/media
+7060060000AV006,AVE,Alta velocidad,Calatayud,Madrid Pta.Atocha - Almudena Grandes,3,Renfe Data GTFS alta/larga/media
+7070004040VRR,REGIONAL,Media distancia,Ricla-La Almunia,Zaragoza-Delicias,10,Renfe Data GTFS alta/larga/media
+7110011200VRE,REG.EXP.,Media distancia,Zaragoza Miraflores,Miranda De Ebro,31,Renfe Data GTFS alta/larga/media
+7110080100VRE,REG.EXP.,Media distancia,Zaragoza Miraflores,Pamplona/Iruña,20,Renfe Data GTFS alta/larga/media
+7110081100VRE,REG.EXP.,Media distancia,Zaragoza Miraflores,Logroño,21,Renfe Data GTFS alta/larga/media
+7110081200VRE,REG.EXP.,Media distancia,Zaragoza Miraflores,Castejón De Ebro,15,Renfe Data GTFS alta/larga/media
+7120479400VRE,REG.EXP.,Media distancia,Caspe,Barcelona-Estació De França,23,Renfe Data GTFS alta/larga/media
+7120979400VRE,REG.EXP.,Media distancia,Riba-Roja D'ebre,Barcelona-Estació De França,20,Renfe Data GTFS alta/larga/media
+7121079400VRE,REG.EXP.,Media distancia,Flix,Barcelona-Estació De França,19,Renfe Data GTFS alta/larga/media
+7130004040VRR,REGIONAL,Media distancia,Móra La Nova,Zaragoza-Delicias,18,Renfe Data GTFS alta/larga/media
+7130079400VRE,REG.EXP.,Media distancia,Móra La Nova,Barcelona-Estació De França,17,Renfe Data GTFS alta/larga/media
+7140079400VRE,REG.EXP.,Media distancia,Reus,Barcelona-Estació De França,10,Renfe Data GTFS alta/larga/media
+7150065411VRR,REGIONAL,Media distancia,Tarragona,Salou - Port Aventura,2,Renfe Data GTFS alta/larga/media
+7150078400VRR,REGIONAL,Media distancia,Tarragona,Lleida-Pirineus,17,Renfe Data GTFS alta/larga/media
+7180104040AV006,AVE,Alta velocidad,Barcelona-Sants,Zaragoza-Delicias,4,Renfe Data GTFS alta/larga/media
+7180104040GL023,ALVIA,Larga distancia,Barcelona-Sants,Zaragoza-Delicias,4,Renfe Data GTFS alta/larga/media
+7180104307AV008,AVANT,Alta velocidad,Barcelona-Sants,Figueres Vilafant,3,Renfe Data GTFS alta/larga/media
+7180105000AV006,AVE,Alta velocidad,Barcelona-Sants,Granada,9,Renfe Data GTFS alta/larga/media
+7180108223GL023,ALVIA,Larga distancia,Barcelona-Sants,Vigo Urzaiz,25,Renfe Data GTFS alta/larga/media
+7180111511GL023,ALVIA,Larga distancia,Barcelona-Sants,San Sebastián/Donostia,11,Renfe Data GTFS alta/larga/media
+7180113200GL023,ALVIA,Larga distancia,Barcelona-Sants,Bilbao-Abando Indalecio Prieto,11,Renfe Data GTFS alta/larga/media
+7180115100GL023,ALVIA,Larga distancia,Barcelona-Sants,Leon,13,Renfe Data GTFS alta/larga/media
+7180122100GL023,ALVIA,Larga distancia,Barcelona-Sants,Ourense,21,Renfe Data GTFS alta/larga/media
+7180150500GL023,ALVIA,Larga distancia,Barcelona-Sants,Cordoba,18,Renfe Data GTFS alta/larga/media
+7180151003AV006,AVE,Alta velocidad,Barcelona-Sants,Sevilla-Santa Justa,8,Renfe Data GTFS alta/larga/media
+7180154413AV006,AVE,Alta velocidad,Barcelona-Sants,Malaga Maria Zambrano,9,Renfe Data GTFS alta/larga/media
+7180160000AV006,AVE,Alta velocidad,Barcelona-Sants,Madrid Pta.Atocha - Almudena Grandes,7,Renfe Data GTFS alta/larga/media
+7180160000AV016,AVE INT,Alta velocidad,Barcelona-Sants,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+7180160911GL012,EUROMED,Larga distancia,Barcelona-Sants,Alicante/Alacant,5,Renfe Data GTFS alta/larga/media
+7180160911GL026,Intercity,Larga distancia,Barcelona-Sants,Alicante/Alacant,15,Renfe Data GTFS alta/larga/media
+7180165000GL012,EUROMED,Larga distancia,Barcelona-Sants,Valencia-Estaciò Del Nord,4,Renfe Data GTFS alta/larga/media
+7180165000GL026,Intercity,Larga distancia,Barcelona-Sants,Valencia-Estaciò Del Nord,9,Renfe Data GTFS alta/larga/media
+7180165400AV008,AVANT EXP,Alta velocidad,Barcelona-Sants,Tortosa,8,Renfe Data GTFS alta/larga/media
+7180178400AV008,AVANT,Alta velocidad,Barcelona-Sants,Lleida-Pirineus,3,Renfe Data GTFS alta/larga/media
+7180178400VRE,REG.EXP.,Media distancia,Barcelona-Sants,Lleida-Pirineus,21,Renfe Data GTFS alta/larga/media
+7180179300VRX,MD,Media distancia,Barcelona-Sants,Girona,8,Renfe Data GTFS alta/larga/media
+7180179309VRX,MD,Media distancia,Barcelona-Sants,Figueres,10,Renfe Data GTFS alta/larga/media
+7180179315VRR,REGIONAL,Media distancia,Barcelona-Sants,Portbou,27,Renfe Data GTFS alta/larga/media
+7180179315VRX,MD,Media distancia,Barcelona-Sants,Portbou,12,Renfe Data GTFS alta/larga/media
+7180179316VRR,REGIONAL,Media distancia,Barcelona-Sants,Cerbère,28,Renfe Data GTFS alta/larga/media
+7180180100GL026,Intercity,Larga distancia,Barcelona-Sants,Pamplona/Iruña,8,Renfe Data GTFS alta/larga/media
+7180187303AV016,AVE INT,Alta velocidad,Barcelona-Sants,Lyon Part Dieu,9,Renfe Data GTFS alta/larga/media
+7310079400VRE,REG.EXP.,Media distancia,La Plana-Picamoixons,Barcelona-Estació De França,12,Renfe Data GTFS alta/larga/media
+7420004040AV006,AVE,Alta velocidad,Huesca,Zaragoza-Delicias,3,Renfe Data GTFS alta/larga/media
+7420004040VRR,REGIONAL,Media distancia,Huesca,Zaragoza-Delicias,7,Renfe Data GTFS alta/larga/media
+7420060000AV006,AVE,Alta velocidad,Huesca,Madrid Pta.Atocha - Almudena Grandes,6,Renfe Data GTFS alta/larga/media
+7421704040VRR,REGIONAL,Media distancia,Canfranc,Zaragoza-Delicias,17,Renfe Data GTFS alta/larga/media
+7830204040VRE,REG.EXP.,Media distancia,Binefar,Zaragoza-Delicias,9,Renfe Data GTFS alta/larga/media
+7840004040AV006,AVE,Alta velocidad,Lleida-Pirineus,Zaragoza-Delicias,2,Renfe Data GTFS alta/larga/media
+7840004040VRE,REG.EXP.,Media distancia,Lleida-Pirineus,Zaragoza-Delicias,10,Renfe Data GTFS alta/larga/media
+7840004040VRR,REGIONAL,Media distancia,Lleida-Pirineus,Zaragoza-Delicias,11,Renfe Data GTFS alta/larga/media
+7840008223GL023,ALVIA,Larga distancia,Lleida-Pirineus,Vigo Urzaiz,23,Renfe Data GTFS alta/larga/media
+7840060000AV006,AVE,Alta velocidad,Lleida-Pirineus,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+7840071500VRE,REG.EXP.,Media distancia,Lleida-Pirineus,Tarragona,17,Renfe Data GTFS alta/larga/media
+7840071801AV008,AVANT,Alta velocidad,Lleida-Pirineus,Barcelona-Sants,3,Renfe Data GTFS alta/larga/media
+7840071801VRE,REG.EXP.,Media distancia,Lleida-Pirineus,Barcelona-Sants,21,Renfe Data GTFS alta/larga/media
+7840072101VRE,REG.EXP.,Media distancia,Lleida-Pirineus,Roda De Mar,17,Renfe Data GTFS alta/larga/media
+7840078500VRR,REGIONAL,Media distancia,Lleida-Pirineus,Cervera,9,Renfe Data GTFS alta/larga/media
+7840078700VRR,REGIONAL,Media distancia,Lleida-Pirineus,Terrassa Estacio Nord,18,Renfe Data GTFS alta/larga/media
+7840079400VRE,REG.EXP.,Media distancia,Lleida-Pirineus,Barcelona-Estació De França,23,Renfe Data GTFS alta/larga/media
+7850078400VRR,REGIONAL,Media distancia,Cervera,Lleida-Pirineus,9,Renfe Data GTFS alta/larga/media
+7870078400VRR,REGIONAL,Media distancia,Terrassa Estacio Nord,Lleida-Pirineus,18,Renfe Data GTFS alta/larga/media
+7930071801VRX,MD,Media distancia,Girona,Barcelona-Sants,8,Renfe Data GTFS alta/larga/media
+7930971801VRX,MD,Media distancia,Figueres,Barcelona-Sants,10,Renfe Data GTFS alta/larga/media
+7931571801VRR,REGIONAL,Media distancia,Portbou,Barcelona-Sants,27,Renfe Data GTFS alta/larga/media
+7931571801VRX,MD,Media distancia,Portbou,Barcelona-Sants,12,Renfe Data GTFS alta/larga/media
+7931579309VRR,REGIONAL,Media distancia,Portbou,Figueres,5,Renfe Data GTFS alta/larga/media
+7931679315VRR,REGIONAL,Media distancia,Cerbère,Portbou,2,Renfe Data GTFS alta/larga/media
+7940004040VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Zaragoza-Delicias,32,Renfe Data GTFS alta/larga/media
+7940065000VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Valencia-Estaciò Del Nord,28,Renfe Data GTFS alta/larga/media
+7940065312VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Vinaròs,17,Renfe Data GTFS alta/larga/media
+7940065400VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Tortosa,16,Renfe Data GTFS alta/larga/media
+7940065411VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Salou - Port Aventura,9,Renfe Data GTFS alta/larga/media
+7940071204VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Caspe,24,Renfe Data GTFS alta/larga/media
+7940071209VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Riba-Roja D'ebre,20,Renfe Data GTFS alta/larga/media
+7940071210VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Flix,19,Renfe Data GTFS alta/larga/media
+7940071300VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Móra La Nova,17,Renfe Data GTFS alta/larga/media
+7940071400VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Reus,10,Renfe Data GTFS alta/larga/media
+7940073100VRR,REGIONAL,Media distancia,Barcelona-Estació De França,La Plana-Picamoixons,12,Renfe Data GTFS alta/larga/media
+7940078400VRE,REG.EXP.,Media distancia,Barcelona-Estació De França,Lleida-Pirineus,23,Renfe Data GTFS alta/larga/media
+8010011200VRE,REG.EXP.,Media distancia,Pamplona/Iruña,Miranda De Ebro,12,Renfe Data GTFS alta/larga/media
+8010060000GL023,ALVIA,Larga distancia,Pamplona/Iruña,Madrid Pta.Atocha - Almudena Grandes,7,Renfe Data GTFS alta/larga/media
+8010060000GL026,Intercity,Larga distancia,Pamplona/Iruña,Madrid Pta.Atocha - Almudena Grandes,4,Renfe Data GTFS alta/larga/media
+8010071100VRE,REG.EXP.,Media distancia,Pamplona/Iruña,Zaragoza Miraflores,20,Renfe Data GTFS alta/larga/media
+8010071801GL026,Intercity,Larga distancia,Pamplona/Iruña,Barcelona-Sants,8,Renfe Data GTFS alta/larga/media
+8110017000GL026,Intercity,Larga distancia,Logroño,Madrid-Chamartín-Clara Campoamor,7,Renfe Data GTFS alta/larga/media
+8110060000GL023,ALVIA,Larga distancia,Logroño,Madrid Pta.Atocha - Almudena Grandes,9,Renfe Data GTFS alta/larga/media
+8110071100VRE,REG.EXP.,Media distancia,Logroño,Zaragoza Miraflores,20,Renfe Data GTFS alta/larga/media
+8110081110VRM,MD,Media distancia,Logroño,Alfaro,4,Renfe Data GTFS alta/larga/media
+8111060000GL023,ALVIA,Larga distancia,Alfaro,Madrid Pta.Atocha - Almudena Grandes,6,Renfe Data GTFS alta/larga/media
+8111081100VRM,MD,Media distancia,Alfaro,Logroño,4,Renfe Data GTFS alta/larga/media
+8120011200VRE,REG.EXP.,Media distancia,Castejón De Ebro,Miranda De Ebro,16,Renfe Data GTFS alta/larga/media
+8120071100VRE,REG.EXP.,Media distancia,Castejón De Ebro,Zaragoza Miraflores,15,Renfe Data GTFS alta/larga/media
+8120081100VRE,REG.EXP.,Media distancia,Castejón De Ebro,Logroño,7,Renfe Data GTFS alta/larga/media
+8210017000VRE,REG.EXP.,Media distancia,Soria,Madrid-Chamartín-Clara Campoamor,13,Renfe Data GTFS alta/larga/media
+8210070300VRE,REG.EXP.,Media distancia,Soria,Baides,7,Renfe Data GTFS alta/larga/media
+8410117000VRE,REG.EXP.,Media distancia,Almazan,Madrid-Chamartín-Clara Campoamor,5,Renfe Data GTFS alta/larga/media
+8410118002VRE,REG.EXP.,Media distancia,Almazan,Madrid-Nuevos Ministerios,5,Renfe Data GTFS alta/larga/media
+8708904307AV016,AVE INT,Alta velocidad,Marseille St Charles,Figueres Vilafant,8,Renfe Data GTFS alta/larga/media
+8708960000AV016,AVE INT,Alta velocidad,Marseille St Charles,Madrid Pta.Atocha - Almudena Grandes,13,Renfe Data GTFS alta/larga/media
+8730304307AV016,AVE INT,Alta velocidad,Lyon Part Dieu,Figueres Vilafant,7,Renfe Data GTFS alta/larga/media
+8730371801AV016,AVE INT,Alta velocidad,Lyon Part Dieu,Barcelona-Sants,9,Renfe Data GTFS alta/larga/media
+9210260000AV008,AVANT,Alta velocidad,Toledo,Madrid Pta.Atocha - Almudena Grandes,2,Renfe Data GTFS alta/larga/media
+9210260600AV008,AVANT,Alta velocidad,Toledo,Albacete-Los Llanos,4,Renfe Data GTFS alta/larga/media
+9434622308GL026,TRENCELTA,Media distancia,Porto Campanha,Vigo Guixar,6,Renfe Data GTFS alta/larga/media
+9434622402GL026,TRENCELTA,Media distancia,Porto Campanha,Valenca Do Minho,5,Renfe Data GTFS alta/larga/media

@@ -1,22 +1,23 @@
-# Mapa 2: seguridad y poblacion
+# Mapa 2: movilidad y transporte
 
-Este mapa sustituye la evolucion del alquiler por una lectura de seguridad relativa. La coropleta provincial muestra la tasa de infracciones penales conocidas por 1.000 habitantes en 2024, y la capa de puntos representa municipios agregados disponibles en el Balance de Criminalidad.
+Este mapa sustituye la evolucion del alquiler por una lectura de movilidad intermodal. La coropleta provincial muestra un `mobility_score` de 0 a 100 y la capa de puntos agrupa nodos ferroviarios y aeroportuarios para ver rapidamente que provincias permiten vivir fuera de los grandes hubs sin quedar aislado.
 
 ## Metodologia
 
-- Fuente de criminalidad: Portal Estadistico de Criminalidad del Ministerio del Interior, Balance de Criminalidad 2024, 4º trimestre.
-- Variable usada: `III. TOTAL INFRACCIONES PENALES`, periodo `enero-diciembre 2024`.
-- Normalizacion: `hechos_delictivos / poblacion * 1000`.
-- Poblacion: hoja municipal y provincial del XLSX de cobertura SETELECO, usada aqui como fuente auxiliar de habitantes.
-- Cartografia: provincias NUTS3 2024 y municipios LAU 2024 de Eurostat/GISCO.
-- Clasificacion: 5 cuantiles para la tasa provincial.
+- Estaciones ferroviarias: Renfe Data, listado completo de estaciones.
+- Recorridos ferroviarios: Renfe Data GTFS de alta velocidad, larga distancia y media distancia.
+- Aeropuertos: nodos AENA/ENAIRE incorporados como puntos estrategicos, no como rutas aereas.
+- Poblacion: hoja provincial del XLSX de cobertura SETELECO, usada para normalizar nodos por 100.000 habitantes.
+- Cartografia: provincias NUTS3 2024 de Eurostat/GISCO.
+- Indice provincial: 60% cercania al nodo estrategico mas cercano y 40% nodos ponderados por 100.000 habitantes.
 
 ## Lectura visual
 
-- La coropleta compara provincias por tasa delictiva relativa.
-- Los puntos no representan delitos individuales: son municipios del balance oficial, principalmente capitales, municipios de mas de 20.000 habitantes e islas.
-- El tamano del punto indica hechos conocidos y el color indica tasa por 1.000 habitantes.
-- Los popups incluyen poblacion, hechos conocidos, tasa y lectura cualitativa.
+- La coropleta compara provincias por accesibilidad relativa al transporte.
+- Los recorridos se separan en capas checkbox: alta velocidad, larga distancia y media distancia.
+- Los puntos se agrupan con `MarkerCluster` y se separan por capas: alta velocidad, larga distancia, media distancia, Cercanias, FEVE y aeropuertos.
+- Alta velocidad, larga distancia, media distancia y aeropuertos estan activos en la vista inicial; Cercanias y FEVE quedan disponibles para activar si se quiere mas detalle.
+- Los popups incluyen nombre, modo, provincia, poblacion local cuando existe y fuente.
 
 ## Ejecutar
 
@@ -26,10 +27,11 @@ Este mapa sustituye la evolucion del alquiler por una lectura de seguridad relat
 
 El script genera:
 
-- `salidas/mapa2_seguridad_poblacion.png`
-- `salidas/mapa2_seguridad_poblacion.pdf`
-- `salidas/mapa2_seguridad_poblacion_interactivo.html`
-- `salidas/mapa2_seguridad_poblacion_datos.csv`
-- `salidas/mapa2_seguridad_poblacion_municipios.csv`
+- `salidas/mapa2_movilidad_transportes.png`
+- `salidas/mapa2_movilidad_transportes.pdf`
+- `salidas/mapa2_movilidad_transportes_interactivo.html`
+- `salidas/mapa2_movilidad_transportes_datos.csv`
+- `salidas/mapa2_movilidad_transportes_nodos.csv`
+- `salidas/mapa2_movilidad_transportes_recorridos.csv`
 
 Tambien mantiene copias con el nombre antiguo `mapa2_evolucion_alquiler.*` para que los scripts de ejecucion existentes sigan funcionando.

@@ -4,7 +4,7 @@ Proyecto de visualizacion de datos georreferenciados sobre la pregunta:
 
 **Donde vivir despues del Master de IA en la UPV**
 
-El repositorio genera seis mapas sobre alquiler, seguridad relativa,
+El repositorio genera seis mapas sobre alquiler, movilidad y transporte,
 accesibilidad laboral tech, conectividad, confort climatico e indice final de
 destino residencial. Tambien incluye una app Streamlit y una memoria en
 Markdown/PDF.
