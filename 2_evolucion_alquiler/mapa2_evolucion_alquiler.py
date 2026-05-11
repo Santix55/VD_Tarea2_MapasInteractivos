@@ -53,6 +53,7 @@ BROADBAND_FILE = DATA_DIR / "cobertura_ba_espana_2021_2024.xlsx"
 NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
 
 PROJECTED_CRS = "EPSG:3035"
+HIGH_SPEED_SEGMENT_MAX_KM = 180.0
 MOBILITY_WEIGHTS = {
     "Alta velocidad": 2.0,
     "Larga distancia": 2.0,
@@ -428,12 +429,26 @@ def load_airports() -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(airports, geometry=geometry, crs="EPSG:4326")
 
 
-def build_route_lines(
+def haversine_km(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
+    radius_km = 6371.0
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    value = (
+        math.sin(delta_phi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
+    )
+    value = min(1.0, max(0.0, value))
+    return 2 * radius_km * math.atan2(math.sqrt(value), math.sqrt(1 - value))
+
+
+def build_representative_route_stops(
     routes: pd.DataFrame,
     trips: pd.DataFrame,
     stop_times: pd.DataFrame,
     stops: pd.DataFrame,
-) -> gpd.GeoDataFrame:
+) -> pd.DataFrame:
     trip_lengths = (
         stop_times.groupby("trip_id", as_index=False)
         .agg(stop_count=("stop_id", "count"))
@@ -452,7 +467,10 @@ def build_route_lines(
         .dropna(subset=["stop_lat", "stop_lon", "rail_mode"])
         .sort_values(["route_id", "stop_sequence"])
     )
+    return route_stops
 
+
+def build_route_lines_from_route_stops(route_stops: pd.DataFrame) -> gpd.GeoDataFrame:
     rows = []
     for route_id, group in route_stops.groupby("route_id", sort=False):
         points = [
@@ -475,6 +493,93 @@ def build_route_lines(
             }
         )
     return gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326")
+
+
+def build_route_lines(
+    routes: pd.DataFrame,
+    trips: pd.DataFrame,
+    stop_times: pd.DataFrame,
+    stops: pd.DataFrame,
+) -> gpd.GeoDataFrame:
+    route_stops = build_representative_route_stops(routes, trips, stop_times, stops)
+    return build_route_lines_from_route_stops(route_stops)
+
+
+def build_clean_high_speed_segments(route_stops: pd.DataFrame) -> gpd.GeoDataFrame:
+    rows_by_pair: dict[tuple[str, str], dict[str, object]] = {}
+    high_speed_stops = route_stops[route_stops["rail_mode"].eq("Alta velocidad")]
+
+    for route_id, group in high_speed_stops.groupby("route_id", sort=False):
+        ordered = list(group.itertuples())
+        for start, end in zip(ordered, ordered[1:]):
+            distance_km = haversine_km(
+                float(start.stop_lon),
+                float(start.stop_lat),
+                float(end.stop_lon),
+                float(end.stop_lat),
+            )
+            if distance_km > HIGH_SPEED_SEGMENT_MAX_KM:
+                continue
+
+            stop_ids = tuple(sorted([str(start.stop_id), str(end.stop_id)]))
+            segment = rows_by_pair.get(stop_ids)
+            if segment is None:
+                segment = {
+                    "stop_a_id": stop_ids[0],
+                    "stop_b_id": stop_ids[1],
+                    "stop_a": start.stop_name if str(start.stop_id) == stop_ids[0] else end.stop_name,
+                    "stop_b": end.stop_name if str(start.stop_id) == stop_ids[0] else start.stop_name,
+                    "distance_km": distance_km,
+                    "services_set": set(),
+                    "route_ids_set": set(),
+                    "source": (
+                        "Esquema GTFS: tramos entre paradas consecutivas; "
+                        "no es geometria ferroviaria real"
+                    ),
+                    "geometry": LineString(
+                        [
+                            (float(start.stop_lon), float(start.stop_lat)),
+                            (float(end.stop_lon), float(end.stop_lat)),
+                        ]
+                    ),
+                }
+                rows_by_pair[stop_ids] = segment
+
+            segment["distance_km"] = min(float(segment["distance_km"]), distance_km)
+            segment["services_set"].add(str(start.route_short_name))
+            segment["route_ids_set"].add(str(route_id))
+
+    rows = []
+    for segment in rows_by_pair.values():
+        services = sorted(segment.pop("services_set"))
+        route_ids = sorted(segment.pop("route_ids_set"))
+        segment["distance_km"] = round(float(segment["distance_km"]), 1)
+        segment["services"] = ", ".join(services)
+        segment["route_count"] = len(route_ids)
+        segment["route_ids"] = ", ".join(route_ids)
+        rows.append(segment)
+
+    if not rows:
+        return gpd.GeoDataFrame(
+            columns=[
+                "stop_a_id",
+                "stop_b_id",
+                "stop_a",
+                "stop_b",
+                "distance_km",
+                "services",
+                "route_count",
+                "route_ids",
+                "source",
+                "geometry",
+            ],
+            geometry="geometry",
+            crs="EPSG:4326",
+        )
+
+    return gpd.GeoDataFrame(rows, geometry="geometry", crs="EPSG:4326").sort_values(
+        ["stop_a", "stop_b"]
+    )
 
 
 def add_geographic_metrics(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -548,6 +653,7 @@ def build_dataset() -> tuple[
     gpd.GeoDataFrame,
     gpd.GeoDataFrame,
     gpd.GeoDataFrame,
+    gpd.GeoDataFrame,
     list[float],
 ]:
     download_file(RENFE_ALL_URL, RENFE_ALL_FILE)
@@ -565,7 +671,9 @@ def build_dataset() -> tuple[
     airports = load_airports()
     nodes = pd.concat([stations, airports], ignore_index=True)
     nodes = gpd.GeoDataFrame(nodes, geometry="geometry", crs="EPSG:4326")
-    route_lines = build_route_lines(routes, trips, stop_times, stops)
+    route_stops = build_representative_route_stops(routes, trips, stop_times, stops)
+    route_lines = build_route_lines_from_route_stops(route_stops)
+    clean_high_speed_segments = build_clean_high_speed_segments(route_stops)
     map_data = calculate_province_mobility(provinces, population, nodes)
 
     required = ["population", "mobility_score", "nearest_strategic_km"]
@@ -580,13 +688,14 @@ def build_dataset() -> tuple[
     map_data["mobility_color"] = map_data["mobility_score"].map(
         lambda value: color_for_bins(value, bins, MOBILITY_PALETTE)
     )
-    return map_data, nodes, route_lines, bins
+    return map_data, nodes, route_lines, clean_high_speed_segments, bins
 
 
 def save_static_map(
     map_data: gpd.GeoDataFrame,
     nodes: gpd.GeoDataFrame,
     route_lines: gpd.GeoDataFrame,
+    clean_high_speed_segments: gpd.GeoDataFrame,
     bins: list[float],
 ) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -599,7 +708,13 @@ def save_static_map(
     map_data.plot(ax=map_ax, color=map_data["mobility_color"], linewidth=0.42, edgecolor="white")
     map_data.boundary.plot(ax=map_ax, color="#555555", linewidth=0.14, alpha=0.55)
     for mode in RAIL_ROUTE_MODES:
-        route_lines[route_lines["mode"].eq(mode)].plot(
+        if mode == "Alta velocidad":
+            line_group = clean_high_speed_segments
+        else:
+            line_group = route_lines[route_lines["mode"].eq(mode)]
+        if line_group.empty:
+            continue
+        line_group.plot(
             ax=map_ax,
             color=MODE_COLORS[mode],
             linewidth=0.55 if mode == "Alta velocidad" else 0.38,
@@ -743,7 +858,7 @@ def add_transport_radio_control(
 ) -> None:
     labels = {
         "none": "Ninguno",
-        "Alta velocidad": "Alta velocidad",
+        "Alta velocidad": "Alta velocidad GTFS limpio",
         "Larga distancia": "Larga distancia",
         "Media distancia": "Media distancia",
         "Aeropuerto": "Aeropuertos",
@@ -776,7 +891,7 @@ def add_transport_radio_control(
         font-size: 12px;
         line-height: 1.25;
         padding: 10px 12px;
-        min-width: 170px;
+        min-width: 205px;
       }
       .transport-radio-control-title {
         font-weight: 700;
@@ -841,6 +956,7 @@ def save_interactive_map(
     map_data: gpd.GeoDataFrame,
     nodes: gpd.GeoDataFrame,
     route_lines: gpd.GeoDataFrame,
+    clean_high_speed_segments: gpd.GeoDataFrame,
     bins: list[float],
 ) -> None:
     web_map = folium.Map(location=[40.2, -3.7], zoom_start=6, tiles="cartodbpositron")
@@ -917,10 +1033,41 @@ def save_interactive_map(
     transport_layers: dict[str, list[str]] = {}
 
     for mode in RAIL_ROUTE_MODES:
-        route_group = route_lines[route_lines["mode"].eq(mode)].copy()
+        if mode == "Alta velocidad":
+            route_group = clean_high_speed_segments.copy()
+            layer_name = "Alta velocidad: esquema GTFS limpio"
+            tooltip_fields = ["stop_a", "stop_b", "distance_km", "services", "route_count"]
+            tooltip_aliases = ["Parada A", "Parada B", "Distancia directa (km)", "Servicios", "Rutas"]
+            popup_fields = [
+                "stop_a",
+                "stop_b",
+                "distance_km",
+                "services",
+                "route_count",
+                "source",
+            ]
+            popup_aliases = [
+                "Parada A",
+                "Parada B",
+                "Distancia directa (km)",
+                "Servicios",
+                "Rutas",
+                "Fuente/nota",
+            ]
+        else:
+            route_group = route_lines[route_lines["mode"].eq(mode)].copy()
+            layer_name = f"Recorridos: {mode}"
+            tooltip_fields = ["route_short_name", "from_stop", "to_stop", "stop_count"]
+            tooltip_aliases = ["Servicio", "Desde", "Hasta", "Paradas"]
+            popup_fields = ["route_short_name", "mode", "from_stop", "to_stop", "source"]
+            popup_aliases = ["Servicio", "Modo", "Desde", "Hasta", "Fuente"]
+
+        if route_group.empty:
+            continue
+
         route_layer = folium.GeoJson(
             route_group,
-            name=f"Recorridos: {mode}",
+            name=layer_name,
             show=False,
             control=False,
             style_function=lambda feature, local_mode=mode: {
@@ -929,13 +1076,13 @@ def save_interactive_map(
                 "opacity": 0.58,
             },
             tooltip=folium.GeoJsonTooltip(
-                fields=["route_short_name", "from_stop", "to_stop", "stop_count"],
-                aliases=["Servicio", "Desde", "Hasta", "Paradas"],
+                fields=tooltip_fields,
+                aliases=tooltip_aliases,
                 sticky=False,
             ),
             popup=folium.GeoJsonPopup(
-                fields=["route_short_name", "mode", "from_stop", "to_stop", "source"],
-                aliases=["Servicio", "Modo", "Desde", "Hasta", "Fuente"],
+                fields=popup_fields,
+                aliases=popup_aliases,
                 max_width=360,
             ),
         )
@@ -982,6 +1129,7 @@ def save_tables(
     map_data: gpd.GeoDataFrame,
     nodes: gpd.GeoDataFrame,
     route_lines: gpd.GeoDataFrame,
+    clean_high_speed_segments: gpd.GeoDataFrame,
 ) -> None:
     province_columns = [
         "COD_PROVINCIA",
@@ -1029,15 +1177,35 @@ def save_tables(
         ["route_id", "route_short_name", "mode", "from_stop", "to_stop", "stop_count", "source"]
     ].to_csv(OUTPUT_DIR / "mapa2_movilidad_transportes_recorridos.csv", index=False)
 
+    clean_segments_table = clean_high_speed_segments[
+        [
+            "stop_a_id",
+            "stop_b_id",
+            "stop_a",
+            "stop_b",
+            "distance_km",
+            "services",
+            "route_count",
+            "route_ids",
+            "source",
+        ]
+    ].copy()
+    clean_segments_table["distance_km"] = clean_segments_table["distance_km"].round(1)
+    clean_segments_table.to_csv(
+        OUTPUT_DIR / "mapa2_movilidad_transportes_tramos_av_limpios.csv",
+        index=False,
+    )
+
 
 def main() -> None:
-    map_data, nodes, route_lines, bins = build_dataset()
-    save_static_map(map_data, nodes, route_lines, bins)
-    save_interactive_map(map_data, nodes, route_lines, bins)
-    save_tables(map_data, nodes, route_lines)
+    map_data, nodes, route_lines, clean_high_speed_segments, bins = build_dataset()
+    save_static_map(map_data, nodes, route_lines, clean_high_speed_segments, bins)
+    save_interactive_map(map_data, nodes, route_lines, clean_high_speed_segments, bins)
+    save_tables(map_data, nodes, route_lines, clean_high_speed_segments)
     print("Mapa 2 generado: movilidad y transporte.")
     print(
-        f"Provincias: {len(map_data)} | nodos: {len(nodes)} | recorridos: {len(route_lines)}"
+        f"Provincias: {len(map_data)} | nodos: {len(nodes)} | "
+        f"recorridos: {len(route_lines)} | tramos AV limpios: {len(clean_high_speed_segments)}"
     )
 
 

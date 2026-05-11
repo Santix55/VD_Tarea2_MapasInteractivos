@@ -52,7 +52,7 @@
 - **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
   Dataset CSV: `VDP001_01.csv`  
   URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
-  Uso: alquiler medio ponderado provincial en 2024 como contexto en popups y grafico lateral, no como variable principal de la coropleta.
+  Uso: alquiler medio ponderado provincial en 2024 como contexto en popups, eje del grafico lateral distancia/alquiler y criterio para marcar candidatas hibridas con alquiler bajo media.
 
 - **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  

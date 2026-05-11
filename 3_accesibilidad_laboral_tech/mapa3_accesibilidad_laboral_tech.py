@@ -82,6 +82,9 @@ BUFFER_DASH_ARRAYS = {
     175: "8 5",
     250: "",
 }
+HYBRID_DISTANCE_KM = 175
+CANDIDATE_OUTLINE_COLOR = "#111111"
+CANDIDATE_FILL_COLOR = "#0B6E4F"
 
 HUBS = [
     {
@@ -229,6 +232,18 @@ def format_eur(value: float | int | None) -> str:
     return f"{float(value):,.0f} EUR".replace(",", ".")
 
 
+def format_gap_eur(value: float | int | None) -> str:
+    if pd.isna(value):
+        return "sin dato"
+    rounded = float(value)
+    if abs(rounded) < 0.5:
+        return "en la media nacional"
+    amount = f"{abs(rounded):,.0f} EUR".replace(",", ".")
+    if rounded > 0:
+        return f"+{amount} sobre media"
+    return f"-{amount} bajo media"
+
+
 def format_km(value: float | int | None) -> str:
     if pd.isna(value):
         return "sin dato"
@@ -244,6 +259,47 @@ def distance_comment(rank: int) -> str:
         5: "Alta distancia: mejor entenderlo como destino remoto.",
     }
     return comments[int(rank)]
+
+
+def access_mode(distance_km: float | int | None) -> str:
+    if pd.isna(distance_km):
+        return "sin dato"
+    if distance_km <= 50:
+        return "presencial frecuente"
+    if distance_km <= 100:
+        return "hibrido semanal"
+    if distance_km <= HYBRID_DISTANCE_KM:
+        return "hibrido puntual"
+    if distance_km <= 250:
+        return "contacto ocasional"
+    return "principalmente remoto"
+
+
+def weighted_national_rent(map_data: pd.DataFrame) -> float:
+    return float(
+        (map_data["rent_eur_month"] * map_data["rental_homes"]).sum()
+        / map_data["rental_homes"].sum()
+    )
+
+
+def add_hybrid_tradeoffs(map_data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    national_rent = weighted_national_rent(map_data)
+    enriched = map_data.copy()
+    enriched["access_mode"] = enriched["nearest_hub_km"].map(access_mode)
+    enriched["rent_gap_eur"] = enriched["rent_eur_month"] - national_rent
+    enriched["rent_gap_label"] = enriched["rent_gap_eur"].map(format_gap_eur)
+
+    close_to_hub = enriched["nearest_hub_km"].le(HYBRID_DISTANCE_KM)
+    affordable = enriched["rent_eur_month"].le(national_rent)
+    enriched["hybrid_candidate"] = close_to_hub & affordable
+    enriched["tradeoff_group"] = "lejano y caro"
+    enriched.loc[close_to_hub & affordable, "tradeoff_group"] = "cerca y asequible"
+    enriched.loc[close_to_hub & ~affordable, "tradeoff_group"] = "cerca pero caro"
+    enriched.loc[~close_to_hub & affordable, "tradeoff_group"] = "barato pero lejano"
+    enriched["hybrid_candidate_label"] = enriched["hybrid_candidate"].map(
+        {True: "si", False: "no"}
+    )
+    return enriched
 
 
 def load_hubs() -> gpd.GeoDataFrame:
@@ -456,6 +512,7 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame, gpd.GeoDataFram
         raise ValueError(f"Faltan datos de alquiler para estas provincias: {missing_codes}")
 
     map_data, lines = assign_nearest_hubs(map_data, hubs)
+    map_data = add_hybrid_tradeoffs(map_data)
     buffers = make_buffers(provinces, hubs)
     validate_dataset(map_data)
     return map_data, hubs, buffers, lines, year
@@ -467,8 +524,23 @@ def validate_dataset(map_data: gpd.GeoDataFrame) -> None:
     if map_data["nearest_hub"].isna().any():
         missing = ", ".join(map_data.loc[map_data["nearest_hub"].isna(), "COD_PROVINCIA"])
         raise ValueError(f"Hay provincias sin hub cercano: {missing}")
+    for column in ["access_mode", "tradeoff_group"]:
+        if map_data[column].isna().any():
+            missing = ", ".join(map_data.loc[map_data[column].isna(), "COD_PROVINCIA"])
+            raise ValueError(f"Hay provincias sin {column}: {missing}")
     if map_data["distance_rank"].nunique() != 5:
         raise ValueError("La clasificacion de distancia no contiene exactamente 5 clases.")
+    national_rent = weighted_national_rent(map_data)
+    invalid_candidates = map_data[
+        map_data["hybrid_candidate"]
+        & (
+            map_data["nearest_hub_km"].gt(HYBRID_DISTANCE_KM)
+            | map_data["rent_eur_month"].gt(national_rent)
+        )
+    ]
+    if not invalid_candidates.empty:
+        names = ", ".join(invalid_candidates["PROVINCIA"].tolist())
+        raise ValueError(f"Candidatas hibridas fuera de criterio: {names}")
 
     hub_code_map = {hub["province_code"]: hub["hub_name"] for hub in HUBS}
     hub_provinces = map_data[map_data["COD_PROVINCIA"].isin(hub_code_map)]
@@ -479,10 +551,19 @@ def validate_dataset(map_data: gpd.GeoDataFrame) -> None:
 
 
 def distance_legend_handles() -> list[mpatches.Patch]:
-    return [
+    handles = [
         mpatches.Patch(color=DISTANCE_COLORS[index + 1], label=label)
         for index, label in enumerate(DISTANCE_LABELS)
     ]
+    handles.append(
+        mpatches.Patch(
+            facecolor="none",
+            edgecolor=CANDIDATE_OUTLINE_COLOR,
+            linewidth=1.6,
+            label=f"Candidata hibrida: <= {HYBRID_DISTANCE_KM} km y alquiler bajo media",
+        )
+    )
+    return handles
 
 
 def plot_canary_inset(
@@ -568,6 +649,17 @@ def save_static_map(
             alpha=0.33,
             zorder=3,
         )
+    candidates = map_data[
+        map_data["hybrid_candidate"] & ~map_data["COD_PROVINCIA"].isin(["35", "38"])
+    ]
+    if not candidates.empty:
+        candidates.plot(
+            ax=map_ax,
+            facecolor="none",
+            edgecolor=CANDIDATE_OUTLINE_COLOR,
+            linewidth=1.6,
+            zorder=3.6,
+        )
     hubs.plot(
         ax=map_ax,
         marker="*",
@@ -608,7 +700,7 @@ def save_static_map(
     map_ax.set_ylim(35.0, 44.5)
     map_ax.set_axis_off()
     map_ax.set_title(
-        "Accesibilidad laboral tech: distancia al hub IA/tech mas cercano",
+        "Accesibilidad laboral hibrida: distancia al hub IA/tech mas cercano",
         fontsize=16.5,
         fontweight="bold",
         pad=12,
@@ -623,6 +715,36 @@ def save_static_map(
     )
     plot_canary_inset(map_ax, map_data, buffers)
 
+    national_rent = weighted_national_rent(map_data)
+    x_max = max(HYBRID_DISTANCE_KM + 65, map_data["nearest_hub_km"].max() * 1.08)
+    y_min = max(0, map_data["rent_eur_month"].min() - 75)
+    y_max = map_data["rent_eur_month"].max() + 80
+    quadrants = [
+        (0, y_min, HYBRID_DISTANCE_KM, national_rent - y_min, "#d9f0d3"),
+        (0, national_rent, HYBRID_DISTANCE_KM, y_max - national_rent, "#fddbc7"),
+        (HYBRID_DISTANCE_KM, y_min, x_max - HYBRID_DISTANCE_KM, national_rent - y_min, "#e0ecf4"),
+        (HYBRID_DISTANCE_KM, national_rent, x_max - HYBRID_DISTANCE_KM, y_max - national_rent, "#f7f7f7"),
+    ]
+    for x, y, width, height, color in quadrants:
+        scatter_ax.add_patch(
+            mpatches.Rectangle((x, y), width, height, facecolor=color, alpha=0.34, zorder=0)
+        )
+    scatter_ax.text(
+        HYBRID_DISTANCE_KM * 0.05,
+        y_min + (national_rent - y_min) * 0.08,
+        "cerca + asequible",
+        fontsize=7.3,
+        color="#215732",
+        fontweight="bold",
+    )
+    scatter_ax.text(
+        HYBRID_DISTANCE_KM + (x_max - HYBRID_DISTANCE_KM) * 0.04,
+        y_min + (national_rent - y_min) * 0.08,
+        "barato pero lejano",
+        fontsize=7.3,
+        color="#1f4e79",
+        fontweight="bold",
+    )
     for rank in range(1, 6):
         subset = map_data[map_data["distance_rank"].eq(rank)]
         scatter_ax.scatter(
@@ -635,18 +757,41 @@ def save_static_map(
             alpha=0.82,
             label=DISTANCE_LABELS[rank - 1].split(" - ")[0],
         )
-    for threshold in DISTANCE_BINS[1:-1]:
-        scatter_ax.axvline(threshold, color="#c7c7c7", linewidth=0.7, linestyle="--")
-    national_rent = (map_data["rent_eur_month"] * map_data["rental_homes"]).sum() / map_data[
-        "rental_homes"
-    ].sum()
+    candidate_points = map_data[map_data["hybrid_candidate"]]
+    if not candidate_points.empty:
+        scatter_ax.scatter(
+            candidate_points["nearest_hub_km"],
+            candidate_points["rent_eur_month"],
+            s=88,
+            facecolors="none",
+            edgecolors=CANDIDATE_OUTLINE_COLOR,
+            linewidth=1.25,
+            marker="o",
+            zorder=4,
+            label="candidata hibrida",
+        )
+    scatter_ax.axvline(
+        HYBRID_DISTANCE_KM,
+        color=CANDIDATE_OUTLINE_COLOR,
+        linewidth=1.0,
+        linestyle="--",
+    )
     scatter_ax.axhline(national_rent, color="#111111", linewidth=1.0, linestyle=":")
     scatter_ax.text(
-        8,
+        6,
         national_rent + 8,
         f"media ponderada {national_rent:.0f} EUR",
         fontsize=7.6,
         color="#111111",
+    )
+    scatter_ax.text(
+        HYBRID_DISTANCE_KM + 5,
+        y_max - 35,
+        f"umbral hibrido {HYBRID_DISTANCE_KM} km",
+        fontsize=7.4,
+        color="#111111",
+        rotation=90,
+        va="top",
     )
     label_codes = ["46", "28", "08", "29", "48", "41", "50", "35", "38"]
     for _, row in map_data[map_data["COD_PROVINCIA"].isin(label_codes)].iterrows():
@@ -664,35 +809,48 @@ def save_static_map(
     scatter_ax.set_title("Distancia al trabajo tech vs alquiler", fontsize=11.2, fontweight="bold")
     scatter_ax.set_xlabel("Km al hub mas cercano", fontsize=8.8)
     scatter_ax.set_ylabel(f"Alquiler medio ponderado {year} (EUR/mes)", fontsize=8.8)
+    scatter_ax.set_xlim(0, x_max)
+    scatter_ax.set_ylim(y_min, y_max)
     scatter_ax.grid(color="#dddddd", linewidth=0.6)
     scatter_ax.tick_params(axis="both", labelsize=7.8)
 
-    hub_summary = (
-        map_data.groupby("nearest_hub", as_index=False)
-        .agg(
-            provinces=("COD_PROVINCIA", "count"),
-            mean_distance=("nearest_hub_km", "mean"),
-        )
-        .sort_values("provinces")
+    candidate_ranking = (
+        map_data[map_data["hybrid_candidate"]]
+        .sort_values(["rent_eur_month", "nearest_hub_km"])
+        .head(8)
+        .sort_values("rent_eur_month", ascending=False)
     )
-    hub_ax.barh(hub_summary["nearest_hub"], hub_summary["provinces"], color="#5ab4ac")
-    for index, row in hub_summary.reset_index(drop=True).iterrows():
+    if candidate_ranking.empty:
         hub_ax.text(
-            row["provinces"] + 0.12,
-            index,
-            f"{row['provinces']:.0f} prov. | {row['mean_distance']:.0f} km",
+            0.5,
+            0.5,
+            "No hay candidatas que cumplan el criterio",
+            ha="center",
             va="center",
-            fontsize=7.5,
+            fontsize=9.0,
             color="#333333",
         )
-    hub_ax.set_title("Provincias asignadas a cada hub", fontsize=11.2, fontweight="bold")
-    hub_ax.set_xlabel("Numero de provincias", fontsize=8.8)
-    hub_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    hub_ax.tick_params(axis="both", labelsize=7.8)
-    hub_ax.set_xlim(0, hub_summary["provinces"].max() + 3.2)
+        hub_ax.set_axis_off()
+    else:
+        labels = candidate_ranking["PROVINCIA"].str.replace("Valencia/Valencia", "Valencia")
+        hub_ax.barh(labels, candidate_ranking["rent_eur_month"], color=CANDIDATE_FILL_COLOR)
+        for index, row in candidate_ranking.reset_index(drop=True).iterrows():
+            hub_ax.text(
+                row["rent_eur_month"] + 8,
+                index,
+                f"{row['rent_eur_month']:.0f} EUR | {row['nearest_hub_km']:.0f} km a {row['nearest_hub']}",
+                va="center",
+                fontsize=7.1,
+                color="#333333",
+            )
+        hub_ax.set_title("Candidatas cerca + alquiler bajo", fontsize=11.2, fontweight="bold")
+        hub_ax.set_xlabel(f"Alquiler medio ponderado {year} (EUR/mes)", fontsize=8.8)
+        hub_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
+        hub_ax.tick_params(axis="both", labelsize=7.6)
+        hub_ax.set_xlim(0, candidate_ranking["rent_eur_month"].max() + 180)
 
     fig.suptitle(
-        "Mapa 3. Accesibilidad residencial a hubs de trabajo tech/IA",
+        "Mapa 3. Accesibilidad hibrida a hubs de trabajo tech/IA",
         fontsize=20,
         fontweight="bold",
         x=0.44,
@@ -718,7 +876,11 @@ def province_popup_fields() -> tuple[list[str], list[str]]:
             "nearest_hub",
             "nearest_hub_km_label",
             "distance_class",
+            "access_mode",
             "rent_label",
+            "rent_gap_label",
+            "tradeoff_group",
+            "hybrid_candidate_label",
             "rental_homes_label",
             "distance_comment",
         ],
@@ -727,14 +889,18 @@ def province_popup_fields() -> tuple[list[str], list[str]]:
             "Hub tech/IA mas cercano",
             "Distancia euclidea",
             "Clase",
+            "Modo de acceso",
             "Alquiler medio 2024",
+            "Diferencia frente a media",
+            "Lectura coste-distancia",
+            "Candidata hibrida",
             "Viviendas observadas",
             "Lectura",
         ],
     )
 
 
-def add_legend(web_map: folium.Map, year: int) -> None:
+def add_legend(web_map: folium.Map, year: int, national_rent: float) -> None:
     class_rows = "".join(
         f"""
         <div style="display:flex; align-items:center; gap:6px; margin:3px 0;">
@@ -780,7 +946,12 @@ def add_legend(web_map: folium.Map, year: int) -> None:
         {hub_rows}
       </div>
       <hr style="margin:7px 0;">
-      Alquiler {year} solo como contexto.<br>
+      <div style="display:flex; align-items:center; gap:6px; margin:3px 0;">
+        <span style="width:17px; height:12px; border:2px solid {CANDIDATE_OUTLINE_COLOR};
+                     display:inline-block; background:rgba(11,110,79,0.08);"></span>
+        <span>Candidata: <= {HYBRID_DISTANCE_KM} km y alquiler <= {national_rent:.0f} EUR</span>
+      </div>
+      Alquiler {year} como lectura coste-distancia.<br>
       Distancia euclidea, no tiempo de viaje.
     </div>
     """
@@ -804,6 +975,7 @@ def save_interactive_map(
     )
     folium.TileLayer("CartoDB dark_matter", name="Base oscura", control=True).add_to(web_map)
 
+    national_rent = weighted_national_rent(map_data)
     fields, aliases = province_popup_fields()
     province_layer = folium.GeoJson(
         map_data,
@@ -821,20 +993,66 @@ def save_interactive_map(
                 "nearest_hub",
                 "nearest_hub_km_label",
                 "distance_class",
+                "access_mode",
                 "rent_label",
+                "rent_gap_label",
+                "tradeoff_group",
             ],
             aliases=[
                 "Provincia",
                 "Hub cercano",
                 "Distancia",
                 "Clase",
+                "Modo",
                 "Alquiler 2024",
+                "Diferencia",
+                "Coste-distancia",
             ],
             sticky=False,
             labels=True,
         ),
         popup=folium.GeoJsonPopup(fields=fields, aliases=aliases, labels=True, max_width=390),
     ).add_to(web_map)
+
+    candidate_layer = folium.FeatureGroup(name="Candidatas cerca + alquiler bajo", show=True)
+    candidate_data = map_data[map_data["hybrid_candidate"]].copy()
+    if not candidate_data.empty:
+        folium.GeoJson(
+            candidate_data,
+            name="Candidatas cerca + alquiler bajo",
+            style_function=lambda _: {
+                "fillColor": CANDIDATE_FILL_COLOR,
+                "color": CANDIDATE_OUTLINE_COLOR,
+                "weight": 2.3,
+                "fillOpacity": 0.08,
+            },
+            highlight_function=lambda _: {
+                "weight": 3.2,
+                "color": CANDIDATE_OUTLINE_COLOR,
+                "fillOpacity": 0.16,
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=[
+                    "PROVINCIA",
+                    "nearest_hub",
+                    "nearest_hub_km_label",
+                    "rent_label",
+                    "rent_gap_label",
+                    "access_mode",
+                ],
+                aliases=[
+                    "Provincia",
+                    "Hub cercano",
+                    "Distancia",
+                    "Alquiler 2024",
+                    "Diferencia",
+                    "Modo",
+                ],
+                sticky=False,
+            ),
+            popup=folium.GeoJsonPopup(fields=fields, aliases=aliases, labels=True, max_width=390),
+        ).add_to(candidate_layer)
+    candidate_layer.add_to(web_map)
 
     for radius in BUFFER_RADII_KM:
         subset = buffers[buffers["radius_km"].eq(radius)]
@@ -925,7 +1143,7 @@ def save_interactive_map(
         ).add_to(hub_group)
     hub_group.add_to(web_map)
 
-    add_legend(web_map, year)
+    add_legend(web_map, year, national_rent)
     plugins.Search(
         layer=province_layer,
         search_label="PROVINCIA",
@@ -954,6 +1172,11 @@ def save_tables(map_data: gpd.GeoDataFrame, hubs: gpd.GeoDataFrame, year: int) -
         "distance_class",
         "distance_rank",
         "rent_eur_month",
+        "rent_gap_eur",
+        "rent_gap_label",
+        "access_mode",
+        "tradeoff_group",
+        "hybrid_candidate",
         "rental_homes",
     ]
     table = map_data[table_columns].sort_values(["distance_rank", "nearest_hub_km"]).copy()
@@ -970,9 +1193,10 @@ def main() -> None:
     save_interactive_map(map_data, hubs, buffers, lines, year)
     save_tables(map_data, hubs, year)
 
-    print(f"Mapa 3 generado con alquiler contextual de {year}.")
+    print(f"Mapa 3 generado con lectura hibrida y alquiler contextual de {year}.")
     print(f"Provincias asignadas a hub: {len(map_data)}.")
     print(f"Clases de distancia: {map_data['distance_rank'].nunique()}.")
+    print(f"Candidatas cerca + alquiler bajo: {int(map_data['hybrid_candidate'].sum())}.")
     print(f"Hubs tech/IA: {len(hubs)}.")
     print(f"Salidas en: {OUTPUT_DIR}")
 

@@ -39,11 +39,11 @@ Las fuentes utilizadas combinan repositorios oficiales, una API científica y ca
 |---|---:|---:|---:|---|
 | Alquiler | MIVAU, Sistema Estatal de Referencia del Precio del Alquiler de Vivienda | Municipal | 2024 | Precio actual, percentiles y viviendas observadas |
 | Movilidad | Renfe Data, AENA/ENAIRE | Estaciones, recorridos GTFS y aeropuertos | 2024-2026 | Nodos intermodales, recorridos y acceso estratégico |
-| Conectividad | SETELECO / Ministerio para la Transformación Digital | Provincial y otras escalas | 2021-2024 | Cobertura de hogares con banda ancha fija >= 1 Gbps |
+| Conectividad | SETELECO / Ministerio para la Transformación Digital | Municipal, provincial y otras escalas | 2021-2024 | Cobertura de hogares por tecnología fija y móvil |
 | Clima | NASA POWER, parámetro T2M | Punto representativo provincial | 1995-2024 | Temperatura media estacional y confort climático |
 | Cartografía | Eurostat/GISCO NUTS 2024 y LAU 2024 | Provincia y municipio | 2024 | Geometrías para coropletas, puntos y cálculos espaciales |
 
-El fichero principal de alquiler contiene 531.585 registros, 9 columnas, 7.331 municipios y 52 provincias. Sus columnas principales son código de provincia, provincia, código municipal, nombre del municipio, elemento medido, tipo de vivienda, tipo de medida, año y valor. Para movilidad se combinan estaciones ferroviarias, recorridos GTFS de alta velocidad, larga distancia y media distancia, y aeropuertos. Para la conectividad se usa un libro Excel oficial de cobertura 2021-2024. Para el clima se construye una tabla provincial de 52 filas a partir de la API mensual de NASA POWER. La cartografía provincial se toma de NUTS3 2024, y la municipal de LAU 2024 se usa para ubicar puntos representativos del mapa de alquiler.
+El fichero principal de alquiler contiene 531.585 registros, 9 columnas, 7.331 municipios y 52 provincias. Sus columnas principales son código de provincia, provincia, código municipal, nombre del municipio, elemento medido, tipo de vivienda, tipo de medida, año y valor. Para movilidad se combinan estaciones ferroviarias, recorridos GTFS de alta velocidad, larga distancia y media distancia, y aeropuertos. Para la conectividad se usa un libro Excel oficial de cobertura 2021-2024, especialmente la hoja municipal por hogares. Para el clima se construye una tabla provincial de 52 filas a partir de la API mensual de NASA POWER. La cartografía provincial se toma de NUTS3 2024, y la municipal de LAU 2024 se usa para el mapa de conectividad y para ubicar puntos representativos del mapa de alquiler.
 
 ## Criterio metodológico
 
@@ -74,7 +74,7 @@ La cartografía NUTS3 se preparó para coincidir con el dato provincial. En terr
 
 Para representar mapas web se mantuvo `EPSG:4326`, pero los cálculos de distancia del mapa 3 se hicieron en `EPSG:3035`, una proyección adecuada para medir distancias en Europa. Después se devolvieron las capas a coordenadas geográficas para publicarlas en Folium.
 
-El mapa de accesibilidad a hubs tecnológicos utiliza `sjoin_nearest()` para asignar a cada provincia el hub más cercano, `buffer()` para crear áreas de influencia y `clip()` para recortarlas al contorno de España. Estos pasos no son decorativos: hacen explícita la hipótesis espacial de proximidad a ecosistemas tecnológicos.
+El mapa de accesibilidad a hubs tecnológicos utiliza `sjoin_nearest()` para asignar a cada provincia el hub más cercano, `buffer()` para crear áreas de influencia y `clip()` para recortarlas al contorno de España. Además cruza esa proximidad con el alquiler medio ponderado para distinguir provincias cercanas y asequibles frente a provincias cercanas pero caras o baratas pero lejanas.
 
 ## Clasificación de coropletas
 
@@ -115,11 +115,11 @@ Salida interactiva: `../2_evolucion_alquiler/salidas/mapa2_movilidad_transportes
 
 ![Mapa 3. Accesibilidad laboral a hubs tech/IA](../3_accesibilidad_laboral_tech/salidas/mapa3_accesibilidad_laboral_tech.png)
 
-El tercer mapa cambia el foco desde la vivienda hacia la accesibilidad laboral. Se define una capa metodológica de hubs tecnológicos o de IA: Valencia/UPV, Madrid, Barcelona, Málaga, Bilbao, Sevilla y Zaragoza. A partir de ella se calcula la distancia euclídea de cada provincia al hub más cercano.
+El tercer mapa tiene un papel complementario. No pretende medir el mercado laboral real, sino aportar un proxy espacial de accesibilidad a hubs tecnológicos o de IA: Valencia/UPV, Madrid, Barcelona, Málaga, Bilbao, Sevilla y Zaragoza. A partir de esa capa metodológica se calcula la distancia euclídea de cada provincia al hub más cercano y se compara con el alquiler medio ponderado de 2024.
 
-Madrid, Bizkaia, Sevilla y Málaga quedan en el primer intervalo de proximidad inmediata. La interpretación debe ser prudente: el mapa no mide ofertas de empleo reales ni tiempos de viaje por carretera, sino una accesibilidad espacial simplificada a entornos donde es razonable esperar más actividad tecnológica, universidades, eventos y empresas.
+La lectura se limita a detectar un compromiso sencillo para trabajo híbrido o contactos puntuales: provincias a 175 km o menos del hub más cercano y con alquiler igual o inferior a la media nacional ponderada se resaltan como candidatas. La interpretación debe ser prudente, porque el mapa no mide ofertas reales, rutas por carretera, transporte público ni tiempos de viaje.
 
-Técnicas principales: reproyección a `EPSG:3035`, `sjoin_nearest()`, anillos de influencia de 50, 100, 175 y 250 km coloreados por hub, líneas provincia-hub, capas apagables, herramienta de medición y `Draw(export=True)` en Folium.
+Técnicas principales: reproyección a `EPSG:3035`, `sjoin_nearest()`, anillos de influencia, líneas provincia-hub, cuadrantes distancia-alquiler, capa de candidatas híbridas, capas apagables, herramienta de medición y `Draw(export=False)` en Folium.
 
 Salida interactiva: `../3_accesibilidad_laboral_tech/salidas/mapa3_accesibilidad_laboral_tech_interactivo.html`.
 
@@ -127,11 +127,11 @@ Salida interactiva: `../3_accesibilidad_laboral_tech/salidas/mapa3_accesibilidad
 
 ![Mapa 4. Conectividad para teletrabajo e IA](../4_conectividad_teletrabajo/salidas/mapa4_conectividad_teletrabajo.png)
 
-El cuarto mapa funciona como filtro tecnológico. Utiliza el porcentaje de hogares con cobertura fija de al menos 1 Gbps en junio de 2024 y añade la mejora anual como información secundaria. Para un perfil de IA, esta variable no sustituye a la oferta laboral, pero condiciona la posibilidad de trabajar en remoto con estabilidad.
+El cuarto mapa se rediseña como filtro tecnológico municipal, pero se simplifica visualmente para no saturar la lectura. En lugar de limitarse a una coropleta provincial de 1 Gbps, permite alternar entre tres conexiones terrestres: WiFi/fijo, 4G y 5G. En el modo WiFi/fijo, un slider discreto permite cambiar entre los umbrales oficiales de 30 Mbps, 100 Mbps y 1 Gbps.
 
-Madrid, Barcelona, Melilla, Araba/Álava y Sevilla muestran coberturas muy altas. Lugo, Ourense, Huesca, Teruel y Soria aparecen como provincias que requieren más cautela. La conectividad revela una tensión interesante: algunas provincias baratas no son necesariamente las más preparadas para teletrabajo intensivo.
+La lectura principal queda en dos planos: cobertura terrestre municipal y cobertura satelital general superpuesta. La capa satelital se representa mediante bandas diagonales inspiradas en la idea de cobertura no cableada basada en Conéctate35/Hispasat. No compite con la fibra ni modela huellas físicas de satélite; funciona como referencia visual de respaldo general.
 
-Técnicas principales: umbrales operativos de cinco clases, lectura tipo semáforo, capas alternativas en Folium, `LayerControl`, `MarkerCluster` para provincias a revisar y popups con recomendación.
+Técnicas principales: unión municipal LAU-CMUN, selector HTML/JavaScript de conexión terrestre, slider discreto de velocidad fija, capa satelital con bandas diagonales, popups HTML con barras por conexión, `Search`, `MiniMap`, `Fullscreen` y `MeasureControl`.
 
 Salida interactiva: `../4_conectividad_teletrabajo/salidas/mapa4_conectividad_teletrabajo_interactivo.html`.
 
@@ -167,7 +167,7 @@ La segunda conclusión es que no basta con mirar el precio actual. La movilidad 
 
 La tercera conclusión es que la conectividad abre oportunidades fuera de los grandes hubs. Muchas provincias no metropolitanas tienen cobertura de 1 Gbps suficientemente alta para teletrabajo o trabajo híbrido. Sin embargo, todavía hay territorios que combinan alquiler bajo con brecha digital, por lo que el mapa de conectividad actúa como filtro necesario antes de recomendar un destino.
 
-La cuarta conclusión es que la proximidad a hubs tecnológicos y el índice final no siempre coinciden. Estar cerca de Madrid, Barcelona, Bilbao, Málaga o Valencia puede mejorar la exposición a empleo, eventos y redes profesionales, pero suele venir acompañado de costes residenciales más altos. El índice final favorece una estrategia distinta: vivir en provincias con buena relación coste-infraestructura y mantener conexión laboral remota o puntual con los hubs.
+La cuarta conclusión, más secundaria, es que la proximidad a hubs tecnológicos y el índice final no siempre coinciden. Estar cerca de Madrid, Barcelona, Bilbao, Málaga o Valencia puede mejorar la exposición a eventos, universidades y redes profesionales, pero suele venir acompañado de costes residenciales más altos. Por eso esta capa se usa como contexto, mientras que la recomendación final descansa sobre vivienda, movilidad, conectividad, disponibilidad y confort climático.
 
 Como recomendación general, Asturias, Ciudad Real, Tarragona, Castellón/Castelló y Zaragoza forman el grupo inicial de destinos competitivos bajo los pesos propuestos. No coinciden necesariamente con los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, movilidad suficiente, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
 

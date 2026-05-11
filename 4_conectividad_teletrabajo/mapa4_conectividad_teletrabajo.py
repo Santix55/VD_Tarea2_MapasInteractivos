@@ -18,9 +18,7 @@ import folium
 from folium import plugins
 from branca.element import MacroElement, Template
 import geopandas as gpd
-import mapclassify
 import matplotlib.patches as mpatches
-import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import pandas as pd
@@ -35,157 +33,77 @@ BROADBAND_URL = (
     "telecomunicacion-e-infraestructuras-digitales/areas_interes/banda-ancha/"
     "cobertura/documents/cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx"
 )
-NUTS_URL = "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson"
+LAU_URL = "https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson"
 
 BROADBAND_FILE = DATA_DIR / "cobertura_ba_espana_2021_2024.xlsx"
-NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
+LAU_FILE = DATA_DIR / "lau_2024_01m.geojson"
 
-SHEET_NAME = "Provincia_%hogar"
-COVERAGE_COLUMN_2023 = "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2023)"
-COVERAGE_COLUMN_2024 = "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2024)"
+MUNICIPAL_SHEET = "Municipio_%hogar"
+DEFAULT_TECH_KEY = "fixed_100"
+DEFAULT_THRESHOLD = 90
+HTML_SIMPLIFY_TOLERANCE_M = 1800
+STATIC_TECH_KEY = "fixed_100"
+STATIC_THRESHOLD = 90
 
-READINESS_BINS = [0, 80, 85, 90, 95, 100]
-READINESS_LABELS = [
-    "Nivel 1 - Riesgo alto (<80%)",
-    "Nivel 2 - Riesgo medio (80-85%)",
-    "Nivel 3 - Revisar (85-90%)",
-    "Nivel 4 - Apto (90-95%)",
-    "Nivel 5 - Muy apto (>=95%)",
+TECH_DEFINITIONS = [
+    {
+        "key": "fixed_30",
+        "label": "Fijo >=30 Mbps",
+        "short": "30 Mbps",
+        "column_2023": "Cob. 30Mbps condiciones maxima demanda\n(junio 2023) ",
+        "column_2024": "Cob. 30Mbps condiciones maxima demanda\n(junio 2024) ",
+        "kind": "fijo",
+    },
+    {
+        "key": "fixed_100",
+        "label": "Fijo >=100 Mbps",
+        "short": "100 Mbps",
+        "column_2023": "Cob. 100Mbps condiciones maxima demanda\n(junio 2023)",
+        "column_2024": "Cob. 100Mbps condiciones maxima demanda\n(junio 2024)",
+        "kind": "fijo",
+    },
+    {
+        "key": "fixed_1gbps",
+        "label": "Fijo >=1 Gbps",
+        "short": "1 Gbps",
+        "column_2023": "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2023)",
+        "column_2024": "Cob. 1Gbps descarga condiciones maxima demanda\n(junio 2024)",
+        "kind": "fijo",
+    },
+    {
+        "key": "mobile_4g",
+        "label": "Movil 4G",
+        "short": "4G",
+        "column_2023": "4G\n(junio 2023)",
+        "column_2024": "4G\n(junio 2024)",
+        "kind": "movil",
+    },
+    {
+        "key": "mobile_5g",
+        "label": "Movil 5G",
+        "short": "5G",
+        "column_2023": "5G\n(junio 2023)",
+        "column_2024": "5G\n(junio 2024)",
+        "kind": "movil",
+    },
+    {
+        "key": "mobile_5g_35",
+        "label": "Movil 5G banda 3,5 GHz",
+        "short": "5G 3,5 GHz",
+        "column_2023": "5G-Banda 3,5GHz\n(junio 2023)",
+        "column_2024": "5G-Banda 3,5GHz\n(junio 2024)",
+        "kind": "movil",
+    },
 ]
-READINESS_RECOMMENDATIONS = [
-    "No usar como destino tech sin revisar zona concreta.",
-    "Valido solo con comprobacion previa de direccion.",
-    "Aceptable, pero conviene revisar municipios concretos.",
-    "Apto para teletrabajo en la mayor parte de hogares.",
-    "Muy apto para teletrabajo e IA.",
+
+PASS_COLORS = ["#f6c85f", "#99d8c9", "#2ca25f"]
+FAIL_COLORS = ["#fee8c8", "#fdae6b", "#e6550d", "#8c1d40"]
+SATELLITE_BANDS = [
+    [[34.8, -10.8], [35.9, -11.3], [44.8, 4.6], [43.7, 5.1]],
+    [[36.8, -10.9], [37.9, -11.4], [46.2, 3.8], [45.1, 4.3]],
+    [[27.1, -18.7], [27.8, -19.1], [30.1, -13.2], [29.4, -12.8]],
+    [[34.9, -7.6], [35.5, -8.0], [37.0, -1.8], [36.4, -1.5]],
 ]
-READINESS_COLORS = ["#8c1d40", "#d95f02", "#f6c85f", "#4eb3d3", "#2ca25f"]
-CHANGE_BINS = [-10, 0, 2.5, 5, 10, 45]
-CHANGE_COLORS = ["#6b6b6b", "#d0e1f2", "#73bfe2", "#2b8cbe", "#f28e2b"]
-GAP_PALETTE = ["#fff7ec", "#fee8c8", "#fdbb84", "#e34a33", "#7f0000"]
-ALERT_THRESHOLD = 85.0
-
-PROVINCE_BY_NUTS = {
-    "ES111": "15",
-    "ES112": "27",
-    "ES113": "32",
-    "ES114": "36",
-    "ES120": "33",
-    "ES130": "39",
-    "ES211": "01",
-    "ES212": "20",
-    "ES213": "48",
-    "ES220": "31",
-    "ES230": "26",
-    "ES241": "22",
-    "ES242": "44",
-    "ES243": "50",
-    "ES300": "28",
-    "ES411": "05",
-    "ES412": "09",
-    "ES413": "24",
-    "ES414": "34",
-    "ES415": "37",
-    "ES416": "40",
-    "ES417": "42",
-    "ES418": "47",
-    "ES419": "49",
-    "ES421": "02",
-    "ES422": "13",
-    "ES423": "16",
-    "ES424": "19",
-    "ES425": "45",
-    "ES431": "06",
-    "ES432": "10",
-    "ES511": "08",
-    "ES512": "17",
-    "ES513": "25",
-    "ES514": "43",
-    "ES521": "03",
-    "ES522": "12",
-    "ES523": "46",
-    "ES531": "07",
-    "ES532": "07",
-    "ES533": "07",
-    "ES611": "04",
-    "ES612": "11",
-    "ES613": "14",
-    "ES614": "18",
-    "ES615": "21",
-    "ES616": "23",
-    "ES617": "29",
-    "ES618": "41",
-    "ES620": "30",
-    "ES630": "51",
-    "ES640": "52",
-    "ES703": "38",
-    "ES704": "35",
-    "ES705": "35",
-    "ES706": "38",
-    "ES707": "38",
-    "ES708": "35",
-    "ES709": "38",
-}
-
-PROVINCE_CODE_BY_NAME = {
-    "araba/alava": "01",
-    "albacete": "02",
-    "alicante/alacant": "03",
-    "almeria": "04",
-    "avila": "05",
-    "badajoz": "06",
-    "balears, illes": "07",
-    "illes balears": "07",
-    "barcelona": "08",
-    "burgos": "09",
-    "caceres": "10",
-    "cadiz": "11",
-    "castellon/castello": "12",
-    "ciudad real": "13",
-    "cordoba": "14",
-    "coruna, a": "15",
-    "a coruna": "15",
-    "cuenca": "16",
-    "girona": "17",
-    "granada": "18",
-    "guadalajara": "19",
-    "gipuzkoa": "20",
-    "huelva": "21",
-    "huesca": "22",
-    "jaen": "23",
-    "leon": "24",
-    "lleida": "25",
-    "rioja, la": "26",
-    "la rioja": "26",
-    "lugo": "27",
-    "madrid": "28",
-    "malaga": "29",
-    "murcia": "30",
-    "navarra": "31",
-    "ourense": "32",
-    "asturias": "33",
-    "palencia": "34",
-    "palmas, las": "35",
-    "las palmas": "35",
-    "pontevedra": "36",
-    "salamanca": "37",
-    "santa cruz de tenerife": "38",
-    "cantabria": "39",
-    "segovia": "40",
-    "sevilla": "41",
-    "soria": "42",
-    "tarragona": "43",
-    "teruel": "44",
-    "toledo": "45",
-    "valencia/valencia": "46",
-    "valencia": "46",
-    "valladolid": "47",
-    "bizkaia": "48",
-    "zamora": "49",
-    "zaragoza": "50",
-    "ceuta": "51",
-    "melilla": "52",
-}
 
 
 def download_file(url: str, target: Path) -> None:
@@ -193,15 +111,9 @@ def download_file(url: str, target: Path) -> None:
         return
 
     target.parent.mkdir(parents=True, exist_ok=True)
-    response = requests.get(url, timeout=60)
+    response = requests.get(url, timeout=90)
     response.raise_for_status()
     target.write_bytes(response.content)
-
-
-def normalize_text(value: str) -> str:
-    text = unicodedata.normalize("NFKD", str(value))
-    text = "".join(char for char in text if not unicodedata.combining(char))
-    return text.strip().lower()
 
 
 def normalize_columns(columns: pd.Index) -> dict[str, str]:
@@ -221,376 +133,309 @@ def to_percent(series: pd.Series) -> pd.Series:
 
 
 def format_int(value: float) -> str:
-    return f"{int(round(value)):,}".replace(",", ".")
+    return f"{int(round(float(value))):,}".replace(",", ".")
 
 
 def format_axis_int(value: float, _: int) -> str:
     return format_int(value)
 
 
-def coverage_class_index(value: float) -> int:
-    value = float(value)
-    for index, upper in enumerate(READINESS_BINS[1:]):
-        is_last = index == len(READINESS_COLORS) - 1
-        if value < upper or (is_last and value <= upper):
-            return index
-    return len(READINESS_COLORS) - 1
+def tech_by_key(key: str) -> dict[str, str]:
+    return next(tech for tech in TECH_DEFINITIONS if tech["key"] == key)
 
 
-def readiness_label(value: float) -> str:
-    return READINESS_LABELS[coverage_class_index(value)]
-
-
-def readiness_recommendation(value: float) -> str:
-    return READINESS_RECOMMENDATIONS[coverage_class_index(value)]
-
-
-def readiness_color(value: float) -> str:
-    return READINESS_COLORS[coverage_class_index(value)]
-
-
-def color_for_bins(value: float, bins: list[float], colors: list[str]) -> str:
-    for index, upper in enumerate(bins[1:]):
-        is_last = index == len(colors) - 1
-        if value < upper or (is_last and value <= upper):
-            return colors[index]
-    return colors[-1]
-
-
-def weighted_coverage(map_data: pd.DataFrame) -> float:
-    return (
-        map_data["coverage_1gbps_2024_pct"].mul(map_data["households"]).sum()
-        / map_data["households"].sum()
-    )
-
-
-def load_broadband_by_province() -> pd.DataFrame:
-    broadband = pd.read_excel(BROADBAND_FILE, sheet_name=SHEET_NAME)
+def load_municipal_broadband() -> pd.DataFrame:
+    broadband = pd.read_excel(BROADBAND_FILE, sheet_name=MUNICIPAL_SHEET)
     broadband = broadband.rename(columns=normalize_columns(broadband.columns))
-    broadband["COD_PROVINCIA"] = broadband["Provincia"].map(
-        lambda value: PROVINCE_CODE_BY_NAME.get(normalize_text(value))
-    )
 
-    missing_codes = broadband[broadband["COD_PROVINCIA"].isna()]["Provincia"].tolist()
-    if missing_codes:
-        raise ValueError(f"No se pudo asignar codigo INE a estas provincias: {missing_codes}")
+    required_columns = [
+        "Comunidad Autonoma",
+        "Provincia",
+        "CMUN",
+        "Municipio",
+        "Habitantes",
+        "Hogares",
+    ]
+    for tech in TECH_DEFINITIONS:
+        required_columns.extend([tech["column_2023"], tech["column_2024"]])
 
-    summary = broadband[
-        [
-            "COD_PROVINCIA",
-            "Comunidad Autonoma",
-            "Provincia",
-            "Habitantes",
-            "Hogares",
-            COVERAGE_COLUMN_2023,
-            COVERAGE_COLUMN_2024,
-        ]
-    ].rename(
+    missing = [column for column in required_columns if column not in broadband.columns]
+    if missing:
+        raise ValueError(f"Faltan columnas municipales de cobertura: {missing}")
+
+    data = broadband[required_columns].rename(
         columns={
             "Comunidad Autonoma": "ccaa",
             "Provincia": "province_name",
+            "CMUN": "CMUN",
+            "Municipio": "municipality_name",
             "Habitantes": "population",
             "Hogares": "households",
-            COVERAGE_COLUMN_2023: "coverage_1gbps_2023_pct",
-            COVERAGE_COLUMN_2024: "coverage_1gbps_2024_pct",
         }
     )
-    summary["population"] = pd.to_numeric(summary["population"], errors="coerce")
-    summary["households"] = pd.to_numeric(summary["households"], errors="coerce")
-    summary["coverage_1gbps_2023_pct"] = to_percent(summary["coverage_1gbps_2023_pct"])
-    summary["coverage_1gbps_2024_pct"] = to_percent(summary["coverage_1gbps_2024_pct"])
-    summary["coverage_change_pp"] = (
-        summary["coverage_1gbps_2024_pct"] - summary["coverage_1gbps_2023_pct"]
-    )
-    summary["connected_households_2024"] = (
-        summary["households"] * summary["coverage_1gbps_2024_pct"] / 100
-    )
-    summary["uncovered_households_2024"] = (
-        summary["households"] - summary["connected_households_2024"]
-    )
+    data["CMUN"] = pd.to_numeric(data["CMUN"], errors="coerce").astype("Int64").astype(str)
+    data["CMUN"] = data["CMUN"].str.zfill(5)
+    data["COD_PROVINCIA"] = data["CMUN"].str[:2]
+    data["population"] = pd.to_numeric(data["population"], errors="coerce").fillna(0)
+    data["households"] = pd.to_numeric(data["households"], errors="coerce").fillna(0)
 
-    numeric_columns = [
-        "coverage_1gbps_2023_pct",
-        "coverage_1gbps_2024_pct",
-        "coverage_change_pp",
-        "connected_households_2024",
-        "uncovered_households_2024",
+    for tech in TECH_DEFINITIONS:
+        data[f"{tech['key']}_2023_pct"] = to_percent(data[tech["column_2023"]])
+        data[f"{tech['key']}_2024_pct"] = to_percent(data[tech["column_2024"]])
+        data[f"{tech['key']}_change_pp"] = (
+            data[f"{tech['key']}_2024_pct"] - data[f"{tech['key']}_2023_pct"]
+        )
+        data[f"{tech['key']}_uncovered_households_2024"] = (
+            data["households"] * (100 - data[f"{tech['key']}_2024_pct"]) / 100
+        )
+
+    output_columns = [
+        "CMUN",
+        "COD_PROVINCIA",
+        "municipality_name",
+        "province_name",
+        "ccaa",
+        "population",
+        "households",
     ]
-    summary[numeric_columns] = summary[numeric_columns].round(2)
-    return summary
+    for tech in TECH_DEFINITIONS:
+        output_columns.extend(
+            [
+                f"{tech['key']}_2023_pct",
+                f"{tech['key']}_2024_pct",
+                f"{tech['key']}_change_pp",
+                f"{tech['key']}_uncovered_households_2024",
+            ]
+        )
+
+    numeric_columns = [column for column in output_columns if column not in {"CMUN", "COD_PROVINCIA", "municipality_name", "province_name", "ccaa"}]
+    data[numeric_columns] = data[numeric_columns].round(2)
+    return data[output_columns]
 
 
-def load_province_geometries() -> gpd.GeoDataFrame:
-    nuts = gpd.read_file(NUTS_FILE)
-    nuts = nuts[nuts["CNTR_CODE"].eq("ES")].copy()
-    nuts["COD_PROVINCIA"] = nuts["NUTS_ID"].map(PROVINCE_BY_NUTS)
-    nuts = nuts.dropna(subset=["COD_PROVINCIA"])
-
-    provinces = nuts.dissolve(by="COD_PROVINCIA", as_index=False)
-    provinces = provinces[["COD_PROVINCIA", "geometry"]].copy()
-    return provinces.to_crs("EPSG:4326")
+def load_municipal_geometries() -> gpd.GeoDataFrame:
+    lau = gpd.read_file(LAU_FILE, where="CNTR_CODE = 'ES'")
+    lau["CMUN"] = lau["GISCO_ID"].str.replace("ES_", "", regex=False)
+    return lau[["CMUN", "geometry"]].to_crs("EPSG:4326")
 
 
 def add_geographic_metrics(map_data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     data = map_data.copy()
     projected = data.to_crs("EPSG:3035")
-    data["area_km2"] = (projected.area / 1_000_000).round(1)
+    data["area_km2"] = (projected.area / 1_000_000).round(2)
 
     points = gpd.GeoSeries(projected.geometry.representative_point(), crs=projected.crs)
     points_wgs84 = points.to_crs("EPSG:4326")
     data["label_lon"] = points_wgs84.x
     data["label_lat"] = points_wgs84.y
-    data["readiness_class"] = data["coverage_1gbps_2024_pct"].map(readiness_label)
-    data["readiness_recommendation"] = data["coverage_1gbps_2024_pct"].map(
-        readiness_recommendation
+
+    default_column = f"{DEFAULT_TECH_KEY}_2024_pct"
+    data["default_gap_pct"] = (100 - data[default_column]).round(2)
+    data["default_uncovered_households_2024"] = (
+        data["households"] * data["default_gap_pct"] / 100
+    ).round(2)
+    data["default_status"] = data[default_column].ge(DEFAULT_THRESHOLD).map(
+        {True: "Cumple umbral inicial", False: "Necesita revisar/respaldo"}
     )
-    data["readiness_color"] = data["coverage_1gbps_2024_pct"].map(readiness_color)
-    data["alert_tech_gap"] = data["coverage_1gbps_2024_pct"].lt(ALERT_THRESHOLD)
-    data["coverage_gap_pct"] = (100 - data["coverage_1gbps_2024_pct"]).round(2)
     return data
 
 
-def build_dataset() -> gpd.GeoDataFrame:
-    download_file(BROADBAND_URL, BROADBAND_FILE)
-    download_file(NUTS_URL, NUTS_FILE)
-
-    coverage = load_broadband_by_province()
-    provinces = load_province_geometries()
-    map_data = provinces.merge(coverage, on="COD_PROVINCIA", how="left")
-
-    missing = map_data[map_data["coverage_1gbps_2024_pct"].isna()]
-    if not missing.empty:
-        missing_codes = ", ".join(missing["COD_PROVINCIA"].tolist())
-        raise ValueError(f"Faltan datos de cobertura para estas provincias: {missing_codes}")
-
-    return add_geographic_metrics(map_data)
-
-
-def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
-    clean = values.dropna().astype(float)
-    classifier = mapclassify.Quantiles(clean, k=k)
-    bins = [float(clean.min())] + [float(value) for value in classifier.bins]
-    bins[0] = max(0.0, bins[0] - 0.1)
-
-    for index in range(1, len(bins)):
-        if bins[index] <= bins[index - 1]:
-            bins[index] = bins[index - 1] + 0.01
-    return bins
-
-
-def plot_canary_inset(map_ax: plt.Axes, map_data: gpd.GeoDataFrame) -> None:
-    canary_codes = ["35", "38"]
-    canary_map = map_data[map_data["COD_PROVINCIA"].isin(canary_codes)]
-    if canary_map.empty:
-        return
-
-    canary_ax = map_ax.inset_axes([0.035, 0.055, 0.22, 0.19])
-    canary_map.plot(
-        ax=canary_ax,
-        color=canary_map["readiness_color"],
-        linewidth=0.45,
-        edgecolor="#ffffff",
+def simplify_for_html(map_data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    data = map_data.copy()
+    simplified = (
+        data.to_crs("EPSG:3035")
+        .geometry.simplify(HTML_SIMPLIFY_TOLERANCE_M, preserve_topology=True)
+        .to_crs("EPSG:4326")
     )
-    canary_map.boundary.plot(ax=canary_ax, color="#4f4f4f", linewidth=0.18, alpha=0.6)
+    data["geometry"] = simplified
+    return data
 
-    alert = canary_map[canary_map["alert_tech_gap"]].copy()
-    if not alert.empty:
-        alert.plot(
-            ax=canary_ax,
-            facecolor="none",
-            edgecolor="#222222",
-            linewidth=0.0,
-            hatch="////",
-            zorder=3,
-        )
 
-    canary_ax.set_xlim(-18.4, -13.1)
-    canary_ax.set_ylim(27.55, 29.65)
-    canary_ax.set_title("Canarias", fontsize=8.2, pad=2)
-    canary_ax.set_xticks([])
-    canary_ax.set_yticks([])
-    for spine in canary_ax.spines.values():
-        spine.set_edgecolor("#8c8c8c")
-        spine.set_linewidth(0.8)
+def build_dataset() -> tuple[gpd.GeoDataFrame, dict[str, int]]:
+    download_file(BROADBAND_URL, BROADBAND_FILE)
+    download_file(LAU_URL, LAU_FILE)
+
+    coverage = load_municipal_broadband()
+    municipalities = load_municipal_geometries()
+    map_data = municipalities.merge(coverage, on="CMUN", how="left")
+
+    stats = {
+        "municipal_geometries": int(len(municipalities)),
+        "municipal_rows": int(len(coverage)),
+        "matched_municipalities": int(map_data["municipality_name"].notna().sum()),
+        "geometries_without_data": int(map_data["municipality_name"].isna().sum()),
+        "data_without_geometry": int(coverage[~coverage["CMUN"].isin(municipalities["CMUN"])].shape[0]),
+    }
+
+    map_data = map_data.dropna(subset=["municipality_name"]).copy()
+    return add_geographic_metrics(map_data), stats
+
+
+def weighted_coverage(map_data: pd.DataFrame, tech_key: str) -> float:
+    coverage_column = f"{tech_key}_2024_pct"
+    return (
+        map_data[coverage_column].mul(map_data["households"]).sum()
+        / map_data["households"].sum()
+    )
+
+
+def style_color(value: float, threshold: float) -> str:
+    if value >= threshold + 5:
+        return PASS_COLORS[2]
+    if value >= threshold:
+        return PASS_COLORS[1]
+    gap = threshold - value
+    if gap < 5:
+        return FAIL_COLORS[0]
+    if gap < 15:
+        return FAIL_COLORS[1]
+    if gap < 30:
+        return FAIL_COLORS[2]
+    return FAIL_COLORS[3]
+
+
+def coverage_color(value: float) -> str:
+    if value >= 90:
+        return "#2ca25f"
+    if value >= 70:
+        return "#f6c85f"
+    if value >= 50:
+        return "#fdae6b"
+    return "#8c1d40"
 
 
 def save_static_map(map_data: gpd.GeoDataFrame) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    tech = tech_by_key(STATIC_TECH_KEY)
+    value_column = f"{STATIC_TECH_KEY}_2024_pct"
+    uncovered_column = f"{STATIC_TECH_KEY}_uncovered_households_2024"
 
-    fig = plt.figure(figsize=(16, 9.8), dpi=180)
+    plot_data = map_data.copy()
+    plot_data["static_color"] = plot_data[value_column].map(
+        lambda value: style_color(float(value), STATIC_THRESHOLD)
+    )
+
+    fig = plt.figure(figsize=(16, 9.5), dpi=180)
     grid = fig.add_gridspec(
         3,
         3,
-        width_ratios=[1.25, 1.25, 0.95],
-        height_ratios=[0.52, 1, 1],
+        width_ratios=[1.32, 1.32, 0.96],
+        height_ratios=[0.54, 1, 1],
         wspace=0.18,
         hspace=0.36,
     )
     map_ax = fig.add_subplot(grid[:, :2])
     summary_ax = fig.add_subplot(grid[0, 2])
     gap_ax = fig.add_subplot(grid[1, 2])
-    slope_ax = fig.add_subplot(grid[2, 2])
+    tech_ax = fig.add_subplot(grid[2, 2])
 
-    map_data.plot(
+    plot_data.plot(
         ax=map_ax,
-        color=map_data["readiness_color"],
-        linewidth=0.42,
-        edgecolor="#ffffff",
+        color=plot_data["static_color"],
+        linewidth=0.06,
+        edgecolor="#f8f8f8",
     )
-    map_data.boundary.plot(ax=map_ax, color="#4f4f4f", linewidth=0.15, alpha=0.55)
-
-    alert = map_data[map_data["alert_tech_gap"]].copy()
-    if not alert.empty:
-        alert.plot(
+    fallback = plot_data[plot_data[value_column].lt(STATIC_THRESHOLD)]
+    if not fallback.empty:
+        fallback.plot(
             ax=map_ax,
             facecolor="none",
-            edgecolor="#222222",
+            edgecolor="#4b2e83",
             linewidth=0.0,
             hatch="////",
             zorder=3,
         )
 
-    weakest = map_data.nsmallest(7, "coverage_1gbps_2024_pct")
-    for _, row in weakest.iterrows():
-        text = map_ax.annotate(
-            f"{row['province_name']}\n{row['coverage_1gbps_2024_pct']:.1f}%",
-            xy=(row["label_lon"], row["label_lat"]),
-            ha="center",
-            va="center",
-            fontsize=7,
-            color="#111111",
-            zorder=5,
-        )
-        text.set_path_effects(
-            [path_effects.withStroke(linewidth=2.5, foreground="white", alpha=0.96)]
-        )
+    weakest = plot_data.nsmallest(12, value_column)
+    map_ax.scatter(
+        weakest["label_lon"],
+        weakest["label_lat"],
+        s=22,
+        color="#111111",
+        edgecolor="#ffffff",
+        linewidth=0.4,
+        zorder=4,
+    )
 
-    map_ax.set_xlim(-10.2, 5.0)
-    map_ax.set_ylim(35.0, 44.5)
+    map_ax.set_xlim(-18.8, 4.7)
+    map_ax.set_ylim(27.3, 44.3)
     map_ax.set_title(
-        "Semaforo provincial de aptitud para teletrabajo",
-        fontsize=16.2,
+        f"Municipios segun cobertura {tech['short']} y respaldo satelital",
+        fontsize=15.5,
         fontweight="bold",
         pad=12,
     )
     map_ax.set_axis_off()
-    plot_canary_inset(map_ax, map_data)
 
     legend_handles = [
-        mpatches.Patch(facecolor=color, edgecolor="#666666", label=label)
-        for color, label in zip(READINESS_COLORS, READINESS_LABELS)
+        mpatches.Patch(facecolor=PASS_COLORS[2], edgecolor="#666666", label=f">= {STATIC_THRESHOLD + 5}%"),
+        mpatches.Patch(facecolor=PASS_COLORS[1], edgecolor="#666666", label=f"{STATIC_THRESHOLD}-{STATIC_THRESHOLD + 5}%"),
+        mpatches.Patch(facecolor=FAIL_COLORS[1], edgecolor="#666666", label=f"No cumple {STATIC_THRESHOLD}%"),
+        mpatches.Patch(facecolor="white", edgecolor="#4b2e83", hatch="////", label="Candidato a respaldo satelital"),
     ]
-    legend_handles.append(
-        mpatches.Patch(
-            facecolor="white",
-            edgecolor="#222222",
-            hatch="////",
-            label="Alerta: <85%",
-        )
-    )
     map_ax.legend(
         handles=legend_handles,
-        title="Cobertura 1 Gbps",
-        loc="lower right",
-        fontsize=7.6,
-        title_fontsize=8.7,
+        title=f"Cobertura {tech['short']}",
+        loc="lower left",
+        fontsize=7.5,
+        title_fontsize=8.5,
         frameon=True,
         framealpha=0.96,
     )
 
     summary_ax.set_axis_off()
-    avg_coverage = weighted_coverage(map_data)
-    alert_count = int(map_data["alert_tech_gap"].sum())
-    uncovered_total = float(map_data["uncovered_households_2024"].sum())
-    summary_ax.text(0.0, 0.96, "Filtro tecnologico", fontsize=11, fontweight="bold", va="top")
-    summary_ax.text(0.0, 0.62, f"{avg_coverage:.1f}%", fontsize=24, fontweight="bold")
-    summary_ax.text(0.0, 0.44, "cobertura ponderada por hogares", fontsize=8.5, color="#444444")
+    avg_coverage = weighted_coverage(plot_data, STATIC_TECH_KEY)
+    failing_count = int(plot_data[value_column].lt(STATIC_THRESHOLD).sum())
+    affected_homes = float(
+        plot_data.loc[plot_data[value_column].lt(STATIC_THRESHOLD), uncovered_column].sum()
+    )
+    summary_ax.text(0.0, 0.96, "Filtro municipal configurable", fontsize=11, fontweight="bold", va="top")
+    summary_ax.text(0.0, 0.62, f"{avg_coverage:.1f}%", fontsize=23, fontweight="bold")
+    summary_ax.text(0.0, 0.44, f"cobertura ponderada {tech['short']}", fontsize=8.5, color="#444444")
     summary_ax.text(
         0.0,
         0.18,
-        f"{alert_count} provincias en riesgo  |  {format_int(uncovered_total)} hogares sin 1 Gbps",
-        fontsize=8.4,
+        f"{failing_count} municipios bajo {STATIC_THRESHOLD}%  |  {format_int(affected_homes)} hogares sin cobertura",
+        fontsize=8.3,
         color="#222222",
     )
 
-    gap = map_data.nlargest(10, "uncovered_households_2024").sort_values(
-        "uncovered_households_2024"
-    )
-    gap_ax.barh(
-        gap["province_name"],
-        gap["uncovered_households_2024"],
-        color="#8c1d40",
-    )
-    gap_ax.set_title("Donde quedan mas hogares sin 1 Gbps", fontsize=11, fontweight="bold")
-    gap_ax.set_xlabel("Hogares estimados sin 1 Gbps", fontsize=8.5)
+    gap = plot_data.nlargest(12, uncovered_column).sort_values(uncovered_column)
+    gap_ax.barh(gap["municipality_name"], gap[uncovered_column], color="#8c1d40")
+    gap_ax.set_title(f"Mas hogares sin {tech['short']}", fontsize=10.5, fontweight="bold")
+    gap_ax.set_xlabel("Hogares estimados", fontsize=8.3)
     gap_ax.xaxis.set_major_formatter(FuncFormatter(format_axis_int))
     gap_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    gap_ax.tick_params(axis="both", labelsize=8)
+    gap_ax.tick_params(axis="both", labelsize=7.4)
 
-    movers = (
-        map_data.assign(abs_change=map_data["coverage_change_pp"].abs())
-        .nlargest(10, "abs_change")
-        .sort_values("coverage_change_pp")
-    )
-    for y_pos, (_, row) in enumerate(movers.iterrows()):
-        color = "#2b8cbe" if row["coverage_change_pp"] >= 0 else "#6b6b6b"
-        slope_ax.plot(
-            [row["coverage_1gbps_2023_pct"], row["coverage_1gbps_2024_pct"]],
-            [y_pos, y_pos],
-            color=color,
-            linewidth=1.8,
-            alpha=0.85,
-        )
-        slope_ax.scatter(
-            [row["coverage_1gbps_2023_pct"]],
-            [y_pos],
-            s=18,
-            color="#ffffff",
-            edgecolor=color,
-            linewidth=1.1,
-            zorder=3,
-        )
-        slope_ax.scatter(
-            [row["coverage_1gbps_2024_pct"]],
-            [y_pos],
-            s=22,
-            color=color,
-            edgecolor="#ffffff",
-            linewidth=0.7,
-            zorder=4,
-        )
-        slope_ax.text(
-            100.7,
-            y_pos,
-            f"{row['coverage_change_pp']:+.1f} pp",
-            va="center",
-            fontsize=7.3,
-            color="#333333",
-        )
-    slope_ax.set_yticks(range(len(movers)))
-    slope_ax.set_yticklabels(movers["province_name"], fontsize=8)
-    slope_ax.set_xlim(55, 105)
-    slope_ax.set_xlabel("% hogares con 1 Gbps", fontsize=8.5)
-    slope_ax.set_title("Cambio 2023 -> 2024", fontsize=11, fontweight="bold")
-    slope_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
-    slope_ax.tick_params(axis="x", labelsize=8)
+    tech_values = [
+        weighted_coverage(plot_data, item["key"]) for item in TECH_DEFINITIONS
+    ]
+    tech_labels = [item["short"] for item in TECH_DEFINITIONS]
+    tech_ax.barh(tech_labels, tech_values, color=["#4eb3d3", "#2ca25f", "#238b45", "#807dba", "#6a51a3", "#54278f"])
+    tech_ax.axvline(STATIC_THRESHOLD, color="#111111", linewidth=1, linestyle="--")
+    tech_ax.set_xlim(0, 100)
+    tech_ax.set_title("Cobertura ponderada por tecnologia", fontsize=10.5, fontweight="bold")
+    tech_ax.set_xlabel("% hogares cubiertos", fontsize=8.3)
+    tech_ax.grid(axis="x", color="#dddddd", linewidth=0.6)
+    tech_ax.tick_params(axis="both", labelsize=8)
 
-    for side_ax in [gap_ax, slope_ax]:
+    for side_ax in [gap_ax, tech_ax]:
         for spine in ["top", "right", "left"]:
             side_ax.spines[spine].set_visible(False)
 
     fig.suptitle(
-        "Mapa 4. Conectividad para teletrabajo e IA",
-        fontsize=20,
+        "Mapa 4. Conectividad multitecnologia para teletrabajo",
+        fontsize=19,
         fontweight="bold",
-        x=0.44,
+        x=0.43,
         y=0.985,
     )
     fig.text(
         0.02,
         0.02,
-        "Fuente: SETELECO/Ministerio para la Transformacion Digital y Eurostat/GISCO NUTS3. "
-        "Coropleta provincial con 5 umbrales operativos; cobertura sobre hogares en junio de 2024.",
+        "Fuente: SETELECO/Ministerio para la Transformacion Digital y Eurostat/GISCO LAU 2024. "
+        "El respaldo satelital se representa de forma conceptual como complemento para zonas sin cobertura terrestre suficiente.",
         fontsize=8,
         color="#555555",
     )
@@ -600,144 +445,140 @@ def save_static_map(map_data: gpd.GeoDataFrame) -> None:
     plt.close(fig)
 
 
-class DetailExplanationControl(MacroElement):
+def build_popup_preview(row: pd.Series) -> str:
+    bars = []
+    for tech in TECH_DEFINITIONS:
+        value = float(row[f"{tech['key']}_2024_pct"])
+        bars.append(
+            f"""
+            <div class="tech-popup-row">
+              <span>{tech['short']}</span>
+              <div class="tech-popup-bar"><i style="width:{max(0, min(100, value)):.1f}%"></i></div>
+              <b>{value:.1f}%</b>
+            </div>
+            """
+        )
+    return "".join(bars)
+
+
+class MultiTechControl(MacroElement):
     _template = Template(
         """
         {% macro header(this, kwargs) %}
         <style>
-          #{{ this._parent.get_name() }} .tech-detail-explanation {
-            width: 270px;
+          #{{ this._parent.get_name() }} .multi-tech-control,
+          #{{ this._parent.get_name() }} .multi-tech-legend {
+            width: 306px;
             max-width: calc(100vw - 34px);
             padding: 10px 12px;
-            border: 1px solid rgba(60, 60, 60, 0.55);
+            border: 1px solid rgba(45, 45, 45, 0.55);
             border-radius: 4px;
-            background: rgba(255, 255, 255, 0.94);
+            background: rgba(255, 255, 255, 0.95);
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
             color: #1f1f1f;
             font-family: Arial, sans-serif;
             font-size: 12px;
-            line-height: 1.34;
+            line-height: 1.3;
           }
 
-          #{{ this._parent.get_name() }} .tech-detail-title {
-            margin-bottom: 5px;
-            font-size: 12.5px;
+          #{{ this._parent.get_name() }} .multi-tech-title {
+            margin-bottom: 7px;
+            font-size: 13px;
             font-weight: 700;
           }
 
-          #{{ this._parent.get_name() }} .tech-detail-body {
-            margin: 0;
-          }
-        </style>
-        {% endmacro %}
-
-        {% macro script(this, kwargs) %}
-        (function () {
-          const map = {{ this._parent.get_name() }};
-          const explanations = {{ this.explanations|tojson }};
-          const defaultLayer = {{ this.default_layer|tojson }};
-          const control = L.control({ position: "bottomright" });
-
-          function escapeHtml(value) {
-            return String(value)
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;")
-              .replace(/"/g, "&quot;")
-              .replace(/'/g, "&#039;");
+          #{{ this._parent.get_name() }} .multi-tech-control label {
+            display: block;
+            margin-top: 7px;
+            font-weight: 700;
           }
 
-          control.onAdd = function () {
-            this._container = L.DomUtil.create("div", "tech-detail-explanation leaflet-control");
-            L.DomEvent.disableClickPropagation(this._container);
-            L.DomEvent.disableScrollPropagation(this._container);
-            this.update(defaultLayer);
-            return this._container;
-          };
+          #{{ this._parent.get_name() }} .multi-tech-control select,
+          #{{ this._parent.get_name() }} .multi-tech-control input[type="range"] {
+            width: 100%;
+            margin-top: 4px;
+          }
 
-          control.update = function (layerName) {
-            const item = explanations[layerName] || explanations[defaultLayer];
-            this._container.innerHTML =
-              '<div class="tech-detail-title">' + escapeHtml(item.title) + '</div>' +
-              '<p class="tech-detail-body">' + escapeHtml(item.body) + '</p>';
-          };
+          #{{ this._parent.get_name() }} .multi-tech-speed-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2px;
+            color: #555555;
+            font-size: 10.5px;
+          }
 
-          control.addTo(map);
-          map.on("baselayerchange", function (event) {
-            control.update(event.name);
-          });
-        })();
-        {% endmacro %}
-        """
-    )
+          #{{ this._parent.get_name() }} .multi-tech-check {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            margin-top: 8px;
+            font-weight: 400;
+          }
 
-    def __init__(self) -> None:
-        super().__init__()
-        self._name = "DetailExplanationControl"
-        self.default_layer = "1. Aptitud actual para teletrabajo"
-        self.explanations = {
-            "1. Aptitud actual para teletrabajo": {
-                "title": "Vista 1: aptitud actual",
-                "body": (
-                    "Clasifica cada provincia por el porcentaje de hogares con 1 Gbps en 2024. "
-                    "Verde y azul indican destinos aptos; amarillo pide revisar municipio; "
-                    "naranja y granate senalan riesgo tecnologico."
-                ),
-            },
-            "2. Evolucion 2023-2024": {
-                "title": "Vista 2: evolucion reciente",
-                "body": (
-                    "Muestra cuantos puntos porcentuales cambio la cobertura 1 Gbps desde 2023. "
-                    "Sirve para detectar provincias que mejoran rapido o retroceden respecto al ano anterior."
-                ),
-            },
-            "3. Hogares sin 1 Gbps": {
-                "title": "Vista 3: brecha pendiente",
-                "body": (
-                    "Colorea por numero estimado de hogares que todavia no tienen 1 Gbps. "
-                    "Una provincia poblada puede salir oscura aunque su porcentaje de cobertura sea alto."
-                ),
-            },
-        }
+          #{{ this._parent.get_name() }} .multi-tech-stats {
+            margin-top: 8px;
+            padding-top: 7px;
+            border-top: 1px solid #d5d5d5;
+          }
 
+          #{{ this._parent.get_name() }} .multi-tech-legend-row {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            margin: 4px 0;
+          }
 
-class DynamicLegendControl(MacroElement):
-    _template = Template(
-        """
-        {% macro header(this, kwargs) %}
-        <style>
-          #{{ this._parent.get_name() }} .tech-dynamic-legend {
-            width: 238px;
-            max-width: calc(100vw - 34px);
-            padding: 9px 10px;
-            border: 1px solid rgba(60, 60, 60, 0.55);
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.94);
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22);
-            color: #1f1f1f;
+          #{{ this._parent.get_name() }} .multi-tech-swatch {
+            width: 20px;
+            height: 12px;
+            border: 1px solid rgba(0,0,0,0.35);
+            flex: 0 0 20px;
+          }
+
+          #{{ this._parent.get_name() }} .tech-popup {
+            width: 270px;
             font-family: Arial, sans-serif;
-            font-size: 11.5px;
+            font-size: 12px;
+            color: #1f1f1f;
+          }
+
+          #{{ this._parent.get_name() }} .tech-popup-title {
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 700;
+          }
+
+          #{{ this._parent.get_name() }} .tech-popup-meta {
+            margin-bottom: 7px;
+            color: #444;
             line-height: 1.25;
           }
 
-          #{{ this._parent.get_name() }} .tech-legend-title {
-            margin-bottom: 6px;
-            font-size: 12.5px;
-            font-weight: 700;
-          }
-
-          #{{ this._parent.get_name() }} .tech-legend-row {
-            display: flex;
-            align-items: center;
+          #{{ this._parent.get_name() }} .tech-popup-row {
+            display: grid;
+            grid-template-columns: 66px 1fr 46px;
             gap: 6px;
-            margin: 3px 0;
+            align-items: center;
+            margin: 4px 0;
           }
 
-          #{{ this._parent.get_name() }} .tech-legend-swatch {
-            width: 18px;
-            height: 12px;
-            flex: 0 0 18px;
-            border: 1px solid rgba(0, 0, 0, 0.35);
+          #{{ this._parent.get_name() }} .tech-popup-bar {
+            height: 8px;
+            border-radius: 2px;
+            background: #e6e6e6;
+            overflow: hidden;
+          }
+
+          #{{ this._parent.get_name() }} .tech-popup-bar i {
+            display: block;
+            height: 100%;
+            background: #2ca25f;
+          }
+
+          #{{ this._parent.get_name() }} .multi-tech-note {
+            margin-top: 7px;
+            color: #555555;
+            font-size: 11px;
           }
         </style>
         {% endmacro %}
@@ -745,12 +586,36 @@ class DynamicLegendControl(MacroElement):
         {% macro script(this, kwargs) %}
         (function () {
           const map = {{ this._parent.get_name() }};
-          const legends = {{ this.legends|tojson }};
-          const defaultLayer = {{ this.default_layer|tojson }};
-          const control = L.control({ position: "topright" });
+          const municipalLayer = {{ this.layer_name }};
+          const satelliteBands = {{ this.satellite_bands|tojson }};
+          const fixedOptions = [
+            {key: "fixed_30", label: "30 Mbps", longLabel: "WiFi/fijo >=30 Mbps"},
+            {key: "fixed_100", label: "100 Mbps", longLabel: "WiFi/fijo >=100 Mbps"},
+            {key: "fixed_1gbps", label: "1 Gbps", longLabel: "WiFi/fijo >=1 Gbps"}
+          ];
+          const mobileOptions = {
+            mobile_4g: {key: "mobile_4g", label: "4G", longLabel: "Cobertura movil 4G"},
+            mobile_5g: {key: "mobile_5g", label: "5G", longLabel: "Cobertura movil 5G"}
+          };
+
+          let connectionMode = "fixed";
+          let fixedIndex = 1;
+          let satelliteEnabled = false;
+
+          const satelliteLayer = L.layerGroup();
+          satelliteBands.forEach(function (band) {
+            L.polygon(band, {
+              color: "#c40000",
+              weight: 2.2,
+              fillColor: "#e31a1c",
+              fillOpacity: 0.14,
+              opacity: 0.82,
+              interactive: false
+            }).addTo(satelliteLayer);
+          });
 
           function escapeHtml(value) {
-            return String(value)
+            return String(value ?? "")
               .replace(/&/g, "&amp;")
               .replace(/</g, "&lt;")
               .replace(/>/g, "&gt;")
@@ -758,364 +623,347 @@ class DynamicLegendControl(MacroElement):
               .replace(/'/g, "&#039;");
           }
 
-          function renderLegend(item) {
-            const rows = item.items.map(function (entry) {
-              return '<div class="tech-legend-row">' +
-                '<span class="tech-legend-swatch" style="background:' + escapeHtml(entry.color) + '"></span>' +
-                '<span>' + escapeHtml(entry.label) + '</span>' +
-              '</div>';
-            }).join("");
-
-            return '<div class="tech-legend-title">' + escapeHtml(item.title) + '</div>' + rows;
+          function fmtNumber(value) {
+            return Math.round(Number(value || 0)).toLocaleString("es-ES");
           }
 
+          function getActiveTech() {
+            if (connectionMode === "fixed") return fixedOptions[fixedIndex];
+            return mobileOptions[connectionMode] || fixedOptions[fixedIndex];
+          }
+
+          function coverage(props, tech) {
+            return Number(props[tech.key + "_2024_pct"] || 0);
+          }
+
+          function change(props, tech) {
+            return Number(props[tech.key + "_change_pp"] || 0);
+          }
+
+          function colorFor(value) {
+            if (value >= 90) return "#2ca25f";
+            if (value >= 70) return "#f6c85f";
+            if (value >= 50) return "#fdae6b";
+            return "#8c1d40";
+          }
+
+          function styleFeature(props) {
+            const tech = getActiveTech();
+            const value = coverage(props, tech);
+            return {
+              fillColor: colorFor(value),
+              fillOpacity: 0.74,
+              color: "#555555",
+              weight: 0.24,
+              opacity: 0.52
+            };
+          }
+
+          function renderBars(props) {
+            const rows = [
+              fixedOptions[fixedIndex],
+              mobileOptions.mobile_4g,
+              mobileOptions.mobile_5g
+            ];
+            return rows.map(function (tech) {
+              const value = coverage(props, tech);
+              return '<div class="tech-popup-row">' +
+                '<span>' + escapeHtml(tech.label) + '</span>' +
+                '<div class="tech-popup-bar"><i style="width:' + Math.max(0, Math.min(100, value)).toFixed(1) + '%"></i></div>' +
+                '<b>' + value.toFixed(1) + '%</b>' +
+              '</div>';
+            }).join("");
+          }
+
+          function renderPopup(props) {
+            const tech = getActiveTech();
+            const value = coverage(props, tech);
+            const status = value >= 90 ? "Cobertura alta" : value >= 70 ? "Cobertura media" : value >= 50 ? "Cobertura limitada" : "Cobertura baja";
+            return '<div class="tech-popup">' +
+              '<div class="tech-popup-title">' + escapeHtml(props.municipality_name) + '</div>' +
+              '<div class="tech-popup-meta">' +
+                escapeHtml(props.province_name) + '<br>' +
+                'Conexion activa: <b>' + escapeHtml(tech.longLabel) + '</b><br>' +
+                'Cobertura: <b>' + value.toFixed(1) + '%</b><br>' +
+                'Cambio 2023-2024: <b>' + change(props, tech).toFixed(1) + ' pp</b><br>' +
+                '<b>' + escapeHtml(status) + '</b>' +
+              '</div>' +
+              renderBars(props) +
+            '</div>';
+          }
+
+          function updateMunicipalLayer() {
+            const tech = getActiveTech();
+            let weightedSum = 0;
+            let householdSum = 0;
+            let highCoverage = 0;
+            let lowCoverage = 0;
+
+            municipalLayer.eachLayer(function (layer) {
+              const props = layer.feature.properties;
+              const value = coverage(props, tech);
+              const households = Number(props.households || 0);
+              weightedSum += value * households;
+              householdSum += households;
+              if (value >= 90) highCoverage += 1;
+              if (value < 50) lowCoverage += 1;
+              layer.setStyle(styleFeature(props));
+              layer.bindPopup(renderPopup(props), {maxWidth: 320});
+            });
+
+            updateStats(tech, highCoverage, lowCoverage, householdSum ? weightedSum / householdSum : 0);
+          }
+
+          function updateStats(tech, highCoverage, lowCoverage, weightedCoverage) {
+            const statsNode = document.getElementById("multi-tech-stats-{{ this.get_name() }}");
+            if (!statsNode) return;
+            statsNode.innerHTML =
+              '<b>' + escapeHtml(tech.longLabel) + '</b><br>' +
+              'Cobertura ponderada: <b>' + weightedCoverage.toFixed(1) + '%</b><br>' +
+              'Municipios con cobertura alta: <b>' + fmtNumber(highCoverage) + '</b><br>' +
+              'Municipios con cobertura baja: <b>' + fmtNumber(lowCoverage) + '</b>';
+          }
+
+          function updateSpeedVisibility() {
+            const speedBlock = document.getElementById("speed-block-{{ this.get_name() }}");
+            if (speedBlock) speedBlock.style.display = connectionMode === "fixed" ? "block" : "none";
+          }
+
+          const control = L.control({position: "topleft"});
           control.onAdd = function () {
-            this._container = L.DomUtil.create("div", "tech-dynamic-legend leaflet-control");
+            this._container = L.DomUtil.create("div", "multi-tech-control leaflet-control");
             L.DomEvent.disableClickPropagation(this._container);
             L.DomEvent.disableScrollPropagation(this._container);
-            this.update(defaultLayer);
+
+            this._container.innerHTML =
+              '<div class="multi-tech-title">Conexion terrestre + satelite</div>' +
+              '<label for="connection-select-{{ this.get_name() }}">Conexion terrestre</label>' +
+              '<select id="connection-select-{{ this.get_name() }}">' +
+                '<option value="fixed" selected>WiFi/fijo</option>' +
+                '<option value="mobile_4g">4G</option>' +
+                '<option value="mobile_5g">5G</option>' +
+              '</select>' +
+              '<div id="speed-block-{{ this.get_name() }}">' +
+                '<label for="speed-slider-{{ this.get_name() }}">Velocidad fija: <span id="speed-value-{{ this.get_name() }}">100 Mbps</span></label>' +
+                '<input id="speed-slider-{{ this.get_name() }}" type="range" min="0" max="2" step="1" value="1">' +
+                '<div class="multi-tech-speed-labels"><span>30</span><span>100</span><span>1000 Mbps</span></div>' +
+              '</div>' +
+              '<label class="multi-tech-check"><input id="satellite-check-{{ this.get_name() }}" type="checkbox"> Mostrar conexion satelital</label>' +
+              '<div class="multi-tech-note">La capa satelital es general y conceptual, no una huella orbital exacta.</div>' +
+              '<div class="multi-tech-stats" id="multi-tech-stats-{{ this.get_name() }}"></div>';
             return this._container;
           };
-
-          control.update = function (layerName) {
-            this._container.innerHTML = renderLegend(legends[layerName] || legends[defaultLayer]);
-          };
-
           control.addTo(map);
-          map.on("baselayerchange", function (event) {
-            control.update(event.name);
-          });
+
+          const legend = L.control({position: "bottomright"});
+          legend.onAdd = function () {
+            this._container = L.DomUtil.create("div", "multi-tech-legend leaflet-control");
+            L.DomEvent.disableClickPropagation(this._container);
+            this._container.innerHTML =
+              '<div class="multi-tech-title">Lectura del color</div>' +
+              '<div class="multi-tech-legend-row"><span class="multi-tech-swatch" style="background:#2ca25f"></span><span>Cobertura alta (>=90%)</span></div>' +
+              '<div class="multi-tech-legend-row"><span class="multi-tech-swatch" style="background:#f6c85f"></span><span>Cobertura media (70-90%)</span></div>' +
+              '<div class="multi-tech-legend-row"><span class="multi-tech-swatch" style="background:#fdae6b"></span><span>Cobertura limitada (50-70%)</span></div>' +
+              '<div class="multi-tech-legend-row"><span class="multi-tech-swatch" style="background:#8c1d40"></span><span>Cobertura baja (<50%)</span></div>' +
+              '<div class="multi-tech-legend-row"><span class="multi-tech-swatch" style="background:#e31a1c"></span><span>Conexion satelital general</span></div>';
+            return this._container;
+          };
+          legend.addTo(map);
+
+          setTimeout(function () {
+            const connectionSelect = document.getElementById("connection-select-{{ this.get_name() }}");
+            const speedSlider = document.getElementById("speed-slider-{{ this.get_name() }}");
+            const speedValue = document.getElementById("speed-value-{{ this.get_name() }}");
+            const satelliteCheck = document.getElementById("satellite-check-{{ this.get_name() }}");
+
+            connectionSelect.addEventListener("change", function (event) {
+              connectionMode = event.target.value;
+              updateSpeedVisibility();
+              updateMunicipalLayer();
+            });
+
+            speedSlider.addEventListener("input", function (event) {
+              fixedIndex = Number(event.target.value);
+              speedValue.textContent = fixedOptions[fixedIndex].label;
+              updateMunicipalLayer();
+            });
+
+            satelliteCheck.addEventListener("change", function (event) {
+              satelliteEnabled = event.target.checked;
+              if (satelliteEnabled) {
+                satelliteLayer.addTo(map);
+              } else {
+                map.removeLayer(satelliteLayer);
+              }
+            });
+            updateSpeedVisibility();
+          }, 0);
+
+          updateMunicipalLayer();
         })();
         {% endmacro %}
         """
     )
 
-    def __init__(self, gap_bins: list[float]) -> None:
+    def __init__(
+        self,
+        layer_name: str,
+    ) -> None:
         super().__init__()
-        self._name = "DynamicLegendControl"
-        self.default_layer = "1. Aptitud actual para teletrabajo"
-        self.legends = {
-            "1. Aptitud actual para teletrabajo": {
-                "title": "Cobertura 1 Gbps",
-                "items": [
-                    {"color": color, "label": label}
-                    for color, label in zip(READINESS_COLORS, READINESS_LABELS)
-                ],
-            },
-            "2. Evolucion 2023-2024": {
-                "title": "Cambio 2023-2024",
-                "items": [
-                    {"color": CHANGE_COLORS[0], "label": "Retroceso (<0 pp)"},
-                    {"color": CHANGE_COLORS[1], "label": "0 a 2,5 pp"},
-                    {"color": CHANGE_COLORS[2], "label": "2,5 a 5 pp"},
-                    {"color": CHANGE_COLORS[3], "label": "5 a 10 pp"},
-                    {"color": CHANGE_COLORS[4], "label": "10 pp o mas"},
-                ],
-            },
-            "3. Hogares sin 1 Gbps": {
-                "title": "Hogares sin 1 Gbps",
-                "items": [
-                    {
-                        "color": color,
-                        "label": f"{format_int(gap_bins[index])} a {format_int(gap_bins[index + 1])}",
-                    }
-                    for index, color in enumerate(GAP_PALETTE)
-                ],
-            },
-        }
+        self._name = "MultiTechControl"
+        self.layer_name = layer_name
+        self.satellite_bands = SATELLITE_BANDS
 
 
 def save_interactive_map(map_data: gpd.GeoDataFrame) -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    html_data = simplify_for_html(map_data)
 
-    gap_bins = build_quantile_bins(map_data["uncovered_households_2024"], k=5)
+    property_columns = [
+        "CMUN",
+        "COD_PROVINCIA",
+        "municipality_name",
+        "province_name",
+        "ccaa",
+        "population",
+        "households",
+        "default_status",
+        "default_gap_pct",
+        "label_lat",
+        "label_lon",
+    ]
+    for tech in TECH_DEFINITIONS:
+        property_columns.extend(
+            [
+                f"{tech['key']}_2023_pct",
+                f"{tech['key']}_2024_pct",
+                f"{tech['key']}_change_pp",
+                f"{tech['key']}_uncovered_households_2024",
+            ]
+        )
+
+    html_data = html_data[property_columns + ["geometry"]].copy()
 
     web_map = folium.Map(
         location=[40.1, -3.7],
         zoom_start=6,
-        tiles=None,
+        tiles="CartoDB positron",
         control_scale=True,
         max_bounds=True,
+        prefer_canvas=True,
     )
-    web_map.fit_bounds([[27.3, -18.8], [43.9, 4.7]])
+    web_map.fit_bounds([[35.4, -10.0], [43.9, 4.7]])
 
-    tooltip_fields = [
-        "province_name",
-        "ccaa",
-        "readiness_class",
-        "readiness_recommendation",
-        "coverage_1gbps_2024_pct",
-        "coverage_gap_pct",
-        "coverage_change_pp",
-        "uncovered_households_2024",
-        "households",
-        "population",
-    ]
-    tooltip_aliases = [
-        "Provincia",
-        "CCAA",
-        "Lectura rapida",
-        "Recomendacion",
-        "Cobertura 2024",
-        "Hogares sin cobertura (%)",
-        "Mejora 2023-2024 (pp)",
-        "Hogares sin 1 Gbps",
-        "Hogares",
-        "Habitantes",
-    ]
-
-    coverage_group = folium.FeatureGroup(
-        name="1. Aptitud actual para teletrabajo",
-        overlay=False,
-        control=True,
-        show=True,
-    )
-    folium.TileLayer("CartoDB positron", control=False).add_to(coverage_group)
-    coverage_layer = folium.GeoJson(
-        map_data,
-        name="Aptitud actual",
+    default_column = f"{DEFAULT_TECH_KEY}_2024_pct"
+    municipal_layer = folium.GeoJson(
+        html_data,
+        name="Municipios: conectividad multitecnologia",
         show=True,
         style_function=lambda feature: {
-            "fillColor": feature["properties"]["readiness_color"],
-            "color": "#222222" if feature["properties"]["alert_tech_gap"] else "#555555",
-            "weight": 1.25 if feature["properties"]["alert_tech_gap"] else 0.45,
-            "fillOpacity": 0.84,
+            "fillColor": coverage_color(float(feature["properties"][default_column])),
+            "color": "#555555",
+            "weight": 0.24,
+            "fillOpacity": 0.74,
         },
-        highlight_function=lambda _: {"weight": 2.0, "color": "#111111", "fillOpacity": 0.92},
+        highlight_function=lambda _: {"weight": 1.4, "color": "#111111", "fillOpacity": 0.9},
         tooltip=folium.GeoJsonTooltip(
-            fields=tooltip_fields,
-            aliases=tooltip_aliases,
-            localize=True,
-            labels=True,
-            sticky=False,
-        ),
-        popup=folium.GeoJsonPopup(
             fields=[
+                "municipality_name",
                 "province_name",
-                "coverage_1gbps_2023_pct",
-                "coverage_1gbps_2024_pct",
-                "readiness_class",
-                "readiness_recommendation",
-                "coverage_change_pp",
-                "connected_households_2024",
-                "uncovered_households_2024",
-            ],
-            aliases=[
-                "Provincia",
-                "Cobertura 2023 (%)",
-                "Cobertura 2024 (%)",
-                "Lectura rapida",
-                "Recomendacion",
-                "Mejora (pp)",
-                "Hogares cubiertos 2024",
-                "Hogares no cubiertos 2024",
-            ],
-            localize=True,
-            labels=True,
-            max_width=360,
-        ),
-    ).add_to(coverage_group)
-    coverage_group.add_to(web_map)
-
-    evolution_group = folium.FeatureGroup(
-        name="2. Evolucion 2023-2024",
-        overlay=False,
-        control=True,
-        show=False,
-    )
-    folium.TileLayer("CartoDB positron", control=False).add_to(evolution_group)
-    folium.GeoJson(
-        map_data,
-        name="Evolucion",
-        show=True,
-        style_function=lambda feature: {
-            "fillColor": color_for_bins(
-                float(feature["properties"]["coverage_change_pp"]),
-                CHANGE_BINS,
-                CHANGE_COLORS,
-            ),
-            "color": "#444444",
-            "weight": 0.5,
-            "fillOpacity": 0.82,
-        },
-        highlight_function=lambda _: {"weight": 2.0, "color": "#111111", "fillOpacity": 0.9},
-        tooltip=folium.GeoJsonTooltip(
-            fields=tooltip_fields,
-            aliases=tooltip_aliases,
-            localize=True,
-            labels=True,
-            sticky=False,
-        ),
-        popup=folium.GeoJsonPopup(
-            fields=[
-                "province_name",
-                "coverage_1gbps_2023_pct",
-                "coverage_1gbps_2024_pct",
-                "coverage_change_pp",
-            ],
-            aliases=[
-                "Provincia",
-                "Cobertura 2023 (%)",
-                "Cobertura 2024 (%)",
-                "Mejora (pp)",
-            ],
-            localize=True,
-            labels=True,
-            max_width=320,
-        ),
-    ).add_to(evolution_group)
-    evolution_group.add_to(web_map)
-
-    gap_group = folium.FeatureGroup(
-        name="3. Hogares sin 1 Gbps",
-        overlay=False,
-        control=True,
-        show=False,
-    )
-    folium.TileLayer("CartoDB positron", control=False).add_to(gap_group)
-    folium.GeoJson(
-        map_data,
-        name="Hogares sin 1 Gbps",
-        show=True,
-        style_function=lambda feature: {
-            "fillColor": color_for_bins(
-                float(feature["properties"]["uncovered_households_2024"]),
-                gap_bins,
-                GAP_PALETTE,
-            ),
-            "color": "#444444",
-            "weight": 0.5,
-            "fillOpacity": 0.82,
-        },
-        highlight_function=lambda _: {"weight": 2.0, "color": "#111111", "fillOpacity": 0.9},
-        tooltip=folium.GeoJsonTooltip(
-            fields=tooltip_fields,
-            aliases=tooltip_aliases,
-            localize=True,
-            labels=True,
-            sticky=False,
-        ),
-        popup=folium.GeoJsonPopup(
-            fields=[
-                "province_name",
-                "uncovered_households_2024",
-                "connected_households_2024",
+                f"{DEFAULT_TECH_KEY}_2024_pct",
+                "default_status",
                 "households",
-                "coverage_1gbps_2024_pct",
             ],
             aliases=[
+                "Municipio",
                 "Provincia",
-                "Hogares sin 1 Gbps",
-                "Hogares cubiertos",
-                "Hogares totales",
-                "Cobertura 2024 (%)",
+                f"{tech_by_key(DEFAULT_TECH_KEY)['short']} 2024",
+                "Lectura inicial",
+                "Hogares",
             ],
             localize=True,
             labels=True,
-            max_width=320,
+            sticky=False,
         ),
-    ).add_to(gap_group)
-    gap_group.add_to(web_map)
+    ).add_to(web_map)
 
-    review_markers = plugins.MarkerCluster(
-        name="Marcadores: provincias a revisar (<90%)",
-        show=True,
-    )
-    for _, row in map_data[map_data["coverage_1gbps_2024_pct"].lt(90)].iterrows():
-        marker_color = "red" if row["coverage_1gbps_2024_pct"] < 85 else "orange"
-        popup = (
-            f"<b>{row['province_name']}</b><br>"
-            f"{row['readiness_class']}<br>"
-            f"{row['readiness_recommendation']}<br>"
-            f"Cobertura 2024: {row['coverage_1gbps_2024_pct']:.1f}%<br>"
-            f"Hogares sin 1 Gbps: {format_int(row['uncovered_households_2024'])}"
-        )
-        folium.Marker(
-            location=[row["label_lat"], row["label_lon"]],
-            tooltip=f"{row['province_name']}: {row['readiness_class']}",
-            popup=folium.Popup(popup, max_width=300),
-            icon=folium.Icon(color=marker_color, icon="info-sign"),
-        ).add_to(review_markers)
-    review_markers.add_to(web_map)
+    MultiTechControl(layer_name=municipal_layer.get_name()).add_to(web_map)
 
-    risk_label_layer = folium.FeatureGroup(name="Etiquetas: riesgo alto/medio (<85%)", show=False)
-    for _, row in map_data[map_data["alert_tech_gap"]].iterrows():
-        label_html = f"""
-        <div style="
-          min-width: 92px; padding: 2px 5px;
-          background: rgba(255, 255, 255, 0.90);
-          border: 1px solid #444; border-radius: 3px;
-          color: #111; font-family: Arial, sans-serif;
-          font-size: 10px; font-weight: 700; line-height: 1.15;
-          text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.25);">
-          {row['province_name']}<br>{row['coverage_1gbps_2024_pct']:.1f}%
-        </div>
-        """
-        folium.Marker(
-            location=[row["label_lat"], row["label_lon"]],
-            icon=folium.DivIcon(
-                html=label_html,
-                icon_size=(96, 30),
-                icon_anchor=(48, 15),
-            ),
-            tooltip=f"{row['province_name']}: {row['readiness_recommendation']}",
-        ).add_to(risk_label_layer)
-    risk_label_layer.add_to(web_map)
-
-    DynamicLegendControl(gap_bins).add_to(web_map)
-    DetailExplanationControl().add_to(web_map)
+    plugins.Search(
+        layer=municipal_layer,
+        geom_type="Polygon",
+        placeholder="Buscar municipio",
+        collapsed=True,
+        search_label="municipality_name",
+        position="topleft",
+    ).add_to(web_map)
+    plugins.MiniMap(toggle_display=True, minimized=True, position="bottomright").add_to(web_map)
+    plugins.Fullscreen(position="topright").add_to(web_map)
+    plugins.MeasureControl(position="topleft", primary_length_unit="kilometers").add_to(web_map)
     plugins.MousePosition(
         position="bottomleft",
         separator=", ",
         prefix="Coordenadas",
         num_digits=4,
     ).add_to(web_map)
-    plugins.Search(
-        layer=coverage_layer,
-        geom_type="Polygon",
-        placeholder="Buscar provincia",
-        collapsed=True,
-        search_label="province_name",
-        position="topleft",
-    ).add_to(web_map)
     folium.LayerControl(collapsed=False).add_to(web_map)
 
     web_map.save(OUTPUT_DIR / "mapa4_conectividad_teletrabajo_interactivo.html")
 
 
-def save_tables(map_data: gpd.GeoDataFrame) -> None:
+def save_tables(map_data: gpd.GeoDataFrame, stats: dict[str, int]) -> None:
     columns = [
+        "CMUN",
         "COD_PROVINCIA",
+        "municipality_name",
         "province_name",
         "ccaa",
         "population",
         "households",
-        "coverage_1gbps_2023_pct",
-        "coverage_1gbps_2024_pct",
-        "coverage_change_pp",
-        "coverage_gap_pct",
-        "readiness_class",
-        "readiness_recommendation",
-        "alert_tech_gap",
-        "connected_households_2024",
-        "uncovered_households_2024",
         "area_km2",
         "label_lat",
         "label_lon",
+        "default_status",
+        "default_gap_pct",
+        "default_uncovered_households_2024",
     ]
-    table = map_data[columns].sort_values("coverage_1gbps_2024_pct", ascending=False).copy()
+    for tech in TECH_DEFINITIONS:
+        columns.extend(
+            [
+                f"{tech['key']}_2023_pct",
+                f"{tech['key']}_2024_pct",
+                f"{tech['key']}_change_pp",
+                f"{tech['key']}_uncovered_households_2024",
+            ]
+        )
+
+    table = map_data[columns].sort_values(
+        f"{DEFAULT_TECH_KEY}_2024_pct", ascending=False
+    ).copy()
+    table["default_technology"] = DEFAULT_TECH_KEY
+    table["default_threshold_pct"] = DEFAULT_THRESHOLD
     table["year"] = 2024
     table.to_csv(OUTPUT_DIR / "mapa4_conectividad_teletrabajo_datos.csv", index=False)
 
+    pd.DataFrame([stats]).to_csv(
+        OUTPUT_DIR / "mapa4_conectividad_teletrabajo_validacion_union.csv",
+        index=False,
+    )
+
 
 def main() -> None:
-    map_data = build_dataset()
+    map_data, stats = build_dataset()
     save_static_map(map_data)
     save_interactive_map(map_data)
-    save_tables(map_data)
+    save_tables(map_data, stats)
 
-    print("Mapa 4 generado con cobertura 1 Gbps en hogares, junio de 2024.")
-    print("Variable secundaria: mejora de cobertura 2023-2024.")
+    print("Mapa 4 generado como conectividad municipal multitecnologia.")
+    print(
+        "Union municipal: "
+        f"{stats['matched_municipalities']} con dato, "
+        f"{stats['geometries_without_data']} geometria(s) sin dato, "
+        f"{stats['data_without_geometry']} dato(s) sin geometria."
+    )
     print(f"Salidas en: {OUTPUT_DIR}")
 
 
