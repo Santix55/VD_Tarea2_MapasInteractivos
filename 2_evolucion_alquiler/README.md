@@ -1,6 +1,6 @@
 # Mapa 2: movilidad y transporte
 
-Este mapa sustituye la evolucion del alquiler por una lectura de movilidad intermodal. La coropleta provincial muestra un `mobility_score` de 0 a 100 y la capa de puntos agrupa nodos ferroviarios y aeroportuarios para ver rapidamente que provincias permiten vivir fuera de los grandes hubs sin quedar aislado.
+Este mapa sustituye la evolucion del alquiler por una lectura de movilidad intermodal. La coropleta provincial muestra un `mobility_score` relativo de 0 a 100 y la capa de puntos agrupa nodos ferroviarios y aeroportuarios para ver rapidamente que provincias permiten vivir fuera de los grandes hubs sin quedar aislado.
 
 ## Metodologia
 
@@ -9,7 +9,7 @@ Este mapa sustituye la evolucion del alquiler por una lectura de movilidad inter
 - Aeropuertos: nodos AENA/ENAIRE incorporados como puntos estrategicos, no como rutas aereas.
 - Poblacion: hoja provincial del XLSX de cobertura SETELECO, usada para normalizar nodos por 100.000 habitantes.
 - Cartografia: provincias NUTS3 2024 de Eurostat/GISCO.
-- Indice provincial: 60% cercania al nodo estrategico mas cercano y 40% nodos ponderados por 100.000 habitantes.
+- Score provincial relativo: 45% cercania al nodo estrategico mas cercano, 35% volumen ponderado de nodos en escala logaritmica y 20% nodos ponderados por 100.000 habitantes.
 
 ## Lectura visual
 

@@ -22,23 +22,20 @@ from streamlit_folium import st_folium
 COMPONENT_LABELS = {
     "rent_score_low_price": "Alquiler bajo",
     "mobility_score": "Movilidad",
-    "availability_score": "Disponibilidad",
     "connectivity_score": "Conectividad",
     "climate_score": "Clima temp+lluvia",
 }
 
 DEFAULT_RAW_WEIGHTS = {
-    "rent_score_low_price": 35,
-    "mobility_score": 20,
-    "availability_score": 15,
-    "connectivity_score": 20,
-    "climate_score": 10,
+    "rent_score_low_price": 41.18,
+    "mobility_score": 23.53,
+    "connectivity_score": 23.53,
+    "climate_score": 11.76,
 }
 
 COMPONENT_COLORS = {
     "rent_score_low_price": "#2a9d8f",
     "mobility_score": "#577590",
-    "availability_score": "#f4a261",
     "connectivity_score": "#277da1",
     "climate_score": "#90be6d",
 }
@@ -64,7 +61,7 @@ def load_base_data(script_mtime: float):
     return map_data, current_year
 
 
-def normalize_weights(raw_weights: dict[str, int]) -> dict[str, float]:
+def normalize_weights(raw_weights: dict[str, float]) -> dict[str, float]:
     total = sum(raw_weights.values())
     if total <= 0:
         return {column: 1 / len(raw_weights) for column in raw_weights}
@@ -219,7 +216,6 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
                 "province_name",
                 "rent_score_low_price",
                 "mobility_score",
-                "availability_score",
                 "connectivity_score",
                 "temperature_comfort_score",
                 "rain_comfort_score",
@@ -231,7 +227,6 @@ def build_folium_map(map_data: pd.DataFrame, bins: list[float], top_n: int) -> f
                 "Provincia",
                 "Score alquiler bajo",
                 "Score movilidad",
-                "Score disponibilidad",
                 "Score conectividad",
                 "Score temperatura",
                 "Score lluvia",
@@ -303,6 +298,7 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
         "nearest_strategic_km",
         "strategic_access_score",
         "node_density_score",
+        "node_mass_score",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
@@ -332,10 +328,10 @@ def main() -> None:
     for column, label in COMPONENT_LABELS.items():
         raw_weights[column] = st.sidebar.slider(
             label,
-            min_value=0,
-            max_value=60,
+            min_value=0.0,
+            max_value=60.0,
             value=DEFAULT_RAW_WEIGHTS[column],
-            step=1,
+            step=0.01,
         )
     weights = normalize_weights(raw_weights)
     st.sidebar.caption(
@@ -541,8 +537,10 @@ def main() -> None:
             }
             for column, variable in [
                 ("rent_score_low_price", "Alquiler medio ponderado bajo"),
-                ("mobility_score", "Acceso a AV/LD/MD o aeropuerto y nodos ponderados por 100.000 habitantes"),
-                ("availability_score", "Viviendas de alquiler por 1.000 hogares"),
+                (
+                    "mobility_score",
+                    "Acceso a AV/LD/MD o aeropuerto, volumen de nodos y nodos ponderados por 100.000 habitantes",
+                ),
                 ("connectivity_score", "Cobertura fija >= 1 Gbps"),
                 (
                     "climate_score",

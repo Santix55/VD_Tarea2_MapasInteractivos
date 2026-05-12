@@ -62,7 +62,7 @@ La memoria no busca producir seis mapas independientes, sino una narrativa de de
 
 La preparación se realizó con `pandas` y `GeoPandas`. En primer lugar, se homogeneizaron códigos territoriales, nombres de provincia y tipos numéricos. Esta fase es importante porque las fuentes no comparten exactamente el mismo formato: los datos de MIVAU están a escala municipal y separados por tipo de vivienda y medida; la conectividad llega en hojas de Excel; la cartografía NUTS3 tiene códigos europeos; y NASA POWER devuelve series temporales por coordenadas.
 
-En el alquiler se filtraron los registros de precio y vivienda observada. Para el precio actual se utilizaron percentiles 25, mediana y 75; y como peso de agregación se empleó el recuento de viviendas. Este criterio evita que municipios con pocos registros tengan la misma influencia que mercados mucho mayores. En movilidad se separaron nodos de alta velocidad, larga distancia, media distancia, Cercanías, FEVE y aeropuertos, y se normalizó el recuento ponderado por población para evitar que el mapa sea solo una lectura demográfica.
+En el alquiler se filtraron los registros de precio y vivienda observada. Para el precio actual se utilizaron percentiles 25, mediana y 75; y como peso de agregación se empleó el recuento de viviendas. Este criterio evita que municipios con pocos registros tengan la misma influencia que mercados mucho mayores. En movilidad se separaron nodos de alta velocidad, larga distancia, media distancia, Cercanías, FEVE y aeropuertos. El score combina cercanía a nodos estratégicos, volumen ponderado de nodos y densidad por población para evitar que el mapa sea solo una lectura demográfica o, al contrario, que penalice demasiado a provincias muy pobladas.
 
 ## Agregación espacial
 
@@ -83,7 +83,7 @@ Todos los mapas de coropletas usan al menos cinco intervalos, como exige el enun
 - Cuantiles para comparar distribuciones relativas, como precio de alquiler o índice final.
 - Intervalos definidos por usuario cuando existe una lectura operativa, como la cobertura de 1 Gbps o la distancia a hubs.
 - Cortes naturales de Jenks para el confort climático, porque la temperatura presenta agrupaciones territoriales no lineales.
-- Cuantiles también para movilidad, donde el índice combina cercanía a nodos estratégicos y densidad de nodos por población.
+- Cuantiles también para movilidad, donde el score combina cercanía a nodos estratégicos, volumen ponderado de nodos y densidad de nodos por población.
 
 # Visualización de datos
 
@@ -103,11 +103,11 @@ Salida interactiva: `../1_precio_medio_alquiler_provincia/salidas/mapa1_alquiler
 
 ![Mapa 2. Movilidad y transporte](../2_evolucion_alquiler/salidas/mapa2_movilidad_transportes.png)
 
-El segundo mapa introduce movilidad intermodal. La coropleta provincial muestra un `mobility_score` entre 0 y 100 que combina cercanía a nodos estratégicos y densidad de transporte normalizada por población.
+El segundo mapa introduce movilidad intermodal. La coropleta provincial muestra un `mobility_score` relativo entre 0 y 100 que combina cercanía a nodos estratégicos, volumen ponderado de nodos y densidad de transporte normalizada por población. Por tanto, una provincia clara no debe interpretarse automáticamente como una provincia sin movilidad, sino como una posición baja dentro de esta comparación concreta.
 
 La capa de puntos muestra estaciones de alta velocidad, larga distancia, media distancia, Cercanías, FEVE y aeropuertos en grupos `MarkerCluster`. Las líneas visibles ya no son una red ferroviaria completa, sino recorridos derivados del GTFS de Renfe y unidos por secuencias de paradas. Los aeropuertos se tratan como nodos estratégicos, no como rutas aéreas. Esta lectura ayuda a detectar provincias asequibles que no quedan desconectadas del resto del territorio.
 
-Técnicas principales: normalización por población, distancia al nodo estratégico más cercano, coropleta de cinco cuantiles en escala azul, recorridos GTFS por modo, `MarkerCluster`, capas checkbox filtrables, tooltips y popups con fuente.
+Técnicas principales: distancia al nodo estratégico más cercano, volumen de nodos en escala logarítmica, normalización por población, coropleta de cinco cuantiles en escala azul, recorridos GTFS por modo, `MarkerCluster`, capas checkbox filtrables, tooltips y popups con fuente.
 
 Salida interactiva: `../2_evolucion_alquiler/salidas/mapa2_movilidad_transportes_interactivo.html`.
 
@@ -151,9 +151,9 @@ Salida interactiva: `../5_confort_climatico/salidas/mapa5_confort_climatico_esta
 
 ![Mapa 6. Índice final de destino residencial tech](../6_indice_destino_tech/salidas/mapa6_indice_destino_tech.png)
 
-El sexto mapa sintetiza el proyecto. El índice final combina cinco componentes normalizados entre 0 y 100: alquiler bajo, movilidad, disponibilidad del mercado, conectividad de 1 Gbps y confort climático. Los pesos iniciales son 35%, 20%, 15%, 20% y 10%, respectivamente.
+El sexto mapa sintetiza el proyecto. El índice final combina cuatro componentes normalizados entre 0 y 100: alquiler bajo, movilidad relativa, conectividad de 1 Gbps y confort climático. Los pesos iniciales son 41,18%, 23,53%, 23,53% y 11,76%, respectivamente. La disponibilidad del mercado se conserva como dato informativo, pero no aporta a la media final.
 
-El ranking resultante sitúa en cabeza a Asturias, Ciudad Real, Tarragona, Castellón/Castelló y Zaragoza. Esta salida no significa que las provincias peor clasificadas sean malas opciones absolutas: muchas tienen ecosistemas laborales fuertes. Lo que indica es que, bajo los pesos elegidos, el equilibrio residencial favorece provincias de coste contenido, movilidad suficiente y conectividad razonable.
+El ranking resultante sitúa en cabeza a Ciudad Real, Badajoz, Asturias, Jaén y Lugo. Esta salida no significa que las provincias peor clasificadas sean malas opciones absolutas: muchas tienen ecosistemas laborales fuertes. Lo que indica es que, bajo los pesos elegidos, el equilibrio residencial favorece provincias de coste contenido, movilidad suficiente y conectividad razonable.
 
 Técnicas principales: normalización min-max, inversión de variables cuando un valor bajo es favorable, índice compuesto ponderado, coropleta de cinco cuantiles, ranking top 10, popups con desglose de componentes y app Streamlit con pesos ajustables.
 
@@ -169,7 +169,7 @@ La tercera conclusión es que la conectividad abre oportunidades fuera de los gr
 
 La cuarta conclusión, más secundaria, es que la proximidad a hubs tecnológicos y el índice final no siempre coinciden. Estar cerca de Madrid, Barcelona, Bilbao, Málaga o Valencia puede mejorar la exposición a eventos, universidades y redes profesionales, pero suele venir acompañado de costes residenciales más altos. Por eso esta capa se usa como contexto, mientras que la recomendación final descansa sobre vivienda, movilidad, conectividad, disponibilidad y confort climático.
 
-Como recomendación general, Asturias, Ciudad Real, Tarragona, Castellón/Castelló y Zaragoza forman el grupo inicial de destinos competitivos bajo los pesos propuestos. No coinciden necesariamente con los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, movilidad suficiente, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
+Como recomendación general, Ciudad Real, Badajoz, Asturias, Jaén y Lugo forman el grupo inicial de destinos competitivos bajo los pesos propuestos. No coinciden necesariamente con los lugares con más empleo tecnológico presencial, pero sí representan una combinación atractiva de alquiler contenido, movilidad suficiente, conectividad aceptable y calidad de vida. El análisis muestra que las alternativas al eje Madrid-Barcelona son reales y medibles, especialmente para perfiles que puedan teletrabajar o mantener una relación laboral híbrida con los principales hubs.
 
 Aun así, la elección final depende mucho de las preferencias de cada persona. No todo el mundo valora igual el ahorro en alquiler, la cercanía a empresas tecnológicas, el clima, el tamaño de la ciudad, la vida cultural, la movilidad, la proximidad a familia y amistades o la posibilidad de construir una red profesional presencial. Para alguien que priorice oportunidades laborales inmediatas, Madrid, Barcelona, Málaga, Bilbao o Valencia pueden seguir siendo opciones muy atractivas aunque tengan peor puntuación residencial. Para otra persona que busque estabilidad económica, menor presión de gasto y buena conexión para trabajar en remoto, provincias con menor coste pueden resultar mucho más adecuadas.
 

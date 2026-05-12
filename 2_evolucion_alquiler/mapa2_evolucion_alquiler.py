@@ -54,6 +54,7 @@ NUTS_FILE = DATA_DIR / "nuts3_2024_01m.geojson"
 
 PROJECTED_CRS = "EPSG:3035"
 HIGH_SPEED_SEGMENT_MAX_KM = 180.0
+STRATEGIC_ACCESS_REFERENCE_KM = 100.0
 MOBILITY_WEIGHTS = {
     "Alta velocidad": 2.0,
     "Larga distancia": 2.0,
@@ -62,7 +63,7 @@ MOBILITY_WEIGHTS = {
     "FEVE": 1.0,
     "Aeropuerto": 3.0,
 }
-MOBILITY_PALETTE = ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"]
+MOBILITY_PALETTE = ["#d6eaf8", "#a9d2e8", "#6baed6", "#3182bd", "#08519c"]
 MODE_COLORS = {
     "Alta velocidad": "#08519c",
     "Larga distancia": "#3182bd",
@@ -222,6 +223,11 @@ def rescale_0_100(series: pd.Series, higher_is_better: bool = True) -> pd.Series
     if not higher_is_better:
         score = 100 - score
     return score.clip(0, 100)
+
+
+def capped_distance_score(series: pd.Series, reference_km: float) -> pd.Series:
+    clean = pd.to_numeric(series, errors="coerce")
+    return (100 * (1 - clean.clip(lower=0, upper=reference_km) / reference_km)).clip(0, 100)
 
 
 def build_quantile_bins(values: pd.Series, k: int = 5) -> list[float]:
@@ -636,15 +642,21 @@ def calculate_province_mobility(
     strategic = nodes[nodes["mode"].isin(STRATEGIC_MODES)].to_crs(PROJECTED_CRS)
     strategic_union = strategic.geometry.union_all()
     map_data["nearest_strategic_km"] = province_points.distance(strategic_union) / 1000
-    map_data["strategic_access_score"] = rescale_0_100(
-        map_data["nearest_strategic_km"], higher_is_better=False
+    map_data["strategic_access_score"] = capped_distance_score(
+        map_data["nearest_strategic_km"],
+        STRATEGIC_ACCESS_REFERENCE_KM,
+    )
+    map_data["node_mass_score"] = rescale_0_100(
+        map_data["weighted_transport_nodes"].map(lambda value: math.log1p(float(value))),
+        higher_is_better=True,
     )
     map_data["node_density_score"] = rescale_0_100(
         map_data["nodes_per_100k"], higher_is_better=True
     )
     map_data["mobility_score"] = (
-        map_data["strategic_access_score"] * 0.60
-        + map_data["node_density_score"] * 0.40
+        map_data["strategic_access_score"] * 0.45
+        + map_data["node_mass_score"] * 0.35
+        + map_data["node_density_score"] * 0.20
     ).clip(0, 100)
     return add_geographic_metrics(map_data)
 
@@ -763,7 +775,7 @@ def save_static_map(
     ]
     map_ax.legend(
         handles=legend_handles,
-        title="Indice movilidad",
+        title="Score movilidad relativa",
         loc="lower right",
         fontsize=7.6,
         title_fontsize=8.7,
@@ -845,7 +857,7 @@ def add_legend(web_map: folium.Map, bins: list[float]) -> None:
       border: 1px solid rgba(80,80,80,0.55); border-radius: 4px;
       font-family: Arial, sans-serif; font-size: 12px; line-height: 1.25;
       box-shadow: 0 1px 5px rgba(0,0,0,0.22);">
-      <div style="font-weight:700; margin-bottom:5px;">Indice movilidad</div>
+      <div style="font-weight:700; margin-bottom:5px;">Score movilidad relativa</div>
       {rows}
     </div>
     """
@@ -966,10 +978,10 @@ def save_interactive_map(
         web_map
     )
 
-    province_layer = folium.FeatureGroup(name="Indice provincial de movilidad", show=True)
+    province_layer = folium.FeatureGroup(name="Score provincial de movilidad relativa", show=True)
     folium.GeoJson(
         map_data,
-        name="Indice provincial",
+        name="Score provincial",
         style_function=lambda feature: {
             "fillColor": feature["properties"]["mobility_color"],
             "color": "#555555",
@@ -983,6 +995,7 @@ def save_interactive_map(
                 "mobility_score",
                 "weighted_transport_nodes",
                 "nodes_per_100k",
+                "node_mass_score",
                 "nearest_strategic_km",
             ],
             aliases=[
@@ -990,6 +1003,7 @@ def save_interactive_map(
                 "Score movilidad",
                 "Nodos ponderados",
                 "Nodos ponderados / 100.000 hab.",
+                "Score volumen nodos",
                 "Distancia a nodo estrategico",
             ],
             localize=True,
@@ -1007,6 +1021,7 @@ def save_interactive_map(
                 "feve_nodes",
                 "airport_nodes",
                 "nodes_per_100k",
+                "node_mass_score",
                 "nearest_strategic_km",
                 "mobility_score",
             ],
@@ -1021,6 +1036,7 @@ def save_interactive_map(
                 "FEVE",
                 "Aeropuertos",
                 "Nodos ponderados / 100.000 hab.",
+                "Score volumen nodos",
                 "Km a nodo estrategico",
                 "Score movilidad",
             ],
@@ -1147,6 +1163,7 @@ def save_tables(
         "nodes_per_100k",
         "nearest_strategic_km",
         "strategic_access_score",
+        "node_mass_score",
         "node_density_score",
         "mobility_score",
         "label_lat",

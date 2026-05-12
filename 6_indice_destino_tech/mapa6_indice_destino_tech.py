@@ -53,17 +53,34 @@ CLIMATE_TEMPERATURE_WEIGHT = 0.70
 CLIMATE_RAIN_WEIGHT = 0.30
 
 WEIGHTS = {
-    "rent_score_low_price": 0.35,
-    "mobility_score": 0.20,
-    "availability_score": 0.15,
-    "connectivity_score": 0.20,
-    "climate_score": 0.10,
+    "rent_score_low_price": 0.35 / 0.85,
+    "mobility_score": 0.20 / 0.85,
+    "connectivity_score": 0.20 / 0.85,
+    "climate_score": 0.10 / 0.85,
 }
+
+MOBILITY_REQUIRED_COLUMNS = [
+    "COD_PROVINCIA",
+    "transport_nodes",
+    "weighted_transport_nodes",
+    "high_speed_nodes",
+    "long_distance_nodes",
+    "medium_distance_nodes",
+    "av_ld_md_nodes",
+    "cercanias_nodes",
+    "feve_nodes",
+    "airport_nodes",
+    "nodes_per_100k",
+    "nearest_strategic_km",
+    "strategic_access_score",
+    "node_mass_score",
+    "node_density_score",
+    "mobility_score",
+]
 
 COMPONENTS = [
     ("Alquiler bajo", "rent_contribution", "#2a9d8f"),
     ("Movilidad", "mobility_contribution", "#577590"),
-    ("Disponibilidad", "availability_contribution", "#f4a261"),
     ("Conectividad", "connectivity_contribution", "#277da1"),
     ("Clima temp+lluvia", "climate_contribution", "#90be6d"),
 ]
@@ -445,7 +462,9 @@ def load_broadband_by_province() -> pd.DataFrame:
 
 def ensure_mobility_file() -> None:
     if MOBILITY_FILE.exists() and MOBILITY_FILE.stat().st_size > 0:
-        return
+        header = pd.read_csv(MOBILITY_FILE, nrows=0)
+        if set(MOBILITY_REQUIRED_COLUMNS).issubset(header.columns):
+            return
 
     spec = importlib.util.spec_from_file_location("mapa2_movilidad_transportes", MAP2_SCRIPT)
     if spec is None or spec.loader is None:
@@ -459,24 +478,7 @@ def ensure_mobility_file() -> None:
 def load_mobility_by_province() -> pd.DataFrame:
     ensure_mobility_file()
     mobility = pd.read_csv(MOBILITY_FILE, dtype={"COD_PROVINCIA": str})
-    columns = [
-        "COD_PROVINCIA",
-        "transport_nodes",
-        "weighted_transport_nodes",
-        "high_speed_nodes",
-        "long_distance_nodes",
-        "medium_distance_nodes",
-        "av_ld_md_nodes",
-        "cercanias_nodes",
-        "feve_nodes",
-        "airport_nodes",
-        "nodes_per_100k",
-        "nearest_strategic_km",
-        "strategic_access_score",
-        "node_density_score",
-        "mobility_score",
-    ]
-    return mobility[columns].copy()
+    return mobility[MOBILITY_REQUIRED_COLUMNS].copy()
 
 
 def load_climate_by_province() -> pd.DataFrame:
@@ -555,9 +557,6 @@ def add_scores(data: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
 
     scored["rent_contribution"] = scored["rent_score_low_price"] * WEIGHTS["rent_score_low_price"]
     scored["mobility_contribution"] = scored["mobility_score"] * WEIGHTS["mobility_score"]
-    scored["availability_contribution"] = (
-        scored["availability_score"] * WEIGHTS["availability_score"]
-    )
     scored["connectivity_contribution"] = (
         scored["connectivity_score"] * WEIGHTS["connectivity_score"]
     )
@@ -604,6 +603,7 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
         "nodes_per_100k",
         "nearest_strategic_km",
         "strategic_access_score",
+        "node_mass_score",
         "node_density_score",
         "rental_homes_per_1000_households",
         "coverage_1gbps_2024_pct",
@@ -619,7 +619,6 @@ def add_labels(data: gpd.GeoDataFrame, bins: list[float], current_year: int) -> 
         "climate_score",
         "rent_contribution",
         "mobility_contribution",
-        "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
         "tech_destination_index",
@@ -652,6 +651,7 @@ def build_dataset() -> tuple[gpd.GeoDataFrame, int, list[float]]:
         "households",
         "mobility_score",
         "nodes_per_100k",
+        "node_mass_score",
         "nearest_strategic_km",
         "coverage_1gbps_2024_pct",
         "precipitation_annual_mm",
@@ -798,8 +798,9 @@ def save_static_map(map_data: gpd.GeoDataFrame, current_year: int, bins: list[fl
     summary_ax.text(
         0.0,
         0.08,
-        f"Pesos: 35 alquiler, 20 movilidad, 15 disponibilidad, 20 conectividad, "
-        f"10 clima (70 temperatura, 30 lluvia). Movilidad = acceso estrategico + nodos/100.000 hab.",
+        f"Pesos: 41.18 alquiler, 23.53 movilidad, 23.53 conectividad, "
+        f"11.76 clima (70 temperatura, 30 lluvia). Movilidad = acceso estrategico, "
+        f"volumen de nodos y nodos/100.000 hab.",
         fontsize=8.1,
         color="#444444",
         wrap=True,
@@ -1165,7 +1166,7 @@ class WeightedIndexControl(MacroElement):
 
             components.forEach((component) => {
               const value = container.querySelector(`[data-value="${component.key}"]`);
-              value.textContent = `${Math.round(rawWeights[component.key])}`;
+              value.textContent = `${rawWeights[component.key].toFixed(2)}`;
             });
 
             const normalized = components.map((component) => (
@@ -1195,7 +1196,7 @@ class WeightedIndexControl(MacroElement):
               ${components.map((component) => `
                 <div class="index-weight-row">
                   <label for="weight-${component.key}">${component.label}</label>
-                  <input id="weight-${component.key}" data-weight="${component.key}" type="range" min="0" max="60" step="1" value="${component.default}">
+                  <input id="weight-${component.key}" data-weight="${component.key}" type="range" min="0" max="60" step="0.01" value="${component.default}">
                   <span class="index-weight-value" data-value="${component.key}">${component.default}</span>
                 </div>
               `).join("")}
@@ -1232,27 +1233,22 @@ class WeightedIndexControl(MacroElement):
                 {
                     "key": "rent_score_low_price",
                     "label": "Alquiler bajo",
-                    "default": int(WEIGHTS["rent_score_low_price"] * 100),
+                    "default": round(WEIGHTS["rent_score_low_price"] * 100, 2),
                 },
                 {
                     "key": "mobility_score",
                     "label": "Movilidad",
-                    "default": int(WEIGHTS["mobility_score"] * 100),
-                },
-                {
-                    "key": "availability_score",
-                    "label": "Disponibilidad",
-                    "default": int(WEIGHTS["availability_score"] * 100),
+                    "default": round(WEIGHTS["mobility_score"] * 100, 2),
                 },
                 {
                     "key": "connectivity_score",
                     "label": "Conectividad",
-                    "default": int(WEIGHTS["connectivity_score"] * 100),
+                    "default": round(WEIGHTS["connectivity_score"] * 100, 2),
                 },
                 {
                     "key": "climate_score",
                     "label": "Clima temp+lluvia",
-                    "default": int(WEIGHTS["climate_score"] * 100),
+                    "default": round(WEIGHTS["climate_score"] * 100, 2),
                 },
             ],
             ensure_ascii=True,
@@ -1300,14 +1296,12 @@ def add_score_layer(
         "province_name",
         "rent_score_low_price",
         "mobility_score",
-        "availability_score",
         "connectivity_score",
         "temperature_comfort_score",
         "rain_comfort_score",
         "climate_score",
         "rent_contribution",
         "mobility_contribution",
-        "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
         "tech_destination_index",
@@ -1316,14 +1310,12 @@ def add_score_layer(
         "Provincia",
         "Score alquiler bajo",
         "Score movilidad",
-        "Score disponibilidad",
         "Score conectividad",
         "Score temperatura",
         "Score lluvia",
         "Score clima final",
         "Aporte alquiler",
         "Aporte movilidad",
-        "Aporte disponibilidad",
         "Aporte conectividad",
         "Aporte clima",
         "Indice final",
@@ -1491,6 +1483,7 @@ def save_tables(map_data: gpd.GeoDataFrame, current_year: int) -> None:
         "nearest_strategic_km",
         "nearest_strategic_label",
         "strategic_access_score",
+        "node_mass_score",
         "node_density_score",
         "rental_homes",
         "rental_homes_per_1000_households",
@@ -1507,7 +1500,6 @@ def save_tables(map_data: gpd.GeoDataFrame, current_year: int) -> None:
         "climate_score",
         "rent_contribution",
         "mobility_contribution",
-        "availability_contribution",
         "connectivity_contribution",
         "climate_contribution",
         "population",
