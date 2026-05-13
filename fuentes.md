@@ -42,24 +42,7 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometria provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometria insular a provincia.
 
-## Mapa 3: accesibilidad laboral a hubs tech/IA
-
-- **Capa metodologica propia de hubs tech/IA**  
-  Dataset generado: `mapa3_hubs_tech.csv`  
-  Hubs: UPV/Valencia, Madrid, Barcelona, Malaga, Bilbao, Sevilla y Zaragoza.  
-  Uso: proxy razonado de proximidad a ecosistemas urbanos de trabajo tecnologico/IA. No representa una fuente oficial de empleo, ofertas laborales ni tiempo real de viaje.
-
-- **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
-  Dataset CSV: `VDP001_01.csv`  
-  URL: https://cdn.mivau.gob.es/portal-web-mivau/Datos_MIVAU/CSV/VDP001_01.csv  
-  Uso: alquiler medio ponderado provincial en 2024 como contexto en popups, eje del grafico lateral distancia/alquiler y criterio para marcar candidatas hibridas con alquiler bajo media.
-
-- **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
-  Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  
-  URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
-  Uso: geometria provincial, puntos representativos, calculo de distancias al hub mas cercano y recorte de buffers a Espana.
-
-## Mapa 4: conectividad para teletrabajo e IA por provincia
+## Mapa 3: conectividad para teletrabajo e IA por provincia
 
 - **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
   Dataset XLSX: `cobertura_ba_espana_2021-2024_mun_prov_ccaa_nacional_datosgob.xlsx`  
@@ -71,7 +54,7 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
 
-## Mapa 5: confort climatico estacional por provincia
+## Mapa 4: confort climatico estacional por provincia
 
 - **NASA POWER - Monthly API**  
   API JSON: parametro `T2M`, comunidad `SB`, periodo 1995-2024  
@@ -84,7 +67,7 @@
   URL: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2024_4326_LEVL_3.geojson  
   Uso: geometría provincial equivalente a NUTS3; en Baleares y Canarias se disuelve la geometría insular a provincia.
 
-## Mapa 6: indice final de destino residencial tech
+## Mapa 5: indice final de destino residencial tech
 
 - **MIVAU - Sistema Estatal de Referencia del Precio del Alquiler de Vivienda**  
   Dataset CSV: `VDP001_01.csv`  
@@ -92,7 +75,7 @@
   Uso: alquiler medio ponderado provincial en 2024 y recuento de viviendas de alquiler observadas.
 
 - **Mapa 2 de movilidad y transporte**  
-  Dataset CSV generado: `2_evolucion_alquiler/salidas/mapa2_movilidad_transportes_datos.csv`  
+  Dataset CSV generado: `2_movilidad_y_transporte/salidas/mapa2_movilidad_transportes_datos.csv`  
   Uso: `mobility_score` provincial como componente del indice final, calculado con cercania a nodo estrategico y nodos ponderados por 100.000 habitantes.
 
 - **Ministerio para la Transformación Digital y de la Función Pública / SETELECO - Cobertura Banda Ancha España 2021-2024**  
@@ -103,7 +86,7 @@
 - **NASA POWER - Monthly API**  
   API JSON: parametro `T2M`, comunidad `SB`, periodo 1995-2024  
   URL base: https://power.larc.nasa.gov/api/temporal/monthly/point  
-  Uso: indice de confort climatico calculado en el mapa 5 y reutilizado como componente secundario del indice final.
+  Uso: indice de confort climatico calculado en el mapa 4 y reutilizado como componente secundario del indice final.
 
 - **Eurostat/GISCO - NUTS 2024, escala 1:1M, nivel 3**  
   Dataset GeoJSON: `NUTS_RG_01M_2024_4326_LEVL_3.geojson`  

@@ -8,7 +8,7 @@ import sys
 sys.dont_write_bytecode = True
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-MAP6_SCRIPT = ROOT_DIR / "6_indice_destino_tech" / "mapa6_indice_destino_tech.py"
+MAP5_SCRIPT = ROOT_DIR / "5_indice_destino_tech" / "mapa5_indice_destino_tech.py"
 
 import folium
 from folium import plugins
@@ -42,9 +42,9 @@ COMPONENT_COLORS = {
 
 
 def load_map6_module():
-    spec = importlib.util.spec_from_file_location("mapa6_indice_destino_tech", MAP6_SCRIPT)
+    spec = importlib.util.spec_from_file_location("mapa5_indice_destino_tech", MAP5_SCRIPT)
     if spec is None or spec.loader is None:
-        raise RuntimeError(f"No se pudo cargar {MAP6_SCRIPT}")
+        raise RuntimeError(f"No se pudo cargar {MAP5_SCRIPT}")
 
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -316,12 +316,12 @@ def build_download_table(data: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Mapa 6 | Indice destino tech",
+        page_title="Mapa 5 | Indice destino tech",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
-    base_data, current_year = load_base_data(MAP6_SCRIPT.stat().st_mtime)
+    base_data, current_year = load_base_data(MAP5_SCRIPT.stat().st_mtime)
 
     st.sidebar.header("Pesos del indice")
     raw_weights = {}
@@ -359,7 +359,7 @@ def main() -> None:
     )
     filtered = data[data["passes_filters"]].copy().sort_values("filtered_rank")
 
-    st.title("Mapa 6. Indice final de destino residencial tech")
+    st.title("Mapa 5. Indice final de destino residencial tech")
     st.caption(
         "App Streamlit para recalcular pesos, filtrar provincias y explorar el ranking final."
     )
@@ -422,7 +422,7 @@ def main() -> None:
             st.download_button(
                 "Descargar ranking recalculado",
                 data=csv,
-                file_name="mapa6_ranking_recalculado.csv",
+                file_name="mapa5_ranking_recalculado.csv",
                 mime="text/csv",
                 use_container_width=True,
             )

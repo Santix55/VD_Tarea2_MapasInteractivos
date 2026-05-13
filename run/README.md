@@ -8,11 +8,10 @@ Desde la raiz del proyecto:
 
 ```bash
 ./run/mapa1_alquiler_provincias.sh
-./run/mapa2_evolucion_alquiler.sh
-./run/mapa3_accesibilidad_laboral_tech.sh
-./run/mapa4_conectividad_teletrabajo.sh
-./run/mapa5_confort_climatico.sh
-./run/mapa6_indice_destino_tech.sh
+./run/mapa2_movilidad_y_transporte.sh
+./run/mapa3_conectividad_teletrabajo.sh
+./run/mapa4_confort_climatico.sh
+./run/mapa5_indice_destino_tech.sh
 ```
 
 Para abrir todos:
@@ -21,7 +20,7 @@ Para abrir todos:
 ./run/abrir_todos_los_mapas.sh
 ```
 
-Los abre en orden del mapa 1 al mapa 6, dejando una pausa entre pestanas para que el navegador respete mejor el orden. Puedes cambiar esa pausa asi:
+Los abre en orden del mapa 1 al mapa 5, dejando una pausa entre pestanas para que el navegador respete mejor el orden. Puedes cambiar esa pausa asi:
 
 ```bash
 OPEN_DELAY_SECONDS=1.5 ./run/abrir_todos_los_mapas.sh
@@ -40,7 +39,7 @@ Cada lanzador abre el HTML ya generado. Si el HTML no existe, lo genera con el s
 Para forzar la regeneracion de un mapa y abrirlo:
 
 ```bash
-./run/mapa4_conectividad_teletrabajo.sh --regen
+./run/mapa3_conectividad_teletrabajo.sh --regen
 ```
 
 Para regenerar todos sin abrir el navegador:
@@ -52,5 +51,5 @@ Para regenerar todos sin abrir el navegador:
 Si necesitas usar un Python concreto:
 
 ```bash
-PYTHON_BIN=/ruta/a/python ./run/mapa4_conectividad_teletrabajo.sh --regen
+PYTHON_BIN=/ruta/a/python ./run/mapa3_conectividad_teletrabajo.sh --regen
 ```

@@ -1,8 +1,0 @@
-hub_id,hub_name,province_code,latitude,longitude,note
-valencia_upv,UPV/Valencia,46,39.4811,-0.3407,Nodo de referencia del Master de IA en la UPV.
-madrid,Madrid,28,40.4168,-3.7038,Gran mercado nacional de empleo tecnologico.
-barcelona,Barcelona,08,41.3874,2.1686,Ecosistema tecnologico y universitario consolidado.
-malaga,Malaga,29,36.7213,-4.4214,Polo tecnologico relevante en el sur.
-bilbao,Bilbao,48,43.263,-2.935,Nodo tecnologico e industrial del norte.
-sevilla,Sevilla,41,37.3891,-5.9845,Nodo urbano y universitario del suroeste.
-zaragoza,Zaragoza,50,41.6488,-0.8891,"Nodo intermedio entre Madrid, Barcelona y el arco mediterraneo."

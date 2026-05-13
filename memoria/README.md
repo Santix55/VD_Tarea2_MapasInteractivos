@@ -28,7 +28,7 @@ Si no tienes Pandoc, abre `memoria.md` en un editor Markdown y exporta a PDF des
 
 - [x] Introduccion con problema, fuentes de datos, rango temporal y cartografia.
 - [x] Preparacion de datos: limpieza, agregacion, uniones espaciales y tratamiento de CRS.
-- [x] Visualizacion de datos: seis mapas, al menos cinco exigidos.
+- [x] Visualizacion de datos: cinco mapas, al menos cinco exigidos.
 - [x] Al menos tres parametros distintos: vivienda, movilidad, accesibilidad, conectividad y clima.
 - [x] Coropletas con al menos cinco intervalos.
 - [x] Conclusiones orientadas a decision.

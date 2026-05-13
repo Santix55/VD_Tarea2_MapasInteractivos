@@ -4,9 +4,8 @@ Proyecto de visualizacion de datos georreferenciados sobre la pregunta:
 
 **Donde vivir despues del Master de IA en la UPV**
 
-El repositorio genera seis mapas sobre alquiler, movilidad y transporte,
-accesibilidad laboral tech, conectividad, confort climatico e indice final de
-destino residencial. Tambien incluye una app Streamlit y una memoria en
+El repositorio genera cinco mapas sobre alquiler, movilidad y transporte,
+conectividad, confort climatico e indice final de destino residencial. Tambien incluye una app Streamlit y una memoria en
 Markdown/PDF.
 
 ## Estructura
@@ -14,11 +13,10 @@ Markdown/PDF.
 ```text
 .
 |-- 1_precio_medio_alquiler_provincia/
-|-- 2_evolucion_alquiler/
-|-- 3_accesibilidad_laboral_tech/
-|-- 4_conectividad_teletrabajo/
-|-- 5_confort_climatico/
-|-- 6_indice_destino_tech/
+|-- 2_movilidad_y_transporte/
+|-- 3_conectividad_teletrabajo/
+|-- 4_confort_climatico/
+|-- 5_indice_destino_tech/
 |-- app_streamlit/
 |-- datos/
 |-- memoria/
@@ -79,11 +77,10 @@ Abrir un mapa concreto:
 
 ```bash
 ./run/mapa1_alquiler_provincias.sh
-./run/mapa2_evolucion_alquiler.sh
-./run/mapa3_accesibilidad_laboral_tech.sh
-./run/mapa4_conectividad_teletrabajo.sh
-./run/mapa5_confort_climatico.sh
-./run/mapa6_indice_destino_tech.sh
+./run/mapa2_movilidad_y_transporte.sh
+./run/mapa3_conectividad_teletrabajo.sh
+./run/mapa4_confort_climatico.sh
+./run/mapa5_indice_destino_tech.sh
 ```
 
 Los lanzadores abren el HTML existente. Si el HTML no existe, ejecutan el script
@@ -100,19 +97,43 @@ Regenerar todos los mapas sin abrir el navegador:
 Regenerar y abrir un mapa concreto:
 
 ```bash
-./run/mapa4_conectividad_teletrabajo.sh --regen
+./run/mapa3_conectividad_teletrabajo.sh --regen
 ```
 
 Regenerar un mapa sin abrirlo:
 
 ```bash
-./run/mapa4_conectividad_teletrabajo.sh --regen --no-abrir
+./run/mapa3_conectividad_teletrabajo.sh --regen --no-abrir
 ```
 
 Usar un Python concreto:
 
 ```bash
-PYTHON_BIN=/home/s/miniconda3/envs/VD/bin/python ./run/mapa4_conectividad_teletrabajo.sh --regen
+PYTHON_BIN=/home/s/miniconda3/envs/VD/bin/python ./run/mapa3_conectividad_teletrabajo.sh --regen
+```
+
+## Lanzadores Python / Windows
+
+La carpeta `run_python/` contiene una version equivalente de los lanzadores,
+hecha solo con Python para poder usarla tambien en Windows.
+
+Abrir todos los mapas:
+
+```bash
+python run_python/abrir_todos_los_mapas.py
+```
+
+Abrir o regenerar un mapa concreto:
+
+```bash
+python run_python/mapa2_movilidad_y_transporte.py
+python run_python/mapa2_movilidad_y_transporte.py --regen
+```
+
+Regenerar todos sin abrir el navegador:
+
+```bash
+python run_python/regenerar_todos_los_mapas.py
 ```
 
 ## Ejecutar scripts Python directamente
@@ -121,11 +142,10 @@ Tambien puedes ejecutar cada mapa sin los lanzadores:
 
 ```bash
 python 1_precio_medio_alquiler_provincia/mapa1_alquiler_provincias.py
-python 2_evolucion_alquiler/mapa2_evolucion_alquiler.py
-python 3_accesibilidad_laboral_tech/mapa3_accesibilidad_laboral_tech.py
-python 4_conectividad_teletrabajo/mapa4_conectividad_teletrabajo.py
-python 5_confort_climatico/mapa5_confort_climatico_estacional.py
-python 6_indice_destino_tech/mapa6_indice_destino_tech.py
+python 2_movilidad_y_transporte/mapa2_movilidad_y_transporte.py
+python 3_conectividad_teletrabajo/mapa3_conectividad_teletrabajo.py
+python 4_confort_climatico/mapa4_confort_climatico_estacional.py
+python 5_indice_destino_tech/mapa5_indice_destino_tech.py
 ```
 
 ## Salidas generadas
@@ -142,16 +162,16 @@ Archivos habituales:
 Ejemplo:
 
 ```text
-4_conectividad_teletrabajo/salidas/
-|-- mapa4_conectividad_teletrabajo.png
-|-- mapa4_conectividad_teletrabajo.pdf
-|-- mapa4_conectividad_teletrabajo_interactivo.html
-`-- mapa4_conectividad_teletrabajo_datos.csv
+3_conectividad_teletrabajo/salidas/
+|-- mapa3_conectividad_teletrabajo.png
+|-- mapa3_conectividad_teletrabajo.pdf
+|-- mapa3_conectividad_teletrabajo_interactivo.html
+`-- mapa3_conectividad_teletrabajo_datos.csv
 ```
 
 ## Apps Streamlit
 
-### App del mapa 6
+### App del mapa 5
 
 Permite recalcular el indice final cambiando pesos, filtros y provincia.
 
